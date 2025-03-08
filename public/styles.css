@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1em;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+#charger-details {
+    padding: 1em;
+}
