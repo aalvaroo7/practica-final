@@ -2,9 +2,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
     const mapContainer = document.getElementById('map-container');
+    const profileContainer = document.getElementById('profile-container');
+    const notificationsContainer = document.getElementById('notifications-container');
+    const paymentContainer = document.getElementById('payment-container');
 
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+    const profileForm = document.getElementById('profile-form');
+    const notificationsForm = document.getElementById('notifications-form');
+    const paymentForm = document.getElementById('payment-form');
 
     const showRegisterButton = document.getElementById('show-register');
     const backToLoginButton = document.getElementById('back-to-login');
@@ -52,6 +58,39 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             errorMessage.classList.remove('hidden');
         }
+    });
+
+    profileForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('profile-name').value.trim();
+        const email = document.getElementById('profile-email').value.trim();
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            currentUser.name = name;
+            currentUser.email = email;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            alert("Perfil actualizado con éxito.");
+        }
+    });
+
+    notificationsForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const notifyAvailable = document.getElementById('notify-available').checked;
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            currentUser.notifications = { notifyAvailable };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            alert("Configuración de notificaciones guardada.");
+        }
+    });
+
+    paymentForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const cardNumber = document.getElementById('card-number').value.trim();
+        const cardExpiry = document.getElementById('card-expiry').value.trim();
+        const cardCvc = document.getElementById('card-cvc').value.trim();
+        // Implement payment processing logic here
+        alert("Pago realizado con éxito.");
     });
 });
 
