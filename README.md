@@ -16,14 +16,6 @@
 
 ### 🚀 Requisitos funcionales por implementar
 
-- **RF-40:** Integrar un sistema de pago para que los usuarios puedan pagar las sesiones de carga directamente a través de la aplicación.
-- **RF-41:** Proporcionar una función para que los usuarios reporten problemas con cargadores específicos y puedan seguir el estado de resolución.
-- **RF-42:** Implementar una función para que los usuarios puedan ver y gestionar su historial de pagos y facturas.
-- **RF-43:** Permitir a los usuarios agregar cargadores favoritos a una lista para acceso rápido.
-- **RF-44:** Habilitar opciones de inicio de sesión social (por ejemplo, Google, Facebook) para facilitar el registro y autenticación de usuarios.
-- **RF-45:** Implementar un modo oscuro para la aplicación para mejorar la experiencia del usuario en condiciones de poca luz.
-- **RF-46:** Proporcionar una función para que los usuarios comparen diferentes cargadores según varios criterios (por ejemplo, costo, velocidad, distancia).
-- **RF-47:** Permitir a los usuarios compartir los detalles de su sesión de carga con amigos o familiares a través de correo electrónico o redes sociales.
 - **RF-03:** Permitir a los usuarios filtrar los cargadores según tipo (rápido, estándar, compatible).
 - **RF-09:** Proporcionar la opción de abrir la ubicación del cargador en aplicaciones de navegación.
 - **RF-12:** Gestionar cargadores (añadir, eliminar, actualizar) por parte del administrador.
@@ -32,3 +24,11 @@
 - **RF-15:** Actualizar el estado de los cargadores por parte del técnico.
 - **RF-16:** Ver detalles técnicos de los cargadores por parte del técnico.
 - **RF-17:** Reportar problemas o incidencias por parte del técnico.
+- **RF-18:** Integrar un sistema de pago para que los usuarios puedan pagar las sesiones de carga directamente a través de la aplicación.
+- **RF-19:** Proporcionar una función para que los usuarios reporten problemas con cargadores específicos y puedan seguir el estado de resolución.
+- **RF-20:** Implementar una función para que los usuarios puedan ver y gestionar su historial de pagos y facturas.
+- **RF-21:** Permitir a los usuarios agregar cargadores favoritos a una lista para acceso rápido.
+- **RF-22:** Habilitar opciones de inicio de sesión social (por ejemplo, Google, Facebook) para facilitar el registro y autenticación de usuarios.
+- **RF-23:** Implementar un modo oscuro para la aplicación para mejorar la experiencia del usuario en condiciones de poca luz.
+- **RF-24:** Proporcionar una función para que los usuarios comparen diferentes cargadores según varios criterios (por ejemplo, costo, velocidad, distancia).
+- **RF-25:** Permitir a los usuarios compartir los detalles de su sesión de carga con amigos o familiares a través de correo electrónico o redes sociales.
