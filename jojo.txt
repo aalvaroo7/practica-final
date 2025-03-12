@@ -1,8 +1,0 @@
-Hay que ipmlenetar los siguientes requisitos funcionales:
-RF-41: Proporcionar una función para que los usuarios reporten problemas con cargadores específicos y puedan seguir el estado de resolución.
-RF-42: Implementar una función para que los usuarios puedan ver y gestionar su historial de pagos y facturas.
-RF-43: Permitir a los usuarios agregar cargadores favoritos a una lista para acceso rápido.
-RF-44: Habilitar opciones de inicio de sesión social (por ejemplo, Google, Facebook) para facilitar el registro y autenticación de usuarios.
-RF-45: Implementar un modo oscuro para la aplicación para mejorar la experiencia del usuario en condiciones de poca luz.
-RF-46: Proporcionar una función para que los usuarios comparen diferentes cargadores según varios criterios (por ejemplo, costo, velocidad, distancia).
-RF-47: Permitir a los usuarios compartir los detalles de su sesión de carga con amigos o familiares a través de correo electrónico o redes sociales.
