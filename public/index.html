@@ -5,15 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encuentra tu Cargador</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
-<header>
+
+<div id="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form id="login-form">
+        <input type="email" id="login-email" placeholder="Correo electrónico" required>
+        <input type="password" id="login-password" placeholder="Contraseña" required>
+        <button type="submit">Acceder</button>
+    </form>
+    <p id="error-message" class="hidden">Correo o contraseña incorrectos</p>
+    <p><a href="javascript:void(0);" id="show-register" class="register-link">Registrarse</a></p>
+</div>
+
+<div id="register-container" class="hidden">
+    <h2>Registrarse</h2>
+    <form id="register-form">
+        <input type="email" id="register-email" placeholder="Correo electrónico" required>
+        <input type="password" id="register-password" placeholder="Contraseña" required>
+        <button type="submit">Crear Cuenta</button>
+    </form>
+    <button id="back-to-login">Volver a Iniciar Sesión</button>
+</div>
+
+<div id="map-container" class="hidden">
     <h1>Encuentra tu Cargador</h1>
-</header>
-<main>
     <div id="map"></div>
     <div id="charger-details"></div>
-</main>
-<script src="script.js"></script>
+</div>
+
 </body>
 </html>
