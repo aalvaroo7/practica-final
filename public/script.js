@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showReservationForm(charger) {
+        selectedCharger = charger;
         chargerDetails.innerHTML = `
             <h3>Charger Details</h3>
             <p>Type: ${charger.type}</p>
@@ -80,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         reservationForm.classList.remove('hidden');
         modal.classList.remove('hidden');
-        document.getElementById('pay-now').addEventListener('click', processPayment);
     }
 
     closeModalButton.addEventListener('click', () => {
@@ -95,26 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     reserveForm.addEventListener('submit', (event) => {
         event.preventDefault();
+
         const reservationTime = document.getElementById('reservation-time').value;
+
         if (selectedCharger) {
-            alert(`Charger ${selectedCharger.type} reserved for ${reservationTime} minutes.`);
+            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
             reservationForm.classList.add('hidden');
+            modal.classList.add('hidden');
             scheduleReminder(selectedCharger.type, reservationTime);
         }
     });
 
     cancelReservationButton.addEventListener('click', () => {
-        alert('Your reservation has been canceled.');
+        alert('Tu reserva ha sido cancelada.');
         reservationForm.classList.add('hidden');
+        modal.classList.add('hidden');
     });
 
     function scheduleReminder(chargerType, time) {
         setTimeout(() => {
-            alert(`Reminder: Your reservation for ${chargerType} expires in 10 minutes.`);
+            alert(`Recordatorio: Tu reserva de ${chargerType} expira en 10 minutos.`);
         }, (time - 10) * 60000);
-    }
-
-    function processPayment() {
-        alert('Payment processed successfully! Your charger is reserved.');
     }
 });
