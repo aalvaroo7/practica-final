@@ -86,5 +86,11 @@ h1 {
     width: 1000px;
 }
 
-
+#charger-details, #reservation-form {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
 
