@@ -82,10 +82,9 @@ h1 {
     border-radius: 8px;
 }
 
-#charger-details {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+#map-container {
+    width: 1000px;
 }
+
+
+
