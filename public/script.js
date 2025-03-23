@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
+    const registerContainer = document.getElementById('register-container');
+    const showRegisterLink = document.getElementById('show-register');
+    const backToLoginButton = document.getElementById('back-to-login');
     const mapContainer = document.getElementById('map-container');
     const errorMessage = document.getElementById('error-message');
     const chargerDetails = document.getElementById('charger-details');
@@ -10,6 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
     const closeModalButton = document.getElementById('close-modal');
     let selectedCharger = null;
+
+    showRegisterLink.addEventListener('click', () => {
+        loginContainer.classList.add('hidden');
+        registerContainer.classList.remove('hidden');
+    });
+
+    backToLoginButton.addEventListener('click', () => {
+        registerContainer.classList.add('hidden');
+        loginContainer.classList.remove('hidden');
+    });
 
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -63,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             marker.on('popupopen', () => {
                 const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
                 reserveButton.addEventListener('click', () => {
+                    selectedCharger = charger;
                     showReservationForm(charger);
                 });
             });
@@ -70,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showReservationForm(charger) {
-        selectedCharger = charger;
         chargerDetails.innerHTML = `
             <h3>Charger Details</h3>
             <p>Type: ${charger.type}</p>
