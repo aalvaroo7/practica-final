@@ -56,13 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initMap(lat, lon) {
-        const map = L.map('map').setView([lat, lon], 12);
+        const map = L.map('map').setView([lat, lon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         const chargers = [
-            { id: 1, lat: 40.5467295, lon: -3.6434806, type: 'TYPE 2 / 7.40kW', status: 'Not reservable', batteryLevel: '80%', estimatedTime: '30 mins', cost: '5€' }
+            // Madrid
+            { id: 1, lat: 40.416775, lon: -3.703790, type: 'TYPE 2 / 22kW', status: 'Available', batteryLevel: '90%', estimatedTime: '20 mins', cost: '7€' },
+            { id: 2, lat: 40.416775, lon: -3.703790, type: 'CHAdeMO / 50kW', status: 'Available', batteryLevel: '60%', estimatedTime: '15 mins', cost: '10€' },
+            // Barcelona
+            { id: 3, lat: 41.385064, lon: 2.173404, type: 'CCS / 150kW', status: 'Available', batteryLevel: '50%', estimatedTime: '10 mins', cost: '15€' },
+            { id: 4, lat: 41.385064, lon: 2.173404, type: 'TYPE 2 / 11kW', status: 'Not reservable', batteryLevel: '70%', estimatedTime: '25 mins', cost: '6€' },
+            // Valencia
+            { id: 5, lat: 39.469907, lon: -0.376288, type: 'TYPE 2 / 7.40kW', status: 'Available', batteryLevel: '85%', estimatedTime: '30 mins', cost: '5€' },
+            { id: 6, lat: 39.469907, lon: -0.376288, type: 'CHAdeMO / 50kW', status: 'Available', batteryLevel: '75%', estimatedTime: '20 mins', cost: '10€' },
+            // Sevilla
+            { id: 7, lat: 37.389092, lon: -5.984459, type: 'CCS / 150kW', status: 'Available', batteryLevel: '65%', estimatedTime: '15 mins', cost: '15€' },
+            { id: 8, lat: 37.389092, lon: -5.984459, type: 'TYPE 2 / 22kW', status: 'Available', batteryLevel: '90%', estimatedTime: '20 mins', cost: '7€' },
+            // Zaragoza
+            { id: 9, lat: 41.648823, lon: -0.889085, type: 'TYPE 2 / 7.40kW', status: 'Available', batteryLevel: '85%', estimatedTime: '30 mins', cost: '5€' },
+            { id: 10, lat: 41.648823, lon: -0.889085, type: 'CHAdeMO / 50kW', status: 'Available', batteryLevel: '75%', estimatedTime: '20 mins', cost: '10€' },
+            // Málaga
+            { id: 11, lat: 36.721274, lon: -4.421399, type: 'CCS / 150kW', status: 'Available', batteryLevel: '65%', estimatedTime: '15 mins', cost: '15€' },
+            { id: 12, lat: 36.721274, lon: -4.421399, type: 'TYPE 2 / 22kW', status: 'Available', batteryLevel: '90%', estimatedTime: '20 mins', cost: '7€' }
         ];
 
         chargers.forEach(charger => {
