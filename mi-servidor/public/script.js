@@ -142,9 +142,52 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('hidden');
     });
 
+
     function scheduleReminder(chargerType, time) {
         setTimeout(() => {
             alert(`Recordatorio: Tu reserva de ${chargerType} expira en 10 minutos.`);
         }, (time - 10) * 60000);
     }
+    // Añadir el manejo del filtro en el archivo script.js
+    document.addEventListener('DOMContentLoaded', () => {
+        const chargerTypeSelect = document.getElementById('charger-type');
+        chargerTypeSelect.addEventListener('change', filterChargers);
+
+        function filterChargers() {
+            const selectedType = chargerTypeSelect.value;
+            const filteredChargers = chargers.filter(charger => {
+                if (selectedType === 'all') return true;
+                return charger.type.toLowerCase().includes(selectedType.toLowerCase());
+            });
+            updateMap(filteredChargers);
+        }
+
+        function updateMap(filteredChargers) {
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            filteredChargers.forEach(charger => {
+                const marker = L.marker([charger.lat, charger.lon])
+                    .addTo(map)
+                    .bindPopup(`
+                    <b>Charger ${charger.type}</b><br>Status: ${charger.status}<br>
+                    <button id='reserve-btn-${charger.id}' class='reserve-btn'>Reserve Now</button>
+                `);
+
+                marker.on('popupopen', () => {
+                    const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
+                    reserveButton.addEventListener('click', () => {
+                        selectedCharger = charger;
+                        showReservationForm(charger);
+                    });
+                });
+            });
+        }
+
+        // Inicializar el mapa con todos los cargadores
+        initMap();
+    });
 });
