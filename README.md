@@ -1,3 +1,10 @@
+COMO INICIAR EL SERVER:
+
+npm start(EN EL TERMINAL)
+
+
+
+
 # Encuentra tu Cargador
 
 ## Requisitos Funcionales
@@ -91,3 +98,5 @@
     - No evaluado: No se han implementado accesos directos y teclas de acceso rápido. Se recomienda agregar esta funcionalidad para usuarios avanzados.
 - **RNF-25:** Búsqueda rápida y eficiente
     - No evaluado: No se ha implementado una función de búsqueda rápida y eficiente. Se recomienda agregar esta funcionalidad para mejorar la experiencia del usuario.
+
+
