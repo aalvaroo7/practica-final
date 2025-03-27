@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { login, logout, getCurrentUser } from '../src/auth.js';
+import { login, logout, getCurrentUser, registerUser, updateUserProfile } from '../src/auth.js';
 import { saveReservation, getReservations } from '../src/storage.js';
 import { getChargers } from '../src/api.js';
 
@@ -45,6 +45,26 @@ app.get('/current-user', (req, res) => {
     }
 });
 
+// Ruta para registro de usuarios
+app.post('/register', (req, res) => {
+    const { email, password } = req.body;
+    if (registerUser(email, password)) {
+        res.status(201).send('User registered successfully');
+    } else {
+        res.status(400).send('Registration failed');
+    }
+});
+
+// Ruta para actualizar perfil de usuario
+app.put('/profile', (req, res) => {
+    const { email, name } = req.body;
+    if (updateUserProfile(email, name)) {
+        res.status(200).send('Profile updated successfully');
+    } else {
+        res.status(400).send('Profile update failed');
+    }
+});
+
 // Ruta para obtener cargadores
 app.get('/chargers', async (req, res) => {
     const chargers = await getChargers();
@@ -61,6 +81,16 @@ app.post('/reservations', (req, res) => {
 app.get('/reservations', (req, res) => {
     const reservations = getReservations();
     res.status(200).json(reservations);
+});
+
+// Ruta para autenticación de administrador
+app.post('/admin-login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'admin' && password === 'admin123') {
+        res.status(200).send('Admin login successful');
+    } else {
+        res.status(401).send('Invalid admin credentials');
+    }
 });
 
 // Manejar todas las demás rutas sirviendo el archivo index.html
