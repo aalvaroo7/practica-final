@@ -28,3 +28,21 @@ export function getCurrentUser() {
     }
     return currentUser;
 }
+
+export function registerUser(username, password) {
+    if (users.find(u => u.username === username)) {
+        return false;
+    }
+    users.push({ username, password, role: 'user' });
+    return true;
+}
+
+export function updateUserProfile(username, name) {
+    const user = users.find(u => u.username === username);
+    if (user) {
+        user.name = name;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        return true;
+    }
+    return false;
+}
