@@ -32,6 +32,16 @@
   <button id="back-to-login">Volver a Iniciar Sesión</button>
 </div>
 
+<div id="admin-login-container" class="hidden">
+<h2>Iniciar Sesión como Administrador</h2>
+<form id="admin-login-form">
+  <input type="text" id="admin-username" placeholder="Usuario" required>
+  <input type="password" id="admin-password" placeholder="Contraseña" required>
+  <button type="submit">Acceder</button>
+</form>
+<p id="admin-error-message" class="hidden">Usuario o contraseña incorrectos</p>
+</div>
+
 <div id="map-container" class="hidden">
   <h1>Encuentra tu Cargador</h1>
   <div id="map"></div>
@@ -65,18 +75,10 @@
   </form>
 </div>
 
-<div id="payment-container" class="hidden">
-  <h2>Pago de Sesión de Carga</h2>
-  <form id="payment-form">
-    <input type="text" id="card-number" placeholder="Número de Tarjeta" required>
-    <input type="text" id="card-expiry" placeholder="Fecha de Expiración" required>
-    <input type="text" id="card-cvc" placeholder="CVC" required>
-    <button type="submit">Pagar</button>
-  </form>
-</div>
+
 <div id="filter-container" class="hidden">
-  <label for="charger-type">Filtrar por tipo de cargador:</label>
-  <select id="charger-type">
+  <label for="charger-type-filter">Filtrar por tipo de cargador:</label>
+  <select id="charger-type-filter">
     <option value="all">Todos</option>
     <option value="rápido">Rápido</option>
     <option value="estándar">Estándar</option>
@@ -85,9 +87,35 @@
   <button id="open-navigation">Open in Navigation App</button>
 </div>
 
+<!-- Sección de administración -->
+<div id="admin-container" class="hidden">
+  <header>
+    <h1>Panel de Administración</h1>
+  </header>
+  <main>
+    <section id="manage-chargers">
+      <h2>Gestionar Cargadores</h2>
+      <form id="add-charger-form">
+        <input type="text" id="charger-name" placeholder="Nombre del Cargador" required>
+        <input type="text" id="charger-type" placeholder="Tipo de Cargador" required>
+        <button type="submit">Añadir Cargador</button>
+      </form>
+      <ul id="charger-list"></ul>
+    </section>
+    <section id="usage-stats">
+      <h2>Estadísticas de Uso y Rendimiento</h2>
+      <div id="stats-container"></div>
+    </section>
+    <section id="audit-logs">
+      <h2>Logs de Auditoría</h2>
+      <div id="logs-container"></div>
+    </section>
+  </main>
+</div>
+
 <!-- Footer -->
 <footer>
-  <p><a href="admin.html">Ingresar como Administrador</a> | <a href="tecnico.html">Ingresar como Técnico</a></p>
+  <p><a href="javascript:void(0);" id="admin-link">Ingresar como Administrador</a> | <a href="tecnico.html">Ingresar como Técnico</a></p>
 </footer>
 
 </body>
