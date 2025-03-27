@@ -13,5 +13,14 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.2"
-  }
+  },
+  "users": [
+    {
+      "role": "admin",
+      "username": "admin",
+      "password": "admin123"
+    }
+  ]
+
+
 }
