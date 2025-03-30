@@ -128,3 +128,21 @@ footer a:hover {
 #login-container h2, #register-container h2 {
     color: white;
 }
+
+/* Estilos para los botones de administrador y técnico */
+.admin-boton, .tecnico-boton {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+}
+
+.admin-boton:hover, .tecnico-boton:hover {
+    background-color: #005bb5;
+}

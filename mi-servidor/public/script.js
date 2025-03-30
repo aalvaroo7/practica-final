@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Variables de referencia a elementos del DOM
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalButton = document.getElementById('close-modal');
     const chargerTypeSelect = document.getElementById('charger-type');
     const openNavigationButton = document.getElementById('open-navigation');
+
     let selectedCharger = null;
 
     // Función para verificar si el usuario está logueado
@@ -109,9 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }).addTo(map);
 
         const chargers = [
-            { id: 1, lat: 40.416775, lon: -3.703790, type: 'fast', status: 'Available' },
-            { id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available' },
-            { id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available' }
+            {id: 1, lat: 40.416775, lon: -3.703790, type: 'fast', status: 'Available'},
+            {id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available'},
+            {id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available'}
         ];
 
         chargers.forEach(charger => {
@@ -235,4 +236,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializar el mapa con todos los cargadores
     initMap();
+
+    const adminLoginForm = document.getElementById('admin-login-form');
+    const adminErrorMessage = document.getElementById('admin-error-message');
+
+    adminLoginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById('admin-username').value.trim();
+        const password = document.getElementById('admin-password').value.trim();
+
+        const response = await fetch('/admin-login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            window.location.href = result.redirect;
+        } else {
+            adminErrorMessage.classList.remove('hidden');
+            adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 2000);
+        }
+    });
 });

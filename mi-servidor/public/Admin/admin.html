@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Encuentra tu Cargador</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../Admin/script.js" defer></script>
+</head>
+<body>
+<div id="admin-login-container">
+  <h2>Iniciar Sesión como Administrador</h2>
+  <form id="admin-login-form">
+    <input type="text" id="admin-username" placeholder="Usuario" required>
+    <input type="password" id="admin-password" placeholder="Contraseña" required>
+    <button type="submit">Acceder</button>
+  </form>
+  <p id="admin-error-message" class="hidden">Usuario o contraseña incorrectos</p>
+</div>
+<div id="admin-container" class="hidden">
+  <header>
+    <h1>Panel de Administración</h1>
+  </header>
+
+
+  <main>
+    <!-- Funciones de administración aquí -->
+  </main>
+</div>
+</body>
+</html>
