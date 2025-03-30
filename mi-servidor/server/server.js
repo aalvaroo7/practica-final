@@ -31,10 +31,10 @@ app.post('/login', (req, res) => {
     const user = authenticateUser(username, password);
 
     if (user) {
-        const redirectPage = user.role === 'admin' ? '/Admin/admin.html' : '/dashboard.html';
+        const redirectPage = user.role === 'admin' ? '/Admin/admin.html' : '/User/usuario.html';
         res.status(200).json({ success: true, redirect: redirectPage });
     } else {
-        res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+        res.status(401).json({ success: false, message: 'Credenciales incorrectas', redirect: '/index.html' });
     }
 });
 
@@ -46,7 +46,7 @@ app.post('/admin-login', (req, res) => {
     if (admin) {
         res.status(200).json({ success: true, redirect: '/Admin/admin.html' });
     } else {
-        res.status(401).json({ success: false, message: 'Acceso denegado' });
+        res.status(401).json({ success: false, message: 'Acceso denegado', redirect: '/index.html' });
     }
 });
 
