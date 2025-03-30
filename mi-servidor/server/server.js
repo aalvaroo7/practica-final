@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware para parsear JSON y datos de formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Configuración de rutas estáticas
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +21,14 @@ app.use(express.static(path.join(__dirname, '../public')));
 const packageJsonPath = path.join(__dirname, '../package.json');
 const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 const users = packageData.users;
+
+// Ruta para obtener credenciales preestablecidas
+app.get('/config', (req, res) => {
+    res.json({
+        admin: packageData.admin,
+        tecnico: packageData.tecnico
+    });
+});
 
 // Función para validar credenciales
 function authenticateUser(username, password) {
@@ -31,22 +41,34 @@ app.post('/login', (req, res) => {
     const user = authenticateUser(username, password);
 
     if (user) {
-        const redirectPage = user.role === 'admin' ? '/Admin/admin.html' : '/User/usuario.html';
+        const redirectPage = user.role === 'admin' ? '/Admin/admin.html' : (user.role === 'tecnico' ? '/tecnico/tecnico.html' : '/dashboard.html');
         res.status(200).json({ success: true, redirect: redirectPage });
     } else {
         res.status(401).json({ success: false, message: 'Credenciales incorrectas', redirect: '/index.html' });
     }
 });
 
-// Ruta de autenticación de administrador (opcional, pero ya cubierta en `/login`)
+// Ruta de autenticación para administrador
 app.post('/admin-login', (req, res) => {
     const { username, password } = req.body;
-    const admin = users.find(user => user.role === 'admin' && user.username === username && user.password === password);
+    const user = authenticateUser(username, password);
 
-    if (admin) {
+    if (user && user.role === 'admin') {
         res.status(200).json({ success: true, redirect: '/Admin/admin.html' });
     } else {
-        res.status(401).json({ success: false, message: 'Acceso denegado', redirect: '/index.html' });
+        res.status(401).json({ success: false, message: 'Credenciales incorrectas', redirect: '/index.html' });
+    }
+});
+
+// Ruta de autenticación para técnico
+app.post('/tecnico-login', (req, res) => {
+    const { username, password } = req.body;
+    const user = authenticateUser(username, password);
+
+    if (user && user.role === 'tecnico') {
+        res.status(200).json({ success: true, redirect: '/tecnico/tecnico.html' });
+    } else {
+        res.status(401).json({ success: false, message: 'Credenciales incorrectas', redirect: '/index.html' });
     }
 });
 

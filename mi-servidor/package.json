@@ -1,18 +1,22 @@
 {
   "name": "mi-servidor",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Servidor con Express y autenticación",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   },
   "users": [
     {
@@ -26,6 +30,4 @@
       "password": "tecnico123"
     }
   ]
-
-
 }
