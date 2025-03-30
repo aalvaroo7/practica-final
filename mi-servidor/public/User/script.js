@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const chargerTypeSelect = document.getElementById('charger-type');
     const openNavigationButton = document.getElementById('open-navigation');
     let selectedCharger = null;
+    const adminLink = document.getElementById('admin-link');
+
+    adminLink.addEventListener('click', () => {
+        window.location.href = 'admin.html';
+    });
 
     // Función para verificar si el usuario está logueado
     function isLoggedIn() {
