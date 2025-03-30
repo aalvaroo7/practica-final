@@ -1,18 +1,93 @@
-COMO INICIAR EL SERVER:
-PARA INICIAR EL SERVIDOR HAY QUE INTRODUCIR EN EL TERMINAL
-cd mi servidor 
-cd server 
-npm start  
+Aquí tienes la lista de requisitos funcionales formateada para un documento de Word:
 
-PARA FINALIZAR EL SERVIDOR HAY QUE INTRODUCIR EN EL TERMINAL
-ctrl + c
+---
 
-IMPLEMENTAR:
-PONER LA IDENTIFICACION SEGUN EL TIPO DE USUARIO(CREAR 3 HTMLS DIFERENCTES  USAR EL AUTH.JS Y CREAR TRES JS PARA CADA USER  PREDEFINIR 2 CUENTAS SOLO LA DE ADMIN Y LA DE TECNICO))
-CAMBIAR EL CSS PARA AÑADIR LO DE FILTRAR DONDE LOS USUARIOS 
-BOTÓN DE REGISTRO(no deja registrarse, despues de mostrar que se ha registrado no deja logearse)
-SISTEMA DE AUTENTIFICACION DE USUARIO
+**Requisitos Funcionales**
 
+1. **Inicio de Sesión de Usuario**:
+  - El usuario debe poder iniciar sesión con su correo electrónico y contraseña.
+  - Si las credenciales son incorrectas, se debe mostrar un mensaje de error.
+
+2. **Registro de Usuario**:
+  - El usuario debe poder registrarse proporcionando un correo electrónico y una contraseña.
+  - Las credenciales deben guardarse en `localStorage`.
+
+3. **Inicio de Sesión de Administrador**:
+  - El administrador debe poder iniciar sesión con un nombre de usuario y contraseña predefinidos en `package.json`.
+  - Si las credenciales son incorrectas, se debe mostrar un mensaje de error y redirigir a la página principal `index.html`.
+
+4. **Inicio de Sesión de Técnico**:
+  - El técnico debe poder iniciar sesión con un nombre de usuario y contraseña.
+  - Si las credenciales son incorrectas, se debe mostrar un mensaje de error.
+
+5. **Mapa de Cargadores**:
+  - Mostrar un mapa con la ubicación de los cargadores.
+  - Permitir al usuario reservar un cargador disponible.
+
+6. **Reserva de Cargadores**:
+  - El usuario debe poder reservar un cargador seleccionando el tiempo de reserva.
+  - Mostrar un recordatorio cuando la reserva esté a punto de expirar.
+
+7. **Perfil de Usuario**:
+  - El usuario debe poder actualizar su perfil con su nombre y correo electrónico.
+
+8. **Configuración de Notificaciones**:
+  - El usuario debe poder configurar notificaciones para ser alertado cuando un cargador esté disponible.
+
+9. **Filtrado de Cargadores**:
+  - Permitir al usuario filtrar los cargadores por tipo (rápido, estándar, compatible).
+
+10. **Pago de Sesión de Carga**:
+  - El usuario debe poder realizar el pago de la sesión de carga proporcionando los detalles de la tarjeta.
+
+11. **Navegación a Cargadores**:
+  - Permitir al usuario abrir la ubicación del cargador en una aplicación de navegación.
+
+12. **Historial de Reservas**:
+  - Mostrar al usuario un historial de sus reservas anteriores.
+
+13. **Gestión de Usuarios**:
+  - Permitir al administrador gestionar usuarios (crear, editar, eliminar).
+
+14. **Gestión de Cargadores**:
+  - Permitir al administrador gestionar cargadores (añadir, editar, eliminar).
+
+15. **Soporte Multilenguaje**:
+  - Implementar soporte para múltiples idiomas en la aplicación.
+
+16. **Diseño Responsivo**:
+  - Asegurarse de que la aplicación sea responsiva y funcione bien en dispositivos móviles.
+
+17. **Seguridad**:
+  - Implementar medidas de seguridad como la protección contra ataques XSS y CSRF.
+
+18. **Pruebas Unitarias**:
+  - Escribir pruebas unitarias para las funciones críticas de la aplicación.
+
+19. **Documentación**:
+  - Proveer documentación detallada sobre cómo configurar y ejecutar el proyecto.
+
+20. **Despliegue en Producción**:
+  - Proveer instrucciones detalladas para desplegar la aplicación en un entorno de producción.
+
+21. **Manejo de Errores**:
+  - Implementar manejo de errores adecuado para mostrar mensajes claros al usuario en caso de fallos en la aplicación.
+
+22. **Autenticación de Usuarios**:
+  - Implementar autenticación de usuarios en el servidor utilizando `express`.
+
+23. **Autenticación de Administradores**:
+  - Implementar autenticación de administradores en el servidor utilizando `express`.
+
+24. **Almacenamiento Local**:
+  - Utilizar `localStorage` para guardar credenciales de usuario y reservas.
+
+25. **Configuración del Servidor**:
+  - Configurar un servidor Express para servir archivos estáticos y manejar autenticación.
+
+---
+
+Puedes copiar y pegar este texto en un documento de Word.
 # Encuentra tu Cargador
 
 ## Requisitos Funcionales

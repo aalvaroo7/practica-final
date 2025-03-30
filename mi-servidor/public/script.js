@@ -237,16 +237,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar el mapa con todos los cargadores
     initMap();
 
-    const adminLoginForm = document.getElementById('admin-login-form');
-    const adminErrorMessage = document.getElementById('admin-error-message');
+    // Manejo del formulario de inicio de sesión de administrador
 
-    adminLoginForm.addEventListener('submit', async (event) => {
+        // Manejo del formulario de inicio de sesión de administrador
+        document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value.trim();
+
+            const response = await fetch('/admin-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                const adminErrorMessage = document.getElementById('admin-error-message');
+                adminErrorMessage.classList.remove('hidden');
+                adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 2000);
+            }
+        });
+
+    // Manejo del formulario de inicio de sesión de técnico
+    document.getElementById('tecnico-login-form').addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const username = document.getElementById('admin-username').value.trim();
-        const password = document.getElementById('admin-password').value.trim();
+        const username = document.getElementById('tecnico-username').value.trim();
+        const password = document.getElementById('tecnico-password').value.trim();
 
-        const response = await fetch('/admin-login', {
+        const response = await fetch('/tecnico-login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -259,11 +288,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (result.success) {
             window.location.href = result.redirect;
         } else {
-            adminErrorMessage.classList.remove('hidden');
-            adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
+            const tecnicoErrorMessage = document.getElementById('tecnico-error-message');
+            tecnicoErrorMessage.classList.remove('hidden');
+            tecnicoErrorMessage.textContent = 'Usuario o contraseña de técnico incorrectos.';
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 2000);
         }
     });
-});
+
+    });

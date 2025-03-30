@@ -6,17 +6,18 @@ import fs from 'fs';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware para parsear JSON
+// Middleware para parsear JSON y datos de formularios
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware para servir archivos estáticos
+// Configuración de rutas estáticas
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Cargar usuarios desde package.json
 const packageJsonPath = path.join(__dirname, '../package.json');
-const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 const users = packageData.users;
 
 // Función para validar credenciales
@@ -31,13 +32,13 @@ app.post('/login', (req, res) => {
 
     if (user) {
         const redirectPage = user.role === 'admin' ? '/Admin/admin.html' : '/dashboard.html';
-        res.json({ success: true, redirect: redirectPage });
+        res.status(200).json({ success: true, redirect: redirectPage });
     } else {
-        res.json({ success: false });
+        res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
     }
 });
 
-// Ruta de autenticación de administrador
+// Ruta de autenticación de administrador (opcional, pero ya cubierta en `/login`)
 app.post('/admin-login', (req, res) => {
     const { username, password } = req.body;
     const admin = users.find(user => user.role === 'admin' && user.username === username && user.password === password);
@@ -45,7 +46,7 @@ app.post('/admin-login', (req, res) => {
     if (admin) {
         res.status(200).json({ success: true, redirect: '/Admin/admin.html' });
     } else {
-        res.status(401).json({ success: false });
+        res.status(401).json({ success: false, message: 'Acceso denegado' });
     }
 });
 
@@ -56,5 +57,5 @@ app.get('*', (req, res) => {
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
