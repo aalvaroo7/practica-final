@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Técnico - Encuentra tu Cargador</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../Tecnico/script.js" defer></script>
+</head>
+<body>
+<div id="tecnico-login-container">
+    <h2>Iniciar Sesión como Técnico</h2>
+    <form id="tecnico-login-form">
+        <input type="text" id="tecnico-username" placeholder="Usuario" required>
+        <input type="password" id="tecnico-password" placeholder="Contraseña" required>
+        <button type="submit">Acceder</button>
+    </form>
+    <p id="tecnico-error-message" class="hidden">Usuario o contraseña incorrectos</p>
+</div>
+<div id="tecnico-container" class="hidden">
+    <header>
+        <h1>Panel de Técnico</h1>
+    </header>
+    <main>
+        <!-- Funciones de técnico aquí -->
+    </main>
+</div>
+</body>
+</html>
