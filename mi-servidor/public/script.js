@@ -238,35 +238,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     initMap();
 
     // Manejo del formulario de inicio de sesión de administrador
+    document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-        // Manejo del formulario de inicio de sesión de administrador
-        document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        const username = document.getElementById('admin-username').value.trim();
+        const password = document.getElementById('admin-password').value.trim();
 
-            const username = document.getElementById('admin-username').value.trim();
-            const password = document.getElementById('admin-password').value.trim();
-
-            const response = await fetch('/admin-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                window.location.href = result.redirect;
-            } else {
-                const adminErrorMessage = document.getElementById('admin-error-message');
-                adminErrorMessage.classList.remove('hidden');
-                adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
-                setTimeout(() => {
-                    window.location.href = '../index.html';
-                }, 2000);
-            }
-        });
+        // Verificar credenciales preestablecidas
+        if (username === 'admin' && password === 'admin123') {
+            window.location.href = '/admin-panel.html'; // Redirigir al panel de administración
+        } else {
+            const adminErrorMessage = document.getElementById('admin-error-message');
+            adminErrorMessage.classList.remove('hidden');
+            adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
+            setTimeout(() => {
+                window.location.href = './index.html'; // Redirigir a la página principal
+            }, 2000);
+        }
+    });
 
     // Manejo del formulario de inicio de sesión de técnico
     document.getElementById('tecnico-login-form').addEventListener('submit', async (event) => {
@@ -292,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             tecnicoErrorMessage.classList.remove('hidden');
             tecnicoErrorMessage.textContent = 'Usuario o contraseña de técnico incorrectos.';
             setTimeout(() => {
-                window.location.href = '../index.html';
+                window.location.href = './index.html';
             }, 2000);
         }
     });
