@@ -35,34 +35,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    loginForm.addEventListener('submit', async (event) => {
+
+    loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const username = document.getElementById('login-email').value.trim();
+        const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
+        const storedPassword = localStorage.getItem(email);
 
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            window.location.href = result.redirect;
+        if (storedPassword === password) {
+            localStorage.setItem('currentUser', email);
+            loginContainer.classList.add('hidden');
+            mapContainer.classList.remove('hidden');
+            updateFilterVisibility();
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation not supported.");
+            }
         } else {
             errorMessage.classList.remove('hidden');
-            setTimeout(() => {
-                window.location.href = result.redirect;
-            }, 2000);
         }
     });
 
     // Llamar a updateFilterVisibility al cargar la página
     updateFilterVisibility();
+
 
     // Código de registro
     const registerForm = document.getElementById('register-form');
@@ -239,6 +237,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar el mapa con todos los cargadores
     initMap();
 
+    // Manejo del formulario de inicio de sesión de administrador
+
+    // Manejo del formulario de inicio de sesión de administrador
+    document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById('admin-username').value.trim();
+        const password = document.getElementById('admin-password').value.trim();
+
+        const response = await fetch('/admin-login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            window.location.href = result.redirect;
+        } else {
+            const adminErrorMessage = document.getElementById('admin-error-message');
+            adminErrorMessage.classList.remove('hidden');
+            adminErrorMessage.textContent = 'Usuario o contraseña de administrador incorrectos.';
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 2000);
+        }
+    });
+
     // Manejo del formulario de inicio de sesión de técnico
     document.getElementById('tecnico-login-form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -263,8 +292,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             tecnicoErrorMessage.classList.remove('hidden');
             tecnicoErrorMessage.textContent = 'Usuario o contraseña de técnico incorrectos.';
             setTimeout(() => {
-                window.location.href = './index.html';
+                window.location.href = '../index.html';
             }, 2000);
         }
     });
+
 });

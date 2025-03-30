@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Encuentra tu Cargador</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
   <script src="../script.js" defer></script>
+  <script scr="admin.js" defer></script>
 </head>
 <body>
 <div id="admin-login-container">
@@ -20,9 +21,61 @@
 <div id="admin-container" class="hidden">
   <header>
     <h1>Panel de Administración</h1>
+    <nav>
+      <ul>
+        <li><a href="#manage-users">Gestión de Usuarios</a></li>
+        <li><a href="#manage-chargers">Gestión de Cargadores</a></li>
+        <li><a href="#view-stats">Ver Estadísticas</a></li>
+        <li><a href="#view-logs">Ver Logs de Auditoría</a></li>
+      </ul>
+    </nav>
   </header>
+
   <main>
-    <!-- Contenido del panel de administración -->
+    <section id="manage-users">
+      <h2>Gestión de Usuarios</h2>
+      <form id="add-user-form">
+        <input type="text" id="new-username" placeholder="Nombre de Usuario" required>
+        <input type="email" id="new-email" placeholder="Correo Electrónico" required>
+        <input type="password" id="new-password" placeholder="Contraseña" required>
+        <select id="new-role">
+          <option value="user">Usuario</option>
+          <option value="admin">Administrador</option>
+          <option value="tecnico">Técnico</option>
+        </select>
+        <button type="submit">Agregar Usuario</button>
+      </form>
+      <div id="user-list">
+        <!-- Lista de usuarios -->
+      </div>
+    </section>
+
+    <section id="manage-chargers">
+      <h2>Gestión de Cargadores</h2>
+      <form id="add-charger-form">
+        <input type="text" id="charger-id" placeholder="ID del Cargador" required>
+        <input type="text" id="charger-type" placeholder="Tipo de Cargador" required>
+        <input type="text" id="charger-status" placeholder="Estado del Cargador" required>
+        <button type="submit">Agregar Cargador</button>
+      </form>
+      <div id="charger-list">
+        <!-- Lista de cargadores -->
+      </div>
+    </section>
+
+    <section id="view-stats">
+      <h2>Ver Estadísticas</h2>
+      <div id="stats-container">
+        <!-- Contenido de estadísticas -->
+      </div>
+    </section>
+
+    <section id="view-logs">
+      <h2>Ver Logs de Auditoría</h2>
+      <div id="logs-container">
+        <!-- Contenido de logs -->
+      </div>
+    </section>
   </main>
 </div>
 </body>
