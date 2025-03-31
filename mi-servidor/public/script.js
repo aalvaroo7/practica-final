@@ -236,25 +236,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar el mapa con todos los cargadores
     initMap();
-    loginForm.addEventListener('submit', (event) => {
-        event.preventDefault();
 
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        const storedPassword = localStorage.getItem(email);
-
-        if (storedPassword === password) {
-            localStorage.setItem('currentUser', email);
-            loginContainer.classList.add('hidden');
-            mapContainer.classList.remove('hidden');
-            updateFilterVisibility();
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation not supported.");
-            }
-        } else {
-            errorMessage.classList.remove('hidden');
-        }
-    });
 });
