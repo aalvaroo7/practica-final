@@ -1,8 +1,4 @@
-const users = [
-    { username: 'user1', password: 'password1', role: 'user' },
-    { username: 'admin', password: 'adminpass', role: 'admin' },
-    { username: 'tech', password: 'techpass', role: 'tech' }
-];
+
 
 let currentUser = null;
 

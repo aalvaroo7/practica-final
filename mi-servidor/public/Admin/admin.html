@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Encuentra tu Cargador</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="../script.js" defer></script>
-  <script scr="../Admin/admin.js" defer></script>
+  <script src="../Admin/admin.js" defer></script>
 </head>
 <body>
 <div id="admin-login-container">
   <h2>Iniciar Sesión como Administrador</h2>
   <form id="admin-login-form">
-    <input type="text" id="admin-username" placeholder="Usuario" required>
-    <input type="password" id="admin-password" placeholder="Contraseña" required>
+    <input type="text" id="username" placeholder="Usuario" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
     <button type="submit">Acceder</button>
+    <p id="admin-error-message" class="hidden">Usuario o contraseña incorrectos</p>
   </form>
-  <p id="admin-error-message" class="hidden">Usuario o contraseña incorrectos</p>
 </div>
+
 <div id="admin-container" class="hidden">
   <header>
     <h1>Panel de Administración</h1>
@@ -77,6 +77,9 @@
       </div>
     </section>
   </main>
+  <div>
+    <p><a class="index-boton" href="../index.html">Volver a la pagina principal</a></p>
+  </div>
 </div>
 </body>
 </html>

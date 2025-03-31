@@ -30,11 +30,6 @@ app.get('/config', (req, res) => {
     });
 });
 
-// Función para validar credenciales
-function authenticateUser(username, password) {
-    return users.find(user => user.username === username && user.password === password);
-}
-
 // Manejar todas las demás rutas sirviendo index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));

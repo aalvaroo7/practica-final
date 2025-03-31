@@ -17,6 +17,10 @@ body {
     display: none;
 }
 
+.visible {
+    display: block;
+}
+
 /* Estilos para el contenedor de inicio de sesión */
 #admin-login-container {
     width: 400px;
@@ -137,3 +141,8 @@ form button {
 form button:hover {
     background-color: #005bb5;
 }
+
+#admin-login-container h2  {
+    color: white;
+}
+
