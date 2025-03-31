@@ -4,6 +4,8 @@ FALTA POR IMPLEMENTAR:
 FALTA HACER QUE CUANDO SE PULSE EL BOTON CON EL USUARIO CORRECTO Y CONTRASEÑA CORRECTA
 QUE ESTA PREESTABLECIDA EN EL JSON SE CARGUE LA PÁGINA DE ADMIN, LO MISMO CON EL TÉCNICO
 
+INICIAR LA APLICACIÓN:
+node server/server.js
 
 LO QUE PASA:
 cuando se pulsa el boton de acceder lo que pasa es que intenta redirigir a una pagina que no existe 

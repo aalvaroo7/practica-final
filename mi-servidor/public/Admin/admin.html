@@ -6,6 +6,8 @@
   <title>Admin - Encuentra tu Cargador</title>
   <link rel="stylesheet" href="styles.css">
   <script src="../Admin/admin.js" defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
 <body>
 <div id="admin-login-container">
@@ -16,6 +18,10 @@
     <button type="submit">Acceder</button>
     <p id="admin-error-message" class="hidden">Usuario o contraseña incorrectos</p>
   </form>
+</div>
+
+<div>
+  <p><a class="index" href="../index.html">Volver a la pagina principal</a></p>
 </div>
 
 <div id="admin-container" class="hidden">
@@ -30,6 +36,22 @@
       </ul>
     </nav>
   </header>
+
+  <main>
+    <div id="map-container" class="hidden">
+      <h1>Encuentra tu Cargador</h1>
+      <div id="map"></div>
+      <div id="charger-details"></div>
+      <div id="reservation-form" class="hidden">
+        <h3>Reserve Charger</h3>
+        <form id="reserve-form">
+          <label for="reservation-time">Reservation Time (minutes):</label>
+          <input type="number" id="reservation-time" min="1" max="120" required>
+          <button type="submit">Reserve</button>
+        </form>
+      </div>
+    </div>
+  </main>
 
   <main>
     <section id="manage-users">
@@ -77,9 +99,7 @@
       </div>
     </section>
   </main>
-  <div>
-    <p><a class="index-boton" href="../index.html">Volver a la pagina principal</a></p>
-  </div>
+
 </div>
 </body>
 </html>
