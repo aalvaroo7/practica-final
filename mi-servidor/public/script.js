@@ -237,4 +237,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar el mapa con todos los cargadores
     initMap();
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginButton = document.querySelector('#admin-login-form button'); // Selecciona el botón de iniciar sesión
+        const loginLinks = document.getElementById('login-links'); // Selecciona el div con los enlaces
+
+        loginButton.addEventListener('click', function() {
+            loginLinks.classList.add('hidden'); // Añade la clase 'hidden' para ocultar los enlaces
+        });
+    });
+
 });
