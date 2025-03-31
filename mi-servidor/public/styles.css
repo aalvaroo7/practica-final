@@ -131,6 +131,7 @@ footer a:hover {
 
 /* Estilos para los botones de administrador y técnico */
 .admin-b, .tecnico-b{
+
     padding: 12px 20px;
     background-color: #0073e6;
     color: white;
