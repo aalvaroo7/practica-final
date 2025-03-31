@@ -1,0 +1,21 @@
+{
+  "name": "mi-aplicacion",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "usuariosPredefinidos": [
+    {
+      "rol": "admin",
+      "username": "admin",
+      "password": "admin123"
+    },
+    {
+      "rol": "tecnico",
+      "username": "tecnico",
+      "password": "tecnico123"
+    }
+  ]
+}
