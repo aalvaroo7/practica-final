@@ -12,7 +12,11 @@ body {
     background: url('assets/Foto 1.jpg') no-repeat center center fixed;
     background-size: cover;
 }
-
+.link-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
 .hidden {
     display: none;
 }
