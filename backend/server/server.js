@@ -32,6 +32,11 @@ app.get('/config', (req, res) => {
     });
 });
 
+// Redirección para la ruta /login (se define antes de la ruta catch-all)
+app.get('/login', (req, res) => {
+    res.redirect('/users/user/user.html');
+});
+
 // Manejar todas las demás rutas con index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(staticPublicPath, 'index.html'));

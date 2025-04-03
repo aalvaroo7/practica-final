@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Llamar a updateFilterVisibility al cargar la página
     updateFilterVisibility();
 
+    document.getElementById('admin-btn').addEventListener('click', () => {
+        window.location.href = '/users/Admin/admin.html';
+    });
+    // Al presionar el botón de Técnico redirige a tecnico.html
+    document.getElementById('tecnico-btn').addEventListener('click', () => {
+        window.location.href = '/users/Tecnico/tecnico.html';
+    });
+
 
     // Código de registro
     const registerForm = document.getElementById('register-form');
