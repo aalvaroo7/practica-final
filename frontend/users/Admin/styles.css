@@ -163,3 +163,27 @@ form button:hover {
 .index:hover {
     background-color: #005bb5;
 }
+
+#btns {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Separación entre botones */
+    margin-top: 20px;
+}
+
+#btns div button {
+    width: 100%;
+    height: 60px;
+    padding: 10px 20px;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#btns div button:hover {
+    background-color: #005bb5;
+}

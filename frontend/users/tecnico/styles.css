@@ -159,3 +159,25 @@ form button:hover {
 .index:hover {
     background-color: #005bb5;
 }
+#buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Separación entre botones */
+    margin-top: 20px;
+}
+
+#buttons button {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#buttons button:hover {
+    background-color: #005bb5;
+}
