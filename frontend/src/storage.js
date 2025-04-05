@@ -7,3 +7,8 @@ export function saveReservation(reservation) {
 export function getReservations() {
     return JSON.parse(localStorage.getItem('reservations')) || [];
 }
+
+export function getUserReservations(email) {
+    const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+    return reservations.filter(reservation => reservation.email === email);
+}
