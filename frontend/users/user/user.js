@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reservationHistoryBtn = document.getElementById('reservation-history-btn');
     const reservationMessage = document.createElement('p');
     const socket = new WebSocket('ws://localhost:8080');
+    const adminBtn = document.getElementById('admin-btn');
+    const tecnicoBtn = document.getElementById('tecnico-btn');
 
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
@@ -93,6 +95,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 alert("Geolocation not supported.");
             }
+            // Ocultar botones de "Eres Admin" y "Eres Técnico"
+            adminBtn.classList.add('hidden');
+            tecnicoBtn.classList.add('hidden');
         } else {
             errorMessage.classList.remove('hidden');
         }
@@ -100,11 +105,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     updateFilterVisibility();
 
-    document.getElementById('admin-btn').addEventListener('click', () => {
+    adminBtn.addEventListener('click', () => {
         window.location.href = '/users/Admin/admin.html';
     });
 
-    document.getElementById('tecnico-btn').addEventListener('click', () => {
+    tecnicoBtn.addEventListener('click', () => {
         window.location.href = '/users/Tecnico/tecnico.html';
     });
 
