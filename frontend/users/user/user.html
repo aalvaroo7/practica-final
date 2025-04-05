@@ -11,6 +11,7 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-container">
     <h2>Iniciar Sesión</h2>
     <form id="login-form">
@@ -22,6 +23,7 @@
     <p><a href="javascript:void(0);" id="show-register" class="register-link">Registrarse</a></p>
 </div>
 
+<!-- REGISTRO -->
 <div id="register-container" class="hidden">
     <h2>Registrarse</h2>
     <form id="register-form">
@@ -32,25 +34,32 @@
     <button id="back-to-login">Volver a Iniciar Sesión</button>
 </div>
 
+<!-- BOTONES INICIALES -->
 <div class="button-container">
-    <button id="admin-btn">Eres Admin?</button>
-    <button id="tecnico-btn">Eres Técnico?</button>
+    <button id="admin-btn">¿Eres Admin?</button>
+    <button id="tecnico-btn">¿Eres Técnico?</button>
 </div>
 
+<!-- MAPA Y CARGADORES -->
 <div id="map-container" class="hidden">
     <h1>Encuentra tu Cargador</h1>
-    <div id="map"></div>
+    <div id="map" style="height: 400px;"></div>
+
+    <!-- DETALLES DEL CARGADOR -->
     <div id="charger-details"></div>
+
+    <!-- FORMULARIO DE RESERVA -->
     <div id="reservation-form" class="hidden">
-        <h3>Reserve Charger</h3>
+        <h3>Reservar Cargador</h3>
         <form id="reserve-form">
-            <label for="reservation-time">Reservation Time (minutes):</label>
+            <label for="reservation-time">Tiempo de reserva (minutos):</label>
             <input type="number" id="reservation-time" min="1" max="120" required>
-            <button type="submit">Reserve</button>
+            <button type="submit">Reservar</button>
         </form>
     </div>
 </div>
 
+<!-- PERFIL -->
 <div id="profile-container" class="hidden">
     <h2>Perfil de Usuario</h2>
     <form id="profile-form">
@@ -60,6 +69,7 @@
     </form>
 </div>
 
+<!-- NOTIFICACIONES -->
 <div id="notifications-container" class="hidden">
     <h2>Configuración de Notificaciones</h2>
     <form id="notifications-form">
@@ -70,6 +80,7 @@
     </form>
 </div>
 
+<!-- FILTRO -->
 <div id="filter-container" class="hidden">
     <label for="charger-type">Filtrar por tipo de cargador:</label>
     <select id="charger-type">
@@ -78,7 +89,13 @@
         <option value="estándar">Estándar</option>
         <option value="compatible">Compatible</option>
     </select>
-    <button id="open-navigation">Open in Navigation App</button>
+    <button id="open-navigation">Abrir en App de Navegación</button>
 </div>
+
+<!-- MODAL OPCIONAL -->
+<div id="modal" class="hidden">
+    <button id="close-modal">Cerrar</button>
+</div>
+
 </body>
 </html>
