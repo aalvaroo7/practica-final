@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
 
-
     socket.addEventListener('message', event => {
-        const chargerStatus = JSON.parse(event.data);
-        alert(`Estado del cargador actualizado: ${chargerStatus.status}`);
+        const data = JSON.parse(event.data);
+        if (data.type === 'notification') {
+            alert(data.message);
+        }
     });
-
 
     let selectedCharger = null;
 
@@ -214,7 +214,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
             reservationForm.classList.add('hidden');
             modal.classList.add('hidden');
-            scheduleReminder(selectedCharger.type, reservationTime);
+
+            // Enviar mensaje al servidor para iniciar la reserva
+            socket.send(JSON.stringify({
+                type: 'reserve',
+                chargerId: selectedCharger.id,
+                duration: reservationTime
+            }));
         }
     });
 
@@ -260,17 +266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         updateMap(filteredChargers);
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const loginButton = document.querySelector('#admin-login-form button');
-        const loginLinks = document.getElementById('login-links');
-
-        if (loginButton && loginLinks) {
-            loginButton.addEventListener('click', function () {
-                loginLinks.classList.add('hidden');
-            });
-        }
     });
 
     // Evento de clic para el botón de historial de reservas
