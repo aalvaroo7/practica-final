@@ -51,18 +51,25 @@ app.listen(PORT, () => {
 
 const wss = new WebSocketServer({ port: 8080 });
 
+let reservations = {};
+
 wss.on('connection', ws => {
     console.log('Client connected');
-    ws.on('message', message => {
-        console.log(`Received message => ${message}`);
-    });
 
-    // Simular cambios en el estado del cargador
-    setInterval(() => {
-        const chargerStatus = {
-            id: 1,
-            status: 'In Use'
-        };
-        ws.send(JSON.stringify(chargerStatus));
-    }, 10000); // Enviar cada 10 segundos
+    ws.on('message', message => {
+        const data = JSON.parse(message);
+        if (data.type === 'reserve') {
+            const { chargerId, duration } = data;
+            reservations[chargerId] = ws;
+
+            // Notificar al usuario que la reserva ha comenzado
+            ws.send(JSON.stringify({ type: 'notification', message: 'Tu tiempo de reserva ha comenzado.' }));
+
+            // Programar notificación para el final de la reserva
+            setTimeout(() => {
+                ws.send(JSON.stringify({ type: 'notification', message: 'Tu tiempo de reserva ha terminado.' }));
+                delete reservations[chargerId];
+            }, duration * 60000);
+        }
+    });
 });
