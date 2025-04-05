@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import cors from 'cors';
+import { WebSocketServer } from 'ws';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,8 +25,6 @@ app.use('/users', express.static(staticUsersPath));
 // Ruta para obtener credenciales preestablecidas
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8080 });
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 
@@ -49,6 +48,8 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
+
+const wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', ws => {
     console.log('Client connected');
