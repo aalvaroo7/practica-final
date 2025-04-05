@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modal = document.getElementById('modal');
     const closeModalButton = document.getElementById('close-modal');
     const openNavigationButton = document.getElementById('open-navigation');
+    const buttonContainer = document.querySelector('.button-container');
 
     let selectedCharger = null;
 
@@ -46,7 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem('currentUser', email);
             loginContainer.classList.add('hidden');
             mapContainer.classList.remove('hidden');
-            document.querySelector('.button-container').classList.add('hidden'); // Oculta los botones
+            buttonContainer.classList.add('hidden');
+            if (buttonContainer) {
+                buttonContainer.classList.add('hidden');
+            }
             updateFilterVisibility();
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -63,10 +67,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('admin-btn').addEventListener('click', () => {
         window.location.href = '/users/Admin/admin.html';
+
     });
     // Al presionar el botón de Técnico redirige a tecnico.html
     document.getElementById('tecnico-btn').addEventListener('click', () => {
         window.location.href = '/users/Tecnico/tecnico.html';
+
     });
 
 
