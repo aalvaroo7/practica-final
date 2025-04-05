@@ -20,8 +20,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reservationHistoryContainer = document.getElementById('reservation-history-container');
     const reservationHistoryBtn = document.getElementById('reservation-history-btn');
     const reservationMessage = document.createElement('p');
+    const socket = new WebSocket('ws://localhost:8080');
+
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
+
+
+    socket.addEventListener('message', event => {
+        const chargerStatus = JSON.parse(event.data);
+        alert(`Estado del cargador actualizado: ${chargerStatus.status}`);
+    });
+
 
     let selectedCharger = null;
 
