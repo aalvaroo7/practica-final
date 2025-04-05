@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
@@ -10,22 +10,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const chargerDetails = document.getElementById('charger-details');
     const reservationForm = document.getElementById('reservation-form');
     const reserveForm = document.getElementById('reserve-form');
+    const cancelReservationButton = document.getElementById('cancel-reservation');
     const modal = document.getElementById('modal');
     const closeModalButton = document.getElementById('close-modal');
     const openNavigationButton = document.getElementById('open-navigation');
     const buttonContainer = document.querySelector('.button-container');
     const currentUser = localStorage.getItem('currentUser');
+    const reservationHistoryContainer = document.getElementById('reservation-history-container');
+    const reservationMessage = document.createElement('p');
+    reservationMessage.id = 'reservation-message';
+    reserveForm.appendChild(reservationMessage);
 
     let selectedCharger = null;
-    let map;
-    const markers = [];
 
-    // Mostrar u ocultar el contenedor de filtro
+    if (!currentUser) {
+        window.location.href = '/login.html';
+    }
+
+    let chargers = [
+        { id: 1, lat: 40.416775, lon: -3.703790, type: 'fast', status: 'Available' },
+        { id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available' },
+        { id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available' }
+    ];
+
+    if (currentUser) {
+        fetch(`/user-reservations?email=${currentUser}`)
+            .then(response => response.json())
+            .then(reservations => {
+                if (reservations.length > 0) {
+                    reservationHistoryContainer.innerHTML = reservations.map(reservation =>
+                        `<div class="reservation">
+                            <p>Charger: ${reservation.charger}</p>
+                            <p>Time: ${reservation.time}</p>
+                        </div>`
+                    ).join('');
+                } else {
+                    reservationHistoryContainer.innerHTML = '<p>No reservations found.</p>';
+                }
+            });
+    }
+
     function isLoggedIn() {
+        console.log("Usuario autenticado:", localStorage.getItem('currentUser'));
         return localStorage.getItem('currentUser') !== null;
     }
 
     function updateFilterVisibility() {
+        console.log("Ejecutando updateFilterVisibility, isLoggedIn:", isLoggedIn());
         if (isLoggedIn()) {
             filterContainer.classList.remove('hidden');
         } else {
@@ -56,7 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Registro
+    updateFilterVisibility();
+
+    document.getElementById('admin-btn').addEventListener('click', () => {
+        window.location.href = '/users/Admin/admin.html';
+    });
+
+    document.getElementById('tecnico-btn').addEventListener('click', () => {
+        window.location.href = '/users/Tecnico/tecnico.html';
+    });
+
     const registerForm = document.getElementById('register-form');
     registerForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -81,22 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
         loginContainer.classList.remove('hidden');
     });
 
-    // Inicializa mapa
     function showPosition(position) {
-        initMap(position.coords.latitude, position.coords.longitude);
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        initMap(lat, lon);
     }
 
     function showError(error) {
-        alert("No se pudo obtener la ubicación: " + error.message);
+        alert("Unable to retrieve location: " + error.message);
     }
 
-    const chargers = [
-        { id: 1, lat: 40.416775, lon: -3.703790, type: 'rápido', status: 'Disponible', batteryLevel: '80%', estimatedTime: '30min', cost: '5€' },
-        { id: 2, lat: 41.385064, lon: 2.173404, type: 'estándar', status: 'Disponible', batteryLevel: '60%', estimatedTime: '45min', cost: '3€' },
-        { id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Disponible', batteryLevel: '70%', estimatedTime: '35min', cost: '4€' }
-    ];
+    let map;
+    let markers = [];
 
-    function initMap(lat = 40.416775, lon = -3.703790) {
+    function initMap(lat, lon) {
         map = L.map('map').setView([lat, lon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
@@ -106,83 +144,121 @@ document.addEventListener('DOMContentLoaded', () => {
             const marker = L.marker([charger.lat, charger.lon])
                 .addTo(map)
                 .bindPopup(`
-                    <b>Cargador ${charger.type}</b><br>
-                    Estado: ${charger.status}<br>
-                    <button class="reserve-btn" data-id="${charger.id}">Reservar</button>
+                    <b>Charger ${charger.type}</b><br>Status: ${charger.status}<br>
+                    <button id="reserve-btn-${charger.id}" class="reserve-btn">Reserve Now</button>
                 `);
 
             marker.on('popupopen', () => {
-                setTimeout(() => {
-                    const btn = document.querySelector(`.reserve-btn[data-id="${charger.id}"]`);
-                    if (btn) {
-                        btn.addEventListener('click', () => {
-                            if (!isLoggedIn()) {
-                                alert("Debes iniciar sesión para reservar.");
-                                return;
-                            }
-                            selectedCharger = charger;
-                            showReservationForm(charger);
-                        });
-                    }
-                }, 100); // espera a que el DOM renderice
+                const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
+                if (reserveButton) {
+                    reserveButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        selectedCharger = charger;
+                        showReservationForm(charger);
+                    });
+                }
             });
+
+            markers.push(marker);
         });
     }
 
     function showReservationForm(charger) {
         chargerDetails.innerHTML = `
-            <h3>Detalles del Cargador</h3>
-            <p>Tipo: ${charger.type}</p>
-            <p>Estado: ${charger.status}</p>
-            <p>Nivel batería: ${charger.batteryLevel}</p>
-            <p>Tiempo estimado: ${charger.estimatedTime}</p>
-            <p>Costo: ${charger.cost}</p>
+            <h3>Charger Details</h3>
+            <p>Type: ${charger.type}</p>
+            <p>Status: ${charger.status}</p>
+            <p>Battery Level: ${charger.batteryLevel || 'N/A'}</p>
+            <p>Estimated Time: ${charger.estimatedTime || 'N/A'}</p>
+            <p>Cost: ${charger.cost || 'N/A'}</p>
         `;
         reservationForm.classList.remove('hidden');
+        modal.classList.remove('hidden');
     }
 
-    reserveForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const time = document.getElementById('reservation-time').value;
-        if (selectedCharger) {
-            alert(`Tu cargador ha sido reservado por ${time} minutos.`);
-            reservationForm.classList.add('hidden');
-            scheduleReminder(selectedCharger.type, time);
+    closeModalButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
         }
     });
 
-    function scheduleReminder(type, time) {
-        const timeMs = (time - 10) * 60000;
-        if (timeMs > 0) {
-            setTimeout(() => {
-                alert(`Recordatorio: tu reserva de ${type} expira en 10 minutos.`);
-            }, timeMs);
+    reserveForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const reservationTime = document.getElementById('reservation-time').value;
+        const currentUser = localStorage.getItem('currentUser');
+        console.log("Reservando para usuario:", currentUser);
+
+        if (!currentUser) {
+            alert("Tu sesión ha expirado. Por favor vuelve a iniciar sesión.");
+            window.location.href = '/login.html';
+            return;
         }
+
+        if (selectedCharger) {
+            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
+            reservationForm.classList.add('hidden');
+            modal.classList.add('hidden');
+            scheduleReminder(selectedCharger.type, reservationTime);
+        }
+    });
+
+    cancelReservationButton.addEventListener('click', () => {
+        alert('Tu reserva ha sido cancelada.');
+        reservationForm.classList.add('hidden');
+        modal.classList.add('hidden');
+    });
+
+    function scheduleReminder(chargerType, time) {
+        setTimeout(() => {
+            alert(`Recordatorio: Tu reserva de ${chargerType} expira en 10 minutos.`);
+        }, (time - 10) * 60000);
+    }
+
+    function updateMap(chargerList) {
+        markers.forEach(marker => {
+            map.removeLayer(marker);
+        });
+        markers.length = 0;
+
+        chargerList.forEach(charger => {
+            const marker = L.marker([charger.lat, charger.lon])
+                .addTo(map)
+                .bindPopup(
+                    `<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`
+                );
+            markers.push(marker);
+        });
     }
 
     const chargerTypeSelect = document.getElementById('charger-type');
     chargerTypeSelect.addEventListener('change', () => {
         const selectedType = chargerTypeSelect.value;
-        const filtered = selectedType === 'all' ? chargers : chargers.filter(c => c.type.toLowerCase() === selectedType.toLowerCase());
-        updateMap(filtered);
+        let filteredChargers;
+
+        if (selectedType === 'all') {
+            filteredChargers = chargers;
+        } else {
+            filteredChargers = chargers.filter(charger =>
+                charger.type.toLowerCase() === selectedType.toLowerCase()
+            );
+        }
+
+        updateMap(filteredChargers);
     });
 
-    function updateMap(chargerList) {
-        markers.forEach(marker => map.removeLayer(marker));
-        chargerList.forEach(charger => {
-            const marker = L.marker([charger.lat, charger.lon])
-                .addTo(map)
-                .bindPopup(`<b>Cargador ${charger.type}</b><br>Estado: ${charger.status}`);
-            markers.push(marker);
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginButton = document.querySelector('#admin-login-form button');
+        const loginLinks = document.getElementById('login-links');
 
-    if (currentUser) {
-        loginContainer.classList.add('hidden');
-        mapContainer.classList.remove('hidden');
-        updateFilterVisibility();
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-    }
-
-    updateFilterVisibility();
+        if (loginButton && loginLinks) {
+            loginButton.addEventListener('click', function () {
+                loginLinks.classList.add('hidden');
+            });
+        }
+    });
 });
