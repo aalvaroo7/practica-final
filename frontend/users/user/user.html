@@ -59,6 +59,13 @@
     </div>
 </div>
 
+<!-- MENÚ LATERAL PARA EDITAR PERFIL -->
+<div id="side-menu" class="hidden">
+    <!-- Botón Editar Perfil, oculto al inicio -->
+    <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
+
+</div>
+
 <!-- PERFIL -->
 <div id="profile-container" class="hidden">
     <h2>Perfil de Usuario</h2>
@@ -95,6 +102,18 @@
 <!-- MODAL OPCIONAL -->
 <div id="modal" class="hidden">
     <button id="close-modal">Cerrar</button>
+</div>
+
+<!-- EDITAR PERFIL -->
+<div id="edit-profile-container" class="hidden">
+    <h3>Editar Perfil</h3>
+    <form id="edit-profile-form">
+        <label for="edit-name">Nombre:</label>
+        <input type="text" id="edit-name" name="edit-name" required>
+        <label for="edit-email">Correo:</label>
+        <input type="email" id="edit-email" name="edit-email" required>
+        <button type="submit">Guardar Cambios</button>
+    </form>
 </div>
 
 </body>
