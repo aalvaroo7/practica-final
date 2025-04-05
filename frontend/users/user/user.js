@@ -16,8 +16,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closeModalButton = document.getElementById('close-modal');
     const openNavigationButton = document.getElementById('open-navigation');
     const buttonContainer = document.querySelector('.button-container');
+    const currentUser = localStorage.getItem('currentUser');
+    const reservationHistoryContainer = document.getElementById('reservation-history-container');
 
     let selectedCharger = null;
+
+    if (currentUser) {
+        fetch(`/user-reservations?email=${currentUser}`)
+            .then(response => response.json())
+            .then(reservations => {
+                if (reservations.length > 0) {
+                    reservationHistoryContainer.innerHTML = reservations.map(reservation => `
+                        <div class="reservation">
+                            <p>Charger: ${reservation.charger}</p>
+                            <p>Time: ${reservation.time}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    reservationHistoryContainer.innerHTML = '<p>No reservations found.</p>';
+                }
+            });
+    }
 
     // Función para verificar si el usuario está logueado
     function isLoggedIn() {

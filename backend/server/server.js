@@ -54,6 +54,13 @@ app.get('/config', (req, res) => {
     });
 });
 
+// Ruta para obtener el historial de reservas de un usuario
+    app.get('/user-reservations', (req, res) => {
+        const email = req.query.email;
+        const reservations = getUserReservations(email);
+        res.status(200).json(reservations);
+    });
+
 // Redirección para la ruta /login (se define antes de la ruta catch-all)
 app.get('/login', (req, res) => {
     res.redirect('/users/user/user.html');
