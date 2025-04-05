@@ -162,15 +162,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .bindPopup(`
                     <b>Charger ${charger.type}</b><br>Status: ${charger.status}<br>
                     <button id="reserve-btn-${charger.id}" class="reserve-btn">Reserve Now</button>
+                    <button id="navigate-btn-${charger.id}" class="navigate-btn button-margin">Navigate</button>
                 `);
 
             marker.on('popupopen', () => {
                 const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
+                const navigateButton = document.getElementById(`navigate-btn-${charger.id}`);
                 if (reserveButton) {
                     reserveButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         selectedCharger = charger;
                         showReservationForm(charger);
+                    });
+                }
+                if (navigateButton) {
+                    navigateButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openNavigationApp(charger.lat, charger.lon);
                     });
                 }
             });
@@ -190,6 +198,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         reservationForm.classList.remove('hidden');
         modal.classList.remove('hidden');
+    }
+
+    function openNavigationApp(lat, lon) {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+        window.open(url, '_blank');
     }
 
     closeModalButton.addEventListener('click', () => {
