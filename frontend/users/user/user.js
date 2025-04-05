@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Variables de referencia a elementos del DOM
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buttonContainer = document.querySelector('.button-container');
     const currentUser = localStorage.getItem('currentUser');
     const reservationHistoryContainer = document.getElementById('reservation-history-container');
+    const reservationHistoryBtn = document.getElementById('reservation-history-btn');
     const reservationMessage = document.createElement('p');
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
@@ -260,5 +262,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loginLinks.classList.add('hidden');
             });
         }
+    });
+
+    // Evento de clic para el botón de historial de reservas
+    reservationHistoryBtn.addEventListener('click', () => {
+        reservationHistoryContainer.classList.toggle('hidden');
     });
 });
