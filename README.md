@@ -34,10 +34,10 @@ node server/server.js
 - **RF-10:** Registro y autenticación.
 - **RF-24:** Guardar credenciales y reservas en localStorage.
 - **RF-30:** Visualizar mapa con Leaflet.js.
+- **RF-08:** Notificaciones en tiempo real sobre estado del cargador.
 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-06:** Consultar historial de reservas.
-- **RF-08:** Notificaciones en tiempo real sobre estado del cargador.
 - **RF-09:** Abrir ubicación del cargador en apps de navegación.
 - **RF-19:** Reportar problemas y ver estado de resolución.
 - **RF-20:** Ver y gestionar historial de pagos/facturas.
