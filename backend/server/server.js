@@ -25,26 +25,6 @@ app.use('/users', express.static(staticUsersPath));
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-fs.readFile(pkgPath, 'utf-8', (err, data) => {
-    if (err) {
-        console.error('Error al leer package.json:', err);
-        return res.status(500).json({ success: false, message: 'Error interno en el servidor' });
-    }
-    try {
-        const packageData = JSON.parse(data);
-        // Asumiendo que en package.json las credenciales se encuentran en la propiedad "usuariosPredefinidos"
-        // y que el técnico es el que tiene "rol" igual a "tecnico"
-        const tecnicoCreds = packageData.usuariosPredefinidos.find(user => user.rol === 'tecnico');
-        if (tecnicoCreds && username === tecnicoCreds.username && password === tecnicoCreds.password) {
-            return res.json({ success: true });
-        } else {
-            return res.json({ success: false, message: 'Usuario o contraseña incorrectos' });
-        }
-    } catch (e) {
-        console.error('Error al parsear package.json:', e);
-        return res.status(500).json({ success: false, message: 'Error interno en el servidor' });
-    }
-
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.get('/config', (req, res) => {
@@ -53,13 +33,6 @@ app.get('/config', (req, res) => {
         tecnico: packageData.usuariosPredefinidos.find(user => user.rol === 'tecnico')
     });
 });
-
-// Ruta para obtener el historial de reservas de un usuario
-    app.get('/user-reservations', (req, res) => {
-        const email = req.query.email;
-        const reservations = getUserReservations(email);
-        res.status(200).json(reservations);
-    });
 
 // Redirección para la ruta /login (se define antes de la ruta catch-all)
 app.get('/login', (req, res) => {
@@ -73,5 +46,4 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-});
 });
