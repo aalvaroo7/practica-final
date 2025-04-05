@@ -160,3 +160,36 @@ footer a:hover {
 .button-margin {
     margin-top: 10px; /* Ajusta el valor según sea necesario */
 }
+
+.hidden {
+    display: none;
+}
+
+#side-menu {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#side-menu button {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#side-menu button:hover {
+    background-color: #0056b3;
+}

@@ -16,14 +16,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closeModalButton = document.getElementById('close-modal');
     const openNavigationButton = document.getElementById('open-navigation');
     const buttonContainer = document.querySelector('.button-container');
-    const currentUser = localStorage.getItem('currentUser');
     const reservationHistoryContainer = document.getElementById('reservation-history-container');
     const reservationHistoryBtn = document.getElementById('reservation-history-btn');
-    const reservationMessage = document.createElement('p');
-    const socket = new WebSocket('ws://localhost:8080');
     const adminBtn = document.getElementById('admin-btn');
     const tecnicoBtn = document.getElementById('tecnico-btn');
+    const editProfileContainer = document.getElementById('edit-profile-container');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    const editProfileButton = document.getElementById('edit-profile-btn'); // <- botón perfil
 
+    const socket = new WebSocket('ws://localhost:8080');
+    const reservationMessage = document.createElement('p');
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
 
@@ -35,6 +37,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     let selectedCharger = null;
+    const currentUser = localStorage.getItem('currentUser');
+
+    // Ocultar botón de editar perfil si no hay usuario autenticado
+    if (!currentUser) {
+        editProfileButton.classList.add('hidden');
+    }
 
     if (!currentUser) {
         window.location.href = '/login.html';
@@ -64,17 +72,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function isLoggedIn() {
-        console.log("Usuario autenticado:", localStorage.getItem('currentUser'));
         return localStorage.getItem('currentUser') !== null;
     }
 
     function updateFilterVisibility() {
-        console.log("Ejecutando updateFilterVisibility, isLoggedIn:", isLoggedIn());
         if (isLoggedIn()) {
             filterContainer.classList.remove('hidden');
         } else {
             filterContainer.classList.add('hidden');
         }
+    }
+
+    // Mostrar el formulario de edición de perfil
+    function showEditProfileForm() {
+        const userData = JSON.parse(localStorage.getItem(currentUser));
+        document.getElementById('edit-name').value = userData.name;
+        document.getElementById('edit-email').value = currentUser;
+        editProfileContainer.classList.remove('hidden');
+    }
+
+    // Manejar la actualización del perfil
+    editProfileForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const newName = document.getElementById('edit-name').value.trim();
+        const newEmail = document.getElementById('edit-email').value.trim();
+
+        if (newEmail !== currentUser) {
+            localStorage.removeItem(currentUser);
+            localStorage.setItem(newEmail, JSON.stringify({ name: newName, email: newEmail }));
+            localStorage.setItem('currentUser', newEmail);
+        } else {
+            const userData = JSON.parse(localStorage.getItem(currentUser));
+            userData.name = newName;
+            localStorage.setItem(currentUser, JSON.stringify(userData));
+        }
+
+        alert('Perfil actualizado correctamente.');
+        editProfileContainer.classList.add('hidden');
+    });
+
+    if (editProfileButton) {
+        editProfileButton.addEventListener('click', showEditProfileForm);
     }
 
     loginForm.addEventListener('submit', (event) => {
@@ -90,12 +129,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             mapContainer.classList.remove('hidden');
             buttonContainer.classList.add('hidden');
             updateFilterVisibility();
+
+            // Mostrar botón "Editar Perfil" después del login exitoso
+            editProfileButton.classList.remove('hidden');
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
                 alert("Geolocation not supported.");
             }
-            // Ocultar botones de "Eres Admin" y "Eres Técnico"
+
             adminBtn.classList.add('hidden');
             tecnicoBtn.classList.add('hidden');
         } else {
@@ -220,7 +263,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const reservationTime = document.getElementById('reservation-time').value;
         const currentUser = localStorage.getItem('currentUser');
-        console.log("Reservando para usuario:", currentUser);
 
         if (!currentUser) {
             alert("Tu sesión ha expirado. Por favor vuelve a iniciar sesión.");
@@ -233,7 +275,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             reservationForm.classList.add('hidden');
             modal.classList.add('hidden');
 
-            // Enviar mensaje al servidor para iniciar la reserva
             socket.send(JSON.stringify({
                 type: 'reserve',
                 chargerId: selectedCharger.id,
@@ -286,7 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateMap(filteredChargers);
     });
 
-    // Evento de clic para el botón de historial de reservas
     reservationHistoryBtn.addEventListener('click', () => {
         reservationHistoryContainer.classList.toggle('hidden');
     });
