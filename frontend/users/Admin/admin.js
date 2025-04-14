@@ -35,7 +35,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Al entrar en Gestión de Cargadores se oculta el modal
+    if (editModal) {
+        editModal.classList.add('hidden');
+    }
+
+    // Al entrar a Gestión de Cargadores, se oculta el modal y se muestra el panel
     if (btnManageChargers) {
         btnManageChargers.addEventListener('click', () => {
             if (editModal) {
@@ -45,14 +49,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Al pulsar el botón de editar cargador se muestra el modal
-    if (editModal) {
-        editModal.addEventListener('click', () => {
-            editModal.classList.remove('hidden');
+    // Al pulsar el botón de editar, se muestra el modal
+    if (btnEditCharger) {
+        btnEditCharger.addEventListener('click', () => {
+            if (editModal) {
+                editModal.classList.remove('hidden');
+            }
         });
     }
 
-    // Evento para cancelar la edición y ocultar el modal
+    // Al pulsar cancelar se oculta el modal
     if (cancelEdit) {
         cancelEdit.addEventListener('click', () => {
             if (editModal) {
