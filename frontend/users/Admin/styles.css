@@ -9,9 +9,10 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: url('assets/Foto 1.jpg') no-repeat center center fixed;
     background-size: cover;
 }
+
+
 .link-container {
     display: flex;
     gap: 10px;
@@ -185,5 +186,175 @@ form button:hover {
 }
 
 #btns div button:hover {
+    background-color: #005bb5;
+}
+
+
+/* Estilos para el contenedor de botones de funcionalidad del Admin */
+#btns-admin {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+#btns-admin button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#btns-admin button:hover {
+    background-color: #005bb5;
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+}
+
+.btn-text {
+    margin-top: 5px;
+    font-size: 1rem;
+}
+
+/* Ocultar secciones de funcionalidad por defecto, si no lo está */
+#manage-users,
+#manage-chargers,
+#view-stats,
+#view-logs {
+    display: none;
+}
+
+/* Mostrar el contenido cuando se remueva la clase "hidden" */
+.hidden {
+    display: none;
+}
+
+
+/* Estilos para el encabezado de Gestión de Usuarios */
+.manage-users-header {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.manage-users-header i {
+    margin-right: 10px;
+    color: #0073e6;
+}
+
+/*Particulas durisimas(enserio estan guapisimas y encima sin chat son de un repositorio de github*/
+#particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Para que quede detrás del contenido */
+    background-color: #1a1a1a; /* Cambia si quieres otro color de fondo */
+}
+
+/* Estilos para la tabla de usuarios */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Estilos para encabezados de la tabla */
+.user-th {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+/* Estilos para las celdas de la tabla */
+.user-td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+/* Estilo específico para la celda de acciones, alinear a la derecha */
+.action-cell {
+    text-align: right;
+}
+
+/* Estilos para el botón Editar */
+.btn-edit {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+/* Estilos para el botón Eliminar */
+.btn-delete {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Estilos para el modal */
+#edit-charger-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#edit-charger-modal .modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
     background-color: #005bb5;
 }

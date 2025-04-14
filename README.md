@@ -1,19 +1,13 @@
 
-Diseño de la pagina web e iniciacion del server.js
-Hay que hacer lo mismo con cd cambias a la carpeta donde este el server.js y cuando estes en esa carpeta 
-se ejecuta el comando node server.js
-
-he organizado la pagina en una principal que te redirige a una de usuario que te redirige a otras dos si asi lo deseas, en todas ellas se ha empleado 
-una verificacion de modo que si no se introduce la contraseña correcta el usuario no puede ver lo que hay en esa pagina
-
-
 FALTA POR IMPLEMENTAR:
-CUANDO SE INICIA SESION EN EL USER SE SIGUEN VIENDO LOS BOTONES ARRIBA, HAY QUE QUITARLOS
-FALTA HACER QUE CUANDO SE PULSE EL BOTON CON EL USUARIO CORRECTO Y CONTRASEÑA CORRECTA
+
 CON EL TÉCNICO
 DISEÑAR LOS METODOS DEL TECNICO QUE ESTAN EN LOS REQUISITOS TECNICOS
+
+CON EL ADMIN
 DISEÑAR LOS METODOS DEL ADMIN
-EN USER CUANDO SE INICIA SESION SE SIGUEN VIENDO LOS BOTONES ARRIBA, HAY QUE QUITARLOS 
+
+
 
 
 INICIAR LA APLICACIÓN:
@@ -60,11 +54,12 @@ node server/server.js
 ### ✅ Requisitos Funcionales Cumplidos
 - **RF-23:** Configurar CORS para orígenes cruzados.
 - **RF-25:** Servidor Express para estáticos y autenticación.
-
-### ❌ Requisitos Funcionales No Cumplidos
 - **RF-07:** Sistema de roles.
 - **RF-11:** Validación de permisos según rol.
 - **RF-12:** Gestión de cargadores (CRUD).
+
+
+### ❌ Requisitos Funcionales No Cumplidos
 - **RF-13:** Ver estadísticas de uso/rendimiento.
 - **RF-14:** Consultar logs de auditoría.
 - **RF-31:** Middleware de validación de permisos según rol.
