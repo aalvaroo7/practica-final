@@ -1,3 +1,4 @@
+<!-- Archivo: frontend/users/Admin/admin.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,12 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Encuentra tu Cargador</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Se añade la referencia a FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="admin.js" defer></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <link rel="server.js" href="../../../backend/sever/server.js">
+  <script src="https://kit.fontawesome.com/955ed7fc64.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
+<div id="particles-js"></div>
+
 <div id="admin-login-container">
   <h2>Iniciar Sesión como Administrador</h2>
   <form id="admin-login-form">
@@ -21,43 +27,38 @@
   </form>
 </div>
 
-<div id="btns">
-<div  id="login-btn"><button>Volver al Inicio de Sesión</button></div>
-<div id="Volver-btn"><button>Volver a la página principal</button></div>
-</div>
 
+<!-- Panel de administración -->
 <div id="admin-container" class="hidden">
   <header>
     <h1>Panel de Administración</h1>
     <nav>
-      <ul>
-        <li><a href="#manage-users">Gestión de Usuarios</a></li>
-        <li><a href="#manage-chargers">Gestión de Cargadores</a></li>
-        <li><a href="#view-stats">Ver Estadísticas</a></li>
-        <li><a href="#view-logs">Ver Logs de Auditoría</a></li>
-      </ul>
+      <div id="btns-admin">
+        <button id="btn-manage-users">
+          <div class="btn-icon"><i class="fa-solid fa-circle-user"></i></div>
+          <div class="btn-text">Gestión de Usuarios</div>
+        </button>
+        <button id="btn-manage-chargers">
+          <div class="btn-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="btn-text">Gestión de Cargadores</div>
+        </button>
+        <button id="btn-view-stats">
+          <div class="btn-icon"><i class="fa-solid fa-chart-simple"></i></div>
+          <div class="btn-text">Ver Estadísticas</div>
+        </button>
+        <button id="btn-view-logs">
+          <div class="btn-icon"><i class="fa-solid fa-address-book"></i></div>
+          <div class="btn-text">Ver Logs de Auditoría</div>
+        </button>
+      </div>
     </nav>
+    <button id="btn-regresar" style="display: none;">Regresar al panel del admin</button>
   </header>
 
   <main>
-    <div id="map-container" class="hidden">
-      <h1>Encuentra tu Cargador</h1>
-      <div id="map"></div>
-      <div id="charger-details"></div>
-      <div id="reservation-form" class="hidden">
-        <h3>Reserve Charger</h3>
-        <form id="reserve-form">
-          <label for="reservation-time">Reservation Time (minutes):</label>
-          <input type="number" id="reservation-time" min="1" max="120" required>
-          <button type="submit">Reserve</button>
-        </form>
-      </div>
-    </div>
-  </main>
-
-  <main>
     <section id="manage-users">
-      <h2>Gestión de Usuarios</h2>
+      <!-- Se añade el ícono al título -->
+      <h2 class="manage-users-header"><i class="fa-solid fa-circle-user"></i> Gestión de Usuarios</h2>
       <form id="add-user-form">
         <input type="text" id="new-username" placeholder="Nombre de Usuario" required>
         <input type="email" id="new-email" placeholder="Correo Electrónico" required>
@@ -101,7 +102,46 @@
       </div>
     </section>
   </main>
-
 </div>
+
+<div id="btns">
+  <div id="login-btn"><button>Volver al Inicio de Sesión</button></div>
+  <div id="Volver-btn"><button>Volver a la página principal</button></div>
+</div>
+
+<div id="edit-charger-modal" class="hidden">
+  <h2>Editar Cargador</h2>
+  <form id="edit-charger-form">
+    <table style="width: 100%; margin-bottom: 20px;">
+      <tr>
+        <td>ID:</td>
+        <td><span id="edit-charger-id"></span></td>
+      </tr>
+      <tr>
+        <td>Tipo:</td>
+        <td>
+          <select id="edit-charger-type" style="width: 100%;" required>
+            <option value="Rapido">Rápido</option>
+            <option value="Compatible">Compatible</option>
+            <option value="Normal">Normal</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Estado:</td>
+        <td>
+          <select id="edit-charger-status" style="width: 100%;" required>
+            <option value="Disponible">Disponible</option>
+            <option value="Ocupado">Ocupado</option>
+            <option value="En reparacion">En Reparación</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+    <button type="submit" style="padding: 10px 20px; margin-right: 10px;">Guardar</button>
+    <button type="button" id="cancel-edit" style="padding: 10px 20px;">Cancelar</button>
+  </form>
+</div>
+
 </body>
 </html>

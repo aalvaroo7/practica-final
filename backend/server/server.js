@@ -12,6 +12,53 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+// Arreglo en memoria para almacenar los cargadores
+let chargers = [
+    { id: 1, type: 'Rápido', status: 'Disponible' },
+    { id: 2, type: 'Nomal', status: 'Ocupado' },
+    { id: 3, type: 'compatible', status: 'En reparación' }
+];
+
+// Endpoint para obtener la lista de cargadores
+app.get('/api/chargers', (req, res) => {
+    res.json(chargers);
+});
+
+// Endpoint para agregar un nuevo cargador (CREATE)
+app.post('/api/chargers', (req, res) => {
+    const { id, type, status } = req.body;
+    if (!id || !type || !status) {
+        return res.status(400).json({ error: 'Datos incompletos del cargador.' });
+    }
+    const newCharger = { id, type, status };
+    chargers.push(newCharger);
+    res.status(201).json(newCharger);
+});
+
+// Actualizar estado o cualquier dato de un cargador existente
+app.put('/api/chargers/:id', (req, res) => {
+    const chargerId = Number(req.params.id);
+    const { type, status } = req.body;
+    const chargerIndex = chargers.findIndex(charger => charger.id === chargerId);
+    if (chargerIndex === -1) {
+        return res.status(404).json({ error: 'Cargador no encontrado.' });
+    }
+    // Actualiza solo las propiedades recibidas
+    chargers[chargerIndex] = { ...chargers[chargerIndex], type, status };
+    res.json(chargers[chargerIndex]);
+});
+
+// Endpoint para eliminar un cargador (DELETE)
+app.delete('/api/chargers/:id', (req, res) => {
+    const chargerId = Number(req.params.id);
+    const index = chargers.findIndex(c => c.id === chargerId);
+    if (index === -1) {
+        return res.status(404).json({ error: 'Cargador no encontrado.' });
+    }
+    const deletedCharger = chargers.splice(index, 1);
+    res.json(deletedCharger[0]);
+});
+
 // Middleware para servir archivos de la carpeta "public"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

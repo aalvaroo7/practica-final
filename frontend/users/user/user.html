@@ -15,8 +15,10 @@
 <div id="login-container">
     <h2>Iniciar Sesión</h2>
     <form id="login-form">
+        <input type="text" id="register-name" placeholder="Nombre" required>
         <input type="email" id="login-email" placeholder="Correo electrónico" required>
         <input type="password" id="login-password" placeholder="Contraseña" required>
+
         <button type="submit">Acceder</button>
     </form>
     <p id="error-message" class="hidden">Correo o contraseña incorrectos</p>
@@ -63,7 +65,7 @@
 <div id="side-menu" class="hidden">
     <!-- Botón Editar Perfil, oculto al inicio -->
     <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
-
+    <button id="show-map-btn" class="hidden">Mostrar Mapa</button>
 </div>
 
 <!-- PERFIL -->
