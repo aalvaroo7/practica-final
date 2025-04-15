@@ -234,7 +234,7 @@ form button:hover {
 
 /* Mostrar el contenido cuando se remueva la clase "hidden" */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 
@@ -357,4 +357,14 @@ form button:hover {
 
 .btn:hover {
     background-color: #005bb5;
+}
+
+#particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: #1a1a1a;
 }

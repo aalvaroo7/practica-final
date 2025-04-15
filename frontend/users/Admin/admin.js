@@ -5,24 +5,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addChargerForm = document.getElementById('add-charger-form');
     const chargerListDiv = document.getElementById('charger-list');
     const addUserForm = document.getElementById('add-user-form');
-    const userListDiv = document.getElementById('user-list');
-    let users = [];
     const btnRegresar = document.getElementById('btn-regresar');
     const btnManageChargers = document.getElementById('btn-manage-chargers');
     const editModal = document.getElementById('edit-charger-modal');
     const cancelEdit = document.getElementById('cancel-edit');
+    const adminContainer = document.getElementById('admin-container');
+    let users = [];
 
-// Función para ocultar todos los paneles
+    // Función para ocultar todos los paneles
     function hideAllPanels() {
         const panels = document.querySelectorAll('main > section');
         panels.forEach(panel => {
             panel.classList.remove('visible');
             panel.style.display = 'none';
             panel.classList.add('hidden');
+            editModal.classList.add('hidden');
         });
     }
 
-    // Muestra el panel deseado removiendo la clase 'hidden'
+    // Función que muestra el panel deseado
     function togglePanel(panelId) {
         hideAllPanels();
         const panel = document.getElementById(panelId);
@@ -35,11 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    if (editModal) {
-        editModal.classList.add('hidden');
-    }
-
-    // Al entrar a Gestión de Cargadores, se oculta el modal y se muestra el panel
+    // Eventos para navegación
     if (btnManageChargers) {
         btnManageChargers.addEventListener('click', () => {
             if (editModal) {
@@ -49,16 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Al pulsar el botón de editar, se muestra el modal
-    if (btnEditCharger) {
-        btnEditCharger.addEventListener('click', () => {
-            if (editModal) {
-                editModal.classList.remove('hidden');
-            }
-        });
-    }
-
-    // Al pulsar cancelar se oculta el modal
     if (cancelEdit) {
         cancelEdit.addEventListener('click', () => {
             if (editModal) {
@@ -67,35 +54,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    btnRegresar.addEventListener('click', () => {
-        hideAllPanels();
-        btnRegresar.style.display = 'none';
-    });
+    if (btnRegresar) {
+        btnRegresar.addEventListener('click', () => {
+            hideAllPanels();
+            btnRegresar.style.display = 'none';
+        });
+    }
 
-    // Asignación de eventos a cada botón de navegación
     const btnManageUsers = document.getElementById('btn-manage-users');
     const btnViewStats = document.getElementById('btn-view-stats');
     const btnViewLogs = document.getElementById('btn-view-logs');
 
-    btnManageUsers.addEventListener('click', () => {
-        console.log('Click en Gestión de Usuarios');
-        togglePanel('manage-users');
-    });
+    if (btnManageUsers) {
+        btnManageUsers.addEventListener('click', () => {
+            console.log('Click en Gestión de Usuarios');
+            togglePanel('manage-users');
+        });
+    }
 
-    btnManageChargers.addEventListener('click', () => {
-        console.log('Click en Gestión de Cargadores');
-        togglePanel('manage-chargers');
-    });
+    if (btnViewStats) {
+        btnViewStats.addEventListener('click', () => {
+            console.log('Click en Ver Estadísticas');
+            togglePanel('view-stats');
+        });
+    }
 
-    btnViewStats.addEventListener('click', () => {
-        console.log('Click en Ver Estadísticas');
-        togglePanel('view-stats');
-    });
-
-    btnViewLogs.addEventListener('click', () => {
-        console.log('Click en Ver Logs de Auditoría');
-        togglePanel('view-logs');
-    });
+    if (btnViewLogs) {
+        btnViewLogs.addEventListener('click', () => {
+            console.log('Click en Ver Logs de Auditoría');
+            togglePanel('view-logs');
+        });
+    }
 
     // Eventos para redirección
     if (loginBtn) {
@@ -113,13 +102,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Autenticación del admin
     adminLoginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        console.log('Intento de login:', username, password);
+
         try {
             const response = await fetch('/config');
+            if (!response.ok) {
+                console.error('Error en el servidor:', response.status);
+                return;
+            }
             const data = await response.json();
+            console.log('Datos recibidos:', data);
             const adminCreds = data.admin;
+            if (!adminCreds) {
+                console.error('Credenciales de admin no encontradas');
+                return;
+            }
 
+            // Configura el fondo
             document.body.style.backgroundImage = "url('FOTO.jpg')";
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -128,88 +129,96 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (username === adminCreds.username && password === adminCreds.password) {
                 document.getElementById('admin-login-container').classList.add('hidden');
                 document.getElementById('admin-container').classList.remove('hidden');
-                hideAllPanels();
             } else {
                 document.getElementById('admin-error-message').classList.remove('hidden');
+                console.warn('Credenciales incorrectas');
             }
         } catch (error) {
             console.error('Error al obtener credenciales:', error);
         }
     });
 
-    // Función que actualiza la tabla de usuarios con botones de "Editar" y "Eliminar"
+    // Resto de funciones para Gestión de Usuarios y Cargadores
     function updateUserList(users) {
-        const userListDiv = document.getElementById('user-list');
-        userListDiv.innerHTML = '';
-        const table = document.createElement('table');
-        table.classList.add('user-table');
+        const userListDiv = document.getElementById("user-list");
+        userListDiv.innerHTML = "";
 
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        const headers = ['Usuario', 'Correo', 'Rol', 'Acciones'];
+        // Crear tabla y encabezado
+        const table = document.createElement("table");
+        table.classList.add("user-table");
+
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const headers = ["Usuario", "Correo", "Rol", "Acciones"];
         headers.forEach(text => {
-            const th = document.createElement('th');
+            const th = document.createElement("th");
             th.textContent = text;
-            th.classList.add('user-th');
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
-        const tbody = document.createElement('tbody');
+        // Crear cuerpo de la tabla con filas para cada usuario
+        const tbody = document.createElement("tbody");
         users.forEach((user, index) => {
-            const tr = document.createElement('tr');
+            const tr = document.createElement("tr");
 
-            const tdUsername = document.createElement('td');
-            tdUsername.textContent = user.username;
-            tdUsername.classList.add('user-td');
-            tr.appendChild(tdUsername);
+            // Crear celdas de usuario, correo y rol
+            ["username", "email", "role"].forEach(prop => {
+                const td = document.createElement("td");
+                td.textContent = user[prop];
+                tr.appendChild(td);
+            });
 
-            const tdEmail = document.createElement('td');
-            tdEmail.textContent = user.email;
-            tdEmail.classList.add('user-td');
-            tr.appendChild(tdEmail);
+            // Celda de acciones
+            const tdActions = document.createElement("td");
 
-            const tdRole = document.createElement('td');
-            tdRole.textContent = user.role;
-            tdRole.classList.add('user-td');
-            tr.appendChild(tdRole);
-
-            const tdAction = document.createElement('td');
-            tdAction.classList.add('user-td', 'action-cell');
-
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'Editar';
-            editBtn.classList.add('btn-edit');
-            editBtn.addEventListener('click', () => {
-                const newUsername = prompt('Ingresa el nuevo nombre de usuario:', user.username);
-                const newEmail = prompt('Ingresa el nuevo correo electrónico:', user.email);
-                const newRole = prompt('Ingresa el nuevo rol:', user.role);
+            // Botón para editar
+            const btnEdit = document.createElement("button");
+            btnEdit.textContent = "Editar";
+            btnEdit.addEventListener("click", () => {
+                const newUsername = prompt("Ingresa el nuevo nombre de usuario:", user.username);
+                const newEmail = prompt("Ingresa el nuevo correo electrónico:", user.email);
+                const newRole = prompt("Ingresa el nuevo rol:", user.role);
                 if (newUsername && newEmail && newRole) {
-                    users[index] = { username: newUsername, email: newEmail, role: newRole };
+                    users[index] = { ...user, username: newUsername, email: newEmail, role: newRole };
                     updateUserList(users);
                 }
             });
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Eliminar';
-            deleteBtn.classList.add('btn-delete');
-            deleteBtn.addEventListener('click', () => {
-                if (confirm('¿Seguro que deseas eliminar este usuario?')) {
+            // Botón para eliminar
+            const btnDelete = document.createElement("button");
+            btnDelete.textContent = "Eliminar";
+            btnDelete.addEventListener("click", () => {
+                if (confirm("¿Seguro que deseas eliminar este usuario?")) {
                     users.splice(index, 1);
                     updateUserList(users);
                 }
             });
 
-            tdAction.appendChild(editBtn);
-            tdAction.appendChild(deleteBtn);
-            tr.appendChild(tdAction);
+            tdActions.appendChild(btnEdit);
+            tdActions.appendChild(btnDelete);
+            tr.appendChild(tdActions);
             tbody.appendChild(tr);
         });
 
         table.appendChild(tbody);
         userListDiv.appendChild(table);
     }
+
+// Evento del formulario de agregar usuario existente
+    addUserForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const newUser = {
+            username: document.getElementById("new-username").value.trim(),
+            email: document.getElementById("new-email").value.trim(),
+            password: document.getElementById("new-password").value.trim(),
+            role: document.getElementById("new-role").value
+        };
+        users.push(newUser);
+        updateUserList(users);
+        addUserForm.reset();
+    });
 
     addUserForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -224,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         addUserForm.reset();
     });
 
-    // Funciones y eventos para Gestión deCargadores
     async function loadChargers() {
         try {
             const response = await fetch('/api/chargers');
@@ -251,7 +259,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
             button.addEventListener('click', deleteCharger);
         });
-        // Evento para abrir el modal de edición con los datos del cargador
         chargerListDiv.querySelectorAll('.edit-charger-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const chargerId = button.getAttribute('data-id');
@@ -323,7 +330,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Código para el modal de edición de cargadores
     document.getElementById('edit-charger-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         const id = document.getElementById('edit-charger-id').textContent;
@@ -351,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit-charger-modal').classList.add('hidden');
     });
 
-    //PARTICULAS DURISIMAS
+    // Inicializa partículas y carga los cargadores
     particlesJS("particles-js", {
         particles: {
             number: { value: 80, density: { enable: true, value_area: 800 } },
@@ -364,14 +370,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         interactivity: {
             detect_on: "canvas",
-            events: {
-                onhover: { enable: true, mode: "repulse" },
-                onclick: { enable: true, mode: "push" }
-            },
-            modes: {
-                repulse: { distance: 100 },
-                push: { particles_nb: 4 }
-            }
+            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
+            modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
         },
         retina_detect: true
     });

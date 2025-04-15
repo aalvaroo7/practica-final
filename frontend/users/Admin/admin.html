@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Encuentra tu Cargador</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Se añade la referencia a FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="admin.js" defer></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
@@ -19,7 +18,7 @@
 
 <div id="admin-login-container">
   <h2>Iniciar Sesión como Administrador</h2>
-  <form id="admin-login-form">
+  <form id="admin-login-form" action="">
     <input type="text" id="username" placeholder="Usuario" required>
     <input type="password" id="password" placeholder="Contraseña" required>
     <button type="submit">Acceder</button>
@@ -27,8 +26,6 @@
   </form>
 </div>
 
-
-<!-- Panel de administración -->
 <div id="admin-container" class="hidden">
   <header>
     <h1>Panel de Administración</h1>
@@ -57,7 +54,6 @@
 
   <main>
     <section id="manage-users">
-      <!-- Se añade el ícono al título -->
       <h2 class="manage-users-header"><i class="fa-solid fa-circle-user"></i> Gestión de Usuarios</h2>
       <form id="add-user-form">
         <input type="text" id="new-username" placeholder="Nombre de Usuario" required>
@@ -70,9 +66,7 @@
         </select>
         <button type="submit">Agregar Usuario</button>
       </form>
-      <div id="user-list">
-        <!-- Lista de usuarios -->
-      </div>
+      <div id="user-list"></div>
     </section>
 
     <section id="manage-chargers">
@@ -83,23 +77,17 @@
         <input type="text" id="charger-status" placeholder="Estado del Cargador" required>
         <button type="submit">Agregar Cargador</button>
       </form>
-      <div id="charger-list">
-        <!-- Lista de cargadores -->
-      </div>
+      <div id="charger-list"></div>
     </section>
 
     <section id="view-stats">
       <h2>Ver Estadísticas</h2>
-      <div id="stats-container">
-        <!-- Contenido de estadísticas -->
-      </div>
+      <div id="stats-container"></div>
     </section>
 
     <section id="view-logs">
       <h2>Ver Logs de Auditoría</h2>
-      <div id="logs-container">
-        <!-- Contenido de logs -->
-      </div>
+      <div id="logs-container"></div>
     </section>
   </main>
 </div>
