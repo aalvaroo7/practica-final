@@ -357,106 +357,83 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit-charger-modal').classList.add('hidden');
     });
 
-    function createEditUserModal() {
-        document.getElementById("edit-user-modal").classList.remove("hidden");
-
-        // Contenedor principal del modal
-        const modalDiv = document.createElement("div");
-        modalDiv.id = "edit-user-modal";
-        modalDiv.classList.add("hidden");
-
-        // Contenedor interno del modal (contenido)
-        const contentDiv = document.createElement("div");
-        contentDiv.classList.add("modal-content");
-
-        // Título del modal
-        const header = document.createElement("h2");
-        header.textContent = "Editar Usuario";
-        contentDiv.appendChild(header);
-
-        // Creación del formulario de edición
-        const form = document.createElement("form");
-        form.id = "edit-user-form";
-
-        // Input oculto para guardar el índice del usuario a editar
-        const hiddenInput = document.createElement("input");
-        hiddenInput.type = "hidden";
-        hiddenInput.id = "edit-user-index";
-        form.appendChild(hiddenInput);
-
-        // Campo para el nombre de usuario
-        const labelUsername = document.createElement("label");
-        labelUsername.setAttribute("for", "edit-username");
-        labelUsername.textContent = "Nombre de Usuario:";
-        form.appendChild(labelUsername);
-
-        const inputUsername = document.createElement("input");
-        inputUsername.type = "text";
-        inputUsername.id = "edit-username";
-        inputUsername.required = true;
-        form.appendChild(inputUsername);
-
-        // Campo para el correo electrónico
-        const labelEmail = document.createElement("label");
-        labelEmail.setAttribute("for", "edit-email");
-        labelEmail.textContent = "Correo Electrónico:";
-        form.appendChild(labelEmail);
-
-        const inputEmail = document.createElement("input");
-        inputEmail.type = "email";
-        inputEmail.id = "edit-email";
-        inputEmail.required = true;
-        form.appendChild(inputEmail);
-
-        // Campo para seleccionar el rol
-        const labelRole = document.createElement("label");
-        labelRole.setAttribute("for", "edit-role");
-        labelRole.textContent = "Rol:";
-        form.appendChild(labelRole);
-
-        const selectRole = document.createElement("select");
-        selectRole.id = "edit-role";
-        const optionAdmin = document.createElement("option");
-        optionAdmin.value = "admin";
-        optionAdmin.textContent = "Admin";
-        const optionTecnico = document.createElement("option");
-        optionTecnico.value = "tecnico";
-        optionTecnico.textContent = "Técnico";
-        selectRole.appendChild(optionAdmin);
-        selectRole.appendChild(optionTecnico);
-        form.appendChild(selectRole);
-
-        // Contenedor para los botones (guardar y cancelar)
-        const btnContainer = document.createElement("div");
-        btnContainer.classList.add("modal-buttons");
-
-        const saveButton = document.createElement("button");
-        saveButton.type = "submit";
-        saveButton.classList.add("btn");
-        saveButton.textContent = "Guardar";
-        btnContainer.appendChild(saveButton);
-
-        const cancelButton = document.createElement("button");
-        cancelButton.type = "button";
-        cancelButton.id = "cancel-edit-user";
-        cancelButton.classList.add("btn");
-        cancelButton.textContent = "Cancelar";
-        btnContainer.appendChild(cancelButton);
-
-        form.appendChild(btnContainer);
-        contentDiv.appendChild(form);
-        modalDiv.appendChild(contentDiv);
-        document.body.appendChild(modalDiv);
-
-        // Agregar el evento para ocultar el modal al hacer clic en "Cancelar"
-        cancelButton.addEventListener("click", () => {
-            modalDiv.classList.add("hidden");
-        });
+    function openEditUserModal(user, index) {
+        const modal = document.getElementById('edit-user-modal');
+        modal.querySelector('#edit-user-index').value = index;
+        modal.querySelector('#edit-username').value = user.username;
+        modal.querySelector('#edit-email').value = user.email;
+        modal.querySelector('#edit-role').value = user.role;
+        modal.classList.remove('hidden');
     }
 
-// Llamada a la función para crear e insertar el modal en el DOM
+// Función que oculta el modal de edición
+    function closeEditUserModal() {
+        document.getElementById('edit-user-modal').classList.add('hidden');
+    }
+
+// Ejemplo en la función que actualiza la lista de usuarios
+    function updateUserList(users) {
+        const userListDiv = document.getElementById("user-list");
+        userListDiv.innerHTML = "";
+
+        // Crear tabla y encabezado
+        const table = document.createElement("table");
+        table.classList.add("user-table");
+
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const headers = ["Usuario", "Correo", "Rol", "Acciones"];
+        headers.forEach(text => {
+            const th = document.createElement("th");
+            th.textContent = text;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Crear cuerpo de la tabla con filas para cada usuario
+        const tbody = document.createElement("tbody");
+        users.forEach((user, index) => {
+            const tr = document.createElement("tr");
+
+            // Celdas de datos
+            ["username", "email", "role"].forEach(prop => {
+                const td = document.createElement("td");
+                td.textContent = user[prop];
+                tr.appendChild(td);
+            });
+
+            // Celda de acciones
+            const tdActions = document.createElement("td");
+
+            // Botón para editar que abre el modal
+            const btnEdit = document.createElement("button");
+            btnEdit.textContent = "Editar";
+            btnEdit.addEventListener("click", () => openEditUserModal(user, index));
+
+            // Botón para eliminar
+            const btnDelete = document.createElement("button");
+            btnDelete.textContent = "Eliminar";
+            btnDelete.addEventListener("click", () => {
+                if (confirm("¿Seguro que deseas eliminar este usuario?")) {
+                    users.splice(index, 1);
+                    updateUserList(users);
+                }
+            });
+
+            tdActions.appendChild(btnEdit);
+            tdActions.appendChild(btnDelete);
+            tr.appendChild(tdActions);
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        userListDiv.appendChild(table);
+    }
+
+// Evento para ocultar el modal al pulsar "Cancelar" dentro del modal
     document.addEventListener("DOMContentLoaded", () => {
-        createEditUserModal();
+        const cancelEditUserBtn = document.getElementById("cancel-edit-user");
+        cancelEditUserBtn.addEventListener("click", closeEditUserModal);
     });
 
     // Inicializa partículas y carga los cargadores
