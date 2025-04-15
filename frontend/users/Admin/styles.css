@@ -305,20 +305,6 @@ form button:hover {
     border-radius: 4px;
 }
 
-/* Estilos para el modal */
-#edit-charger-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
 #edit-charger-modal .modal-content {
     background: #fff;
     padding: 20px;
@@ -367,4 +353,60 @@ form button:hover {
     height: 100%;
     z-index: -1;
     background-color: #1a1a1a;
+}
+
+#edit-user-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#edit-user-modal .modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#edit-user-modal h2 {
+    margin-top: 0;
+}
+
+#edit-user-modal form {
+    display: flex;
+    flex-direction: column;
+}
+
+#edit-user-modal form input,
+#edit-user-modal form select,
+#edit-user-modal form button {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#edit-user-modal .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#edit-user-modal button.btn {
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+#edit-user-modal button.btn:hover {
+    background-color: #005bb5;
 }

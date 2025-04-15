@@ -357,6 +357,108 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit-charger-modal').classList.add('hidden');
     });
 
+    function createEditUserModal() {
+        document.getElementById("edit-user-modal").classList.remove("hidden");
+
+        // Contenedor principal del modal
+        const modalDiv = document.createElement("div");
+        modalDiv.id = "edit-user-modal";
+        modalDiv.classList.add("hidden");
+
+        // Contenedor interno del modal (contenido)
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("modal-content");
+
+        // Título del modal
+        const header = document.createElement("h2");
+        header.textContent = "Editar Usuario";
+        contentDiv.appendChild(header);
+
+        // Creación del formulario de edición
+        const form = document.createElement("form");
+        form.id = "edit-user-form";
+
+        // Input oculto para guardar el índice del usuario a editar
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.id = "edit-user-index";
+        form.appendChild(hiddenInput);
+
+        // Campo para el nombre de usuario
+        const labelUsername = document.createElement("label");
+        labelUsername.setAttribute("for", "edit-username");
+        labelUsername.textContent = "Nombre de Usuario:";
+        form.appendChild(labelUsername);
+
+        const inputUsername = document.createElement("input");
+        inputUsername.type = "text";
+        inputUsername.id = "edit-username";
+        inputUsername.required = true;
+        form.appendChild(inputUsername);
+
+        // Campo para el correo electrónico
+        const labelEmail = document.createElement("label");
+        labelEmail.setAttribute("for", "edit-email");
+        labelEmail.textContent = "Correo Electrónico:";
+        form.appendChild(labelEmail);
+
+        const inputEmail = document.createElement("input");
+        inputEmail.type = "email";
+        inputEmail.id = "edit-email";
+        inputEmail.required = true;
+        form.appendChild(inputEmail);
+
+        // Campo para seleccionar el rol
+        const labelRole = document.createElement("label");
+        labelRole.setAttribute("for", "edit-role");
+        labelRole.textContent = "Rol:";
+        form.appendChild(labelRole);
+
+        const selectRole = document.createElement("select");
+        selectRole.id = "edit-role";
+        const optionAdmin = document.createElement("option");
+        optionAdmin.value = "admin";
+        optionAdmin.textContent = "Admin";
+        const optionTecnico = document.createElement("option");
+        optionTecnico.value = "tecnico";
+        optionTecnico.textContent = "Técnico";
+        selectRole.appendChild(optionAdmin);
+        selectRole.appendChild(optionTecnico);
+        form.appendChild(selectRole);
+
+        // Contenedor para los botones (guardar y cancelar)
+        const btnContainer = document.createElement("div");
+        btnContainer.classList.add("modal-buttons");
+
+        const saveButton = document.createElement("button");
+        saveButton.type = "submit";
+        saveButton.classList.add("btn");
+        saveButton.textContent = "Guardar";
+        btnContainer.appendChild(saveButton);
+
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.id = "cancel-edit-user";
+        cancelButton.classList.add("btn");
+        cancelButton.textContent = "Cancelar";
+        btnContainer.appendChild(cancelButton);
+
+        form.appendChild(btnContainer);
+        contentDiv.appendChild(form);
+        modalDiv.appendChild(contentDiv);
+        document.body.appendChild(modalDiv);
+
+        // Agregar el evento para ocultar el modal al hacer clic en "Cancelar"
+        cancelButton.addEventListener("click", () => {
+            modalDiv.classList.add("hidden");
+        });
+    }
+
+// Llamada a la función para crear e insertar el modal en el DOM
+    document.addEventListener("DOMContentLoaded", () => {
+        createEditUserModal();
+    });
+
     // Inicializa partículas y carga los cargadores
     particlesJS("particles-js", {
         particles: {
