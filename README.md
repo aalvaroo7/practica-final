@@ -1,15 +1,3 @@
-
-FALTA POR IMPLEMENTAR:
-
-CON EL TÉCNICO
-DISEÑAR LOS METODOS DEL TECNICO QUE ESTAN EN LOS REQUISITOS TECNICOS
-
-CON EL ADMIN
-DISEÑAR LOS METODOS DEL ADMIN
-
-
-
-
 INICIAR LA APLICACIÓN:
 node server/server.js
 
@@ -57,12 +45,12 @@ node server/server.js
 - **RF-07:** Sistema de roles.
 - **RF-11:** Validación de permisos según rol.
 - **RF-12:** Gestión de cargadores (CRUD).
-
+- **RF-31:** Middleware de validación de permisos según rol. esto se cumple en este repositori****
 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-13:** Ver estadísticas de uso/rendimiento.
 - **RF-14:** Consultar logs de auditoría.
-- **RF-31:** Middleware de validación de permisos según rol.
+
 - **RF-32:** Interfaz de administración para gestionar cargadores.
 - **RF-33:** Gráficos/estadísticas con Chart.js.
 - **RF-40:** Configurar horarios de disponibilidad.
@@ -84,11 +72,13 @@ node server/server.js
 ### ✅ Cumplidos (Generales)
 - **RNF-01:** Aplicación responsiva.
 - **RNF-06:** Buenas prácticas de código (modularidad, legibilidad, documentación).
-
-### ❌ No Cumplidos (Generales)
 - **RNF-02:** Tiempo de respuesta ≤ 2 segundos.
 - **RNF-03:** Usabilidad y accesibilidad (WCAG 2.1).
 - **RNF-04:** Mensajes de error claros y útiles.
 - **RNF-05:** Push notifications ≤ 5 segundos.
-- **RNF-07:** Compatibilidad con últimos 3 navegadores principales.
 - **RNF-08:** Tiempo de carga < 3 segundos.
+
+
+### ❌ No Cumplidos (Generales)
+
+- **RNF-07:** Compatibilidad con últimos 3 navegadores principales.
