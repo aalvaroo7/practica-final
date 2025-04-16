@@ -430,29 +430,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+// Función para cargar y desplegar los logs de auditoría
+    async function loadLogs() {
+        try {
+            const response = await fetch('/api/logs');
+            if (!response.ok) {
+                console.error('Error al obtener los logs de auditoría');
+                return;
+            }
+            const data = await response.json();
+            const logsContainer = document.getElementById('logs-container');
+            logsContainer.innerHTML = '';
+            if (data.logs && data.logs.length > 0) {
+                const ul = document.createElement('ul');
+                data.logs.forEach(log => {
+                    const li = document.createElement('li');
+                    li.textContent = log;
+                    ul.appendChild(li);
+                });
+                logsContainer.appendChild(ul);
+            } else {
+                logsContainer.innerHTML = '<p>No hay logs de auditoría.</p>';
+            }
+        } catch (error) {
+            console.error('Error al cargar logs de auditoría:', error);
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Actualiza el evento del botón "Ver Logs de Auditoría" para cargar los logs
+    if (btnViewLogs) {
+        btnViewLogs.addEventListener('click', () => {
+            togglePanel('view-logs');
+            loadLogs();
+        });
+    }
 
     // Inicializa partículas y carga los cargadores
     particlesJS("particles-js", {
