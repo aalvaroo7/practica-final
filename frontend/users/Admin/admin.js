@@ -747,16 +747,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Función para cargar los cargadores desde el servidor
-        async function loadChargers() {
-            try {
-                const response = await fetch('/api/chargers');
-                const chargers = await response.json();
-                displayChargers(chargers);
-            } catch (error) {
-                console.error('Error al cargar cargadores:', error);
-            }
-        }
+
+
 
         // Función para mostrar los cargadores en la interfaz
         function displayChargers(chargers) {

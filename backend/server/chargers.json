@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "lat": 40.416775,
+    "lon": -3.70379,
+    "type": "fast",
+    "status": "Available"
+  },
+  {
+    "id": 2,
+    "lat": 41.385064,
+    "lon": 2.173404,
+    "type": "standard",
+    "status": "Available"
+  },
+  {
+    "id": 3,
+    "lat": 39.469907,
+    "lon": -0.376288,
+    "type": "compatible",
+    "status": "Available"
+  },
+  {
+    "id": "4",
+    "type": "compatible",
+    "status": "in-repair",
+    "lat": "10",
+    "lon": "20"
+  },
+  {
+    "id": "5",
+    "type": "compatible",
+    "status": "occupied",
+    "lat": "30",
+    "lon": "40"
+  },
+  {
+    "id": "6",
+    "type": "compatible",
+    "status": "occupied",
+    "lat": "80",
+    "lon": "90"
+  }
+]
