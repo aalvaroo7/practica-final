@@ -29,76 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
 
-    setupEventListeners();
-    loadChargers();
-
-    function setupEventListeners() {
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                // Lógica para validación de usuario
-            });
-        }
-
-        // Configuración de otros eventos (registro, botones, etc.)
-        const registerLink = document.getElementById('show-register');
-        if (registerLink) {
-            registerLink.addEventListener('click', () => {
-                document.getElementById('login-container').classList.add('hidden');
-                document.getElementById('register-container').classList.remove('hidden');
-            });
-        }
-
-        const backToLogin = document.getElementById('back-to-login');
-        if (backToLogin) {
-            backToLogin.addEventListener('click', () => {
-                document.getElementById('register-container').classList.add('hidden');
-                document.getElementById('login-container').classList.remove('hidden');
-            });
-        }
-
-        // Puedes agregar el resto de listeners según la funcionalidad ya existente
-    }
-
-// Función para cargar los cargadores desde el servidor
-    async function loadChargers() {
-        try {
-            const response = await fetch('/api/chargers');
-            if (!response.ok) {
-                console.error('Error al obtener cargadores:', response.status);
-                return;
-            }
-            const chargers = await response.json();
-            displayChargers(chargers);
-        } catch (error) {
-            console.error('Error en la petición de cargadores:', error);
-        }
-    }
-
-// Función para mostrar los cargadores en la interfaz
-    function displayChargers(chargers) {
-        const chargerListDiv = document.getElementById('charger-list');
-
-        // Se limpia el contenedor
-        if (chargerListDiv) {
-            chargerListDiv.innerHTML = '';
-            chargers.forEach(charger => {
-                const chargerItem = document.createElement('div');
-                chargerItem.classList.add('charger-item');
-                chargerItem.innerHTML = `
-                <p>ID: ${charger.id}</p>
-                <p>Tipo: ${charger.type}</p>
-                <p>Estado: ${charger.status}</p>
-            `;
-                chargerListDiv.appendChild(chargerItem);
-            });
-        } else {
-            console.error('No se encontró el contenedor de cargadores.');
-        }
-    }
-
-
     socket.addEventListener('message', event => {
         const data = JSON.parse(event.data);
         if (data.type === 'notification') {
@@ -188,31 +118,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
+
         const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
-
-        // Se obtiene la contraseña almacenada en localStorage para ese correo
         const storedPassword = localStorage.getItem(email);
 
-        if (storedPassword && storedPassword === password) {
-            // Se crea el objeto con la información del usuario
-            const userData = {
-                email: email,
-                password: password
-            };
-            // Se almacena el objeto en localStorage bajo la clave 'currentUser'
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-
+        if (storedPassword === password) {
+            localStorage.setItem('currentUser', email);
             loginContainer.classList.add('hidden');
             mapContainer.classList.remove('hidden');
             buttonContainer.classList.add('hidden');
             updateFilterVisibility();
+
+            // Mostrar botón "Editar Perfil" después del login exitoso
             editProfileButton.classList.remove('hidden');
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
-                alert('Geolocation not supported.');
+                alert("Geolocation not supported.");
             }
 
             adminBtn.classList.add('hidden');
