@@ -18,13 +18,13 @@ node server/server.js
 - **RF-30:** Visualizar mapa con Leaflet.js.
 - **RF-08:** Notificaciones en tiempo real sobre estado del cargador.
 - **RF-09:** Abrir ubicación del cargador en apps de navegación.
-
+- **RF-22:** Editar perfil (nombre y correo).
+- 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-06:** Consultar historial de reservas.
 - **RF-19:** Reportar problemas y ver estado de resolución.
 - **RF-20:** Ver y gestionar historial de pagos/facturas.
 - **RF-21:** Agregar cargadores favoritos.
-- **RF-22:** Editar perfil (nombre y correo).
 - **RF-26:** Calificar y dejar reseñas.
 - **RF-27:** Reportar incidencias.
 - **RF-28:** Guardar cargadores frecuentes como favoritos.
@@ -35,7 +35,6 @@ node server/server.js
 - **RF-39:** Validar compatibilidad entre coche y cargador.
 - **RF-41:** Modificar/extender reservas antes de que comiencen.
 
----
 
 ## 👨‍💼 Administrador
 
