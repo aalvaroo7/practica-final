@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Elementos y variables globales
     const loginBtn = document.getElementById('login-btn');
     const adminLoginForm = document.getElementById('admin-login-form');
     const volverBtn = document.querySelector('#Volver-btn button');
@@ -12,18 +13,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminContainer = document.getElementById('admin-container');
     let users = [];
 
-    // Función para ocultar todos los paneles
+    // Función para ocultar todos los paneles y el modal de cargadores
     function hideAllPanels() {
         const panels = document.querySelectorAll('main > section');
         panels.forEach(panel => {
             panel.classList.remove('visible');
             panel.style.display = 'none';
             panel.classList.add('hidden');
-            editModal.classList.add('hidden');
         });
+        if (editModal) {
+            editModal.classList.add('hidden');
+        }
     }
 
-    // Función que muestra el panel deseado
+    // Función para mostrar un panel específico
     function togglePanel(panelId) {
         hideAllPanels();
         const panel = document.getElementById(panelId);
@@ -36,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Eventos para navegación
+    // Eventos de navegación entre paneles
     if (btnManageChargers) {
         btnManageChargers.addEventListener('click', () => {
             if (editModal) {
@@ -61,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Botones de navegación del panel de administración
     const btnManageUsers = document.getElementById('btn-manage-users');
     const btnViewStats = document.getElementById('btn-view-stats');
     const btnViewLogs = document.getElementById('btn-view-logs');
@@ -99,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Autenticación del admin
+    // Autenticación del administrador
     adminLoginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const username = document.getElementById('username').value.trim();
@@ -138,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Resto de funciones para Gestión de Usuarios y Cargadores
+    // Función para actualizar la lista de usuarios en la interfaz
     function updateUserList(users) {
         const userListDiv = document.getElementById("user-list");
         userListDiv.innerHTML = "";
@@ -149,6 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const thead = document.createElement("thead");
         const headerRow = document.createElement("tr");
+        // Encabezados de la tabla
         const headers = ["Usuario", "Correo", "Rol", "Acciones"];
         headers.forEach(text => {
             const th = document.createElement("th");
@@ -158,35 +163,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
-        // Crear cuerpo de la tabla con filas para cada usuario
+        // Crear cuerpo de la tabla con filas para cada usuario registrado
         const tbody = document.createElement("tbody");
         users.forEach((user, index) => {
             const tr = document.createElement("tr");
 
-            // Crear celdas de usuario, correo y rol
+            // Celdas de datos del usuario
             ["username", "email", "role"].forEach(prop => {
                 const td = document.createElement("td");
                 td.textContent = user[prop];
                 tr.appendChild(td);
             });
 
-            // Celda de acciones
+            // Celda de acciones: editar y eliminar
             const tdActions = document.createElement("td");
 
-            // Botón para editar
+            // Botón para abrir el modal de edición del usuario
             const btnEdit = document.createElement("button");
             btnEdit.textContent = "Editar";
-            btnEdit.addEventListener("click", () => {
-                const newUsername = prompt("Ingresa el nuevo nombre de usuario:", user.username);
-                const newEmail = prompt("Ingresa el nuevo correo electrónico:", user.email);
-                const newRole = prompt("Ingresa el nuevo rol:", user.role);
-                if (newUsername && newEmail && newRole) {
-                    users[index] = { ...user, username: newUsername, email: newEmail, role: newRole };
-                    updateUserList(users);
-                }
-            });
+            btnEdit.addEventListener("click", () => openEditUserModal(user, index));
 
-            // Botón para eliminar
+            // Botón para eliminar usuario
             const btnDelete = document.createElement("button");
             btnDelete.textContent = "Eliminar";
             btnDelete.addEventListener("click", () => {
@@ -201,12 +198,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             tr.appendChild(tdActions);
             tbody.appendChild(tr);
         });
-
         table.appendChild(tbody);
         userListDiv.appendChild(table);
     }
 
-// Evento del formulario de agregar usuario existente
+    // Evento del formulario para agregar un nuevo usuario (sin duplicidad)
     addUserForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const newUser = {
@@ -220,19 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addUserForm.reset();
     });
 
-    addUserForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const newUser = {
-            username: document.getElementById('new-username').value.trim(),
-            email: document.getElementById('new-email').value.trim(),
-            password: document.getElementById('new-password').value.trim(),
-            role: document.getElementById('new-role').value
-        };
-        users.push(newUser);
-        updateUserList(users);
-        addUserForm.reset();
-    });
-
+    // Función para cargar los cargadores desde el servidor
     async function loadChargers() {
         try {
             const response = await fetch('/api/chargers');
@@ -243,6 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Función para mostrar los cargadores en la interfaz
     function displayChargers(chargers) {
         chargerListDiv.innerHTML = '';
         chargers.forEach(charger => {
@@ -256,9 +241,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             chargerListDiv.appendChild(chargerItem);
         });
+        // Eventos para eliminar cargadores
         chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
             button.addEventListener('click', deleteCharger);
         });
+        // Eventos para editar cargadores
         chargerListDiv.querySelectorAll('.edit-charger-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const chargerId = button.getAttribute('data-id');
@@ -272,6 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Evento para agregar un nuevo cargador al servidor
     addChargerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const chargerId = document.getElementById('charger-id').value.trim();
@@ -295,6 +283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Función para actualizar un cargador
     async function updateCharger(id, updatedData) {
         try {
             const response = await fetch(`/api/chargers/${id}`, {
@@ -313,6 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Función para eliminar un cargador
     async function deleteCharger(event) {
         const id = event.target.getAttribute('data-id');
         if (confirm('¿Estás seguro de eliminar este cargador?')) {
@@ -330,6 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Manejador para el formulario de edición de cargador
     document.getElementById('edit-charger-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         const id = document.getElementById('edit-charger-id').textContent;
@@ -353,10 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit-charger-modal').classList.add('hidden');
     });
 
-    document.getElementById('cancel-edit').addEventListener('click', () => {
-        document.getElementById('edit-charger-modal').classList.add('hidden');
-    });
-
+    // Función para abrir el modal de edición de usuario y cargar datos actuales
     function openEditUserModal(user, index) {
         const modal = document.getElementById('edit-user-modal');
         modal.querySelector('#edit-user-index').value = index;
@@ -366,75 +354,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.classList.remove('hidden');
     }
 
-// Función que oculta el modal de edición
+    // Función para cerrar el modal de edición de usuario
     function closeEditUserModal() {
         document.getElementById('edit-user-modal').classList.add('hidden');
     }
 
-// Ejemplo en la función que actualiza la lista de usuarios
-    function updateUserList(users) {
-        const userListDiv = document.getElementById("user-list");
-        userListDiv.innerHTML = "";
+    // Manejador para el formulario de edición de usuario
+    document.getElementById('edit-user-form').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-        // Crear tabla y encabezado
-        const table = document.createElement("table");
-        table.classList.add("user-table");
-
-        const thead = document.createElement("thead");
-        const headerRow = document.createElement("tr");
-        const headers = ["Usuario", "Correo", "Rol", "Acciones"];
-        headers.forEach(text => {
-            const th = document.createElement("th");
-            th.textContent = text;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-
-        // Crear cuerpo de la tabla con filas para cada usuario
-        const tbody = document.createElement("tbody");
-        users.forEach((user, index) => {
-            const tr = document.createElement("tr");
-
-            // Celdas de datos
-            ["username", "email", "role"].forEach(prop => {
-                const td = document.createElement("td");
-                td.textContent = user[prop];
-                tr.appendChild(td);
-            });
-
-            // Celda de acciones
-            const tdActions = document.createElement("td");
-
-            // Botón para editar que abre el modal
-            const btnEdit = document.createElement("button");
-            btnEdit.textContent = "Editar";
-            btnEdit.addEventListener("click", () => openEditUserModal(user, index));
-
-            // Botón para eliminar
-            const btnDelete = document.createElement("button");
-            btnDelete.textContent = "Eliminar";
-            btnDelete.addEventListener("click", () => {
-                if (confirm("¿Seguro que deseas eliminar este usuario?")) {
-                    users.splice(index, 1);
-                    updateUserList(users);
-                }
-            });
-
-            tdActions.appendChild(btnEdit);
-            tdActions.appendChild(btnDelete);
-            tr.appendChild(tdActions);
-            tbody.appendChild(tr);
-        });
-        table.appendChild(tbody);
-        userListDiv.appendChild(table);
-    }
-
-// Evento para ocultar el modal al pulsar "Cancelar" dentro del modal
-    document.addEventListener("DOMContentLoaded", () => {
-        const cancelEditUserBtn = document.getElementById("cancel-edit-user");
-        cancelEditUserBtn.addEventListener("click", closeEditUserModal);
+        const index = parseInt(document.getElementById('edit-user-index').value, 10);
+        const newUsername = document.getElementById('edit-username').value.trim();
+        const newEmail = document.getElementById('edit-email').value.trim();
+        const newRole = document.getElementById('edit-role').value;
+        users[index] = { ...users[index], username: newUsername, email: newEmail, role: newRole };
+        updateUserList(users);
+        closeEditUserModal();
     });
+
+    // Manejador para el botón "Cancelar" del modal de usuario
+    const cancelEditUserBtn = document.getElementById("cancel-edit-user");
+    if (cancelEditUserBtn) {
+        cancelEditUserBtn.addEventListener("click", closeEditUserModal);
+    }
 
     // Inicializa partículas y carga los cargadores
     particlesJS("particles-js", {
@@ -455,5 +397,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         retina_detect: true
     });
 
+    // Carga inicial de cargadores
     loadChargers();
+
 });
