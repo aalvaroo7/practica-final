@@ -1,7 +1,4 @@
 {
-  "default": {
-    "reservations": []
-  },
   "reservations": [
     {
       "chargerId": 1,

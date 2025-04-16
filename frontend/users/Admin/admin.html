@@ -71,19 +71,28 @@
     <section id="manage-chargers">
       <h2>Gestión de Cargadores</h2>
       <form id="add-charger-form">
-        <input type="text" id="charger-id" placeholder="ID del Cargador" required>
+        <label for="charger-id">ID:</label>
+        <input type="text" id="charger-id" required>
+
+        <label for="charger-type">Tipo:</label>
         <select id="charger-type" required>
-          <option value="">Selecciona Tipo</option>
           <option value="Rápido">Rápido</option>
-          <option value="Normal">Normal</option>
-          <option value="Compatible">Compatible</option>
+          <option value="compatible">Compatible</option>
+          <option value="normal">Normal</option>
         </select>
-          <select id="charger-status" required>
-            <option value="">Selecciona Estado</option>
-            <option value="Ocupado">Ocupado</option>
-            <option value="Disponible">Disponible</option>
-            <option value="En Reparación">En Reparación</option>
-          </select>
+        <label for="charger-status">Estado:</label>
+        <select id="charger-status" required>
+          <option value="available">Disponible</option>
+          <option value="occupied">Ocupado</option>
+          <option value="in-repair">En Reparación</option>
+        </select>
+
+        <label for="charger-lat">Latitud:</label>
+        <input type="text" id="charger-lat" required>
+
+        <label for="charger-lon">Longitud:</label>
+        <input type="text" id="charger-lon" required>
+
         <button type="submit">Agregar Cargador</button>
       </form>
       <div id="charger-list"></div>
