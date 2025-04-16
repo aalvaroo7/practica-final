@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{955ed7fc64, font-awesome, leaflet, particles, particles.js}" />
+    <file url="PROJECT" libraries="{955ed7fc64, chart.js, font-awesome, leaflet, particles, particles.js}" />
     <includedPredefinedLibrary name="Node.js Core" />
   </component>
 </project>
