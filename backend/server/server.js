@@ -21,7 +21,7 @@ const __dirname = path.dirname(__filename);
 const chargersFilePath = path.join(__dirname, 'chargers.json');
 let chargers = [];
 
-// Función para cargar los cargadores
+// Función para cargar los cargadores !!!!!!!!!Esta mal hay que corregirla para que coja los cargadores de chargers.json
 function loadChargers() {
     try {
         const chargersData = fs.readFileSync(chargersFilePath, 'utf-8');
@@ -235,4 +235,13 @@ wss.on('connection', ws => {
             console.error('Error al procesar el mensaje:', err);
         }
     });
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const logsFilePath = path.join(__dirname, 'logs.txt');
+
+// Si el archivo no existe, créalo vacío
+    if (!fs.existsSync(logsFilePath)) {
+        fs.writeFileSync(logsFilePath, '', 'utf-8');
+    }
 });

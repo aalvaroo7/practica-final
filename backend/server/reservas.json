@@ -23,6 +23,13 @@
       "duration": "1",
       "date": "2025-04-16T11:54:25.497Z",
       "finished": true
+    },
+    {
+      "id": 1744831068599,
+      "chargerId": 1,
+      "duration": "1",
+      "date": "2025-04-16T19:17:48.599Z",
+      "finished": false
     }
   ]
 }

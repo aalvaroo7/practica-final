@@ -23,22 +23,8 @@
   {
     "id": "4",
     "type": "compatible",
-    "status": "in-repair",
+    "status": "occupied",
     "lat": "10",
     "lon": "20"
-  },
-  {
-    "id": "5",
-    "type": "compatible",
-    "status": "occupied",
-    "lat": "30",
-    "lon": "40"
-  },
-  {
-    "id": "6",
-    "type": "compatible",
-    "status": "occupied",
-    "lat": "80",
-    "lon": "90"
   }
 ]
