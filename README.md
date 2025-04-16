@@ -45,13 +45,12 @@ node server/server.js
 - **RF-07:** Sistema de roles.
 - **RF-11:** Validación de permisos según rol.
 - **RF-12:** Gestión de cargadores (CRUD).
-- **RF-31:** Middleware de validación de permisos según rol. esto se cumple en este repositori****
-
+- **RF-31:** Middleware de validación de permisos según rol. esto se cumple en este repositorio****
+- **RF-32:** Interfaz de administración para gestionar cargadores.
+- 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-13:** Ver estadísticas de uso/rendimiento.
 - **RF-14:** Consultar logs de auditoría.
-
-- **RF-32:** Interfaz de administración para gestionar cargadores.
 - **RF-33:** Gráficos/estadísticas con Chart.js.
 - **RF-40:** Configurar horarios de disponibilidad.
 - **RF-42:** Ajustar precios según demanda/horarios pico.

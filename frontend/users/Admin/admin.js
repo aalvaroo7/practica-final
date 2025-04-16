@@ -378,6 +378,82 @@ document.addEventListener('DOMContentLoaded', async () => {
         cancelEditUserBtn.addEventListener("click", closeEditUserModal);
     }
 
+//Cargar las estadisticas de uso
+    async function loadStats() {
+        const statsContainer = document.getElementById('stats-container');
+        // Se limpia y crea el canvas donde se mostrará el gráfico sin agregar atributos de estilo adicionales
+        statsContainer.innerHTML = '<canvas id="statsChart"></canvas>';
+        const ctx = document.getElementById('statsChart').getContext('2d');
+
+        try {
+            const response = await fetch('/api/stats');
+            if (!response.ok) {
+                console.error('Error al obtener estadísticas:', response.status);
+                return;
+            }
+            const stats = await response.json();
+
+            // Gráfico de barras con el número de cargadores por tipo
+            const labels = Object.keys(stats.chargersByType);
+            const dataValues = Object.values(stats.chargersByType);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cantidad de Cargadores',
+                        data: dataValues,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error al cargar estadísticas:', error);
+        }
+    }
+
+// Llamada a la función loadStats cuando se hace clic en el botón correspondiente
+    if (btnViewStats) {
+        btnViewStats.addEventListener('click', () => {
+            console.log('Click en Ver Estadísticas');
+            togglePanel('view-stats');
+            loadStats();
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Inicializa partículas y carga los cargadores
     particlesJS("particles-js", {
         particles: {

@@ -92,6 +92,21 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(staticPublicPath, 'index.html'));
 });
 
+app.get('/api/stats', (req, res) => {
+    // Datos de ejemplo para las estadísticas
+    const stats = {
+        chargersByType: {
+            'Rapido': 2,
+            'Normal': 5,
+            'Compatible': 3
+        },
+        totalChargers: 10,
+        totalUsers: 15
+    };
+    res.json(stats);
+});
+
+
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
