@@ -22,9 +22,7 @@
   },
   {
     "id": "4",
-    "type": "compatible",
-    "status": "occupied",
-    "lat": "10",
-    "lon": "20"
+    "type": "Compatible",
+    "status": "Disponible"
   }
 ]
