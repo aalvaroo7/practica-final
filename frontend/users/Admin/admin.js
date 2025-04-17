@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 const data = await response.json();
                 const logs = data.logs;
-                let tableHTML = '<table><thead><tr><th>IP</th><th>Conectado En</th></tr></thead><tbody>';
+                let tableHTML = '<table class="table-logs"><caption>Logs de Auditoría</caption><thead><tr><th>IP</th><th>Conectado En</th></tr></thead><tbody>';
                 logs.forEach(log => {
                     tableHTML += `<tr><td>${log.ip}</td><td>${log.connectedAt}</td></tr>`;
                 });
