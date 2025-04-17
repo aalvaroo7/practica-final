@@ -54,7 +54,7 @@ async function initLowDb() {
 }
 await initLowDb();
 
-// Endpoints
+// Endpoints de cargadores
 app.get('/api/chargers', (req, res) => {
     res.json(chargers);
 });
@@ -148,28 +148,61 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-const logsFilePath = path.join(__dirname, 'logs.txt');
-if (!fs.existsSync(logsFilePath)) {
-    fs.writeFileSync(logsFilePath, '', 'utf-8');
+// Endpoint para obtener los clientes registrados (para admin.js)
+const clientsFilePath = path.join(__dirname, 'clients.json');
+function loadClients() {
+    try {
+        if (!fs.existsSync(clientsFilePath)) {
+            fs.writeFileSync(clientsFilePath, JSON.stringify([]));
+            return [];
+        }
+        const data = fs.readFileSync(clientsFilePath, 'utf-8').trim();
+        if (!data) return [];
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        console.error(`Error al cargar datos de clientes: ${error}`);
+        return [];
+    }
 }
+function saveClients(clients) {
+    fs.writeFile(clientsFilePath, JSON.stringify(clients, null, 2), err => {
+        if (err) console.error('Error al escribir clients.json:', err);
+    });
+}
+app.get('/api/clients', (req, res) => {
+    const clients = loadClients();
+    res.json({ clients });
+});
+
+// Definición global del endpoint para obtener logs (usando clients.json)
+app.get('/api/logs', (req, res) => {
+    fs.readFile(clientsFilePath, 'utf-8', (err, data) => {
+        if (err) {
+            console.error('Error al cargar clients.json:', err);
+            return res.status(500).json({ error: 'Error al cargar logs' });
+        }
+        try {
+            const clients = JSON.parse(data);
+            res.json({ logs: clients });
+        } catch (error) {
+            console.error('Error al parsear clients.json:', error);
+            res.status(500).json({ error: 'Error al parsear logs' });
+        }
+    });
+});
+
+// Función logAudit para registrar logs de auditoría
 function logAudit(message) {
+    const logsFilePath = path.join(__dirname, 'logs.txt');
     const timestamp = new Date().toISOString();
     const logEntry = `${timestamp}: ${message}\n`;
     fs.appendFile(logsFilePath, logEntry, err => {
         if (err) console.error('Error al registrar log:', err);
     });
 }
-app.get('/api/logs', (req, res) => {
-    fs.readFile(logsFilePath, 'utf-8', (err, data) => {
-        if (err) {
-            console.error('Error al leer el archivo de logs:', err);
-            return res.status(500).json({ error: 'Error al obtener los logs de auditoría.' });
-        }
-        const logs = data.split('\n').filter(line => line.trim() !== '');
-        res.json({ logs });
-    });
-});
 
+// Rutas comodín
 app.get('*', (req, res) => {
     res.sendFile(path.join(staticPublicPath, 'index.html'));
 });
@@ -181,8 +214,24 @@ app.listen(PORT, () => {
 
 // Configuración de WebSocket
 const wss = new WebSocketServer({ port: 8080 });
-wss.on('connection', ws => {
+wss.on('connection', (ws, req) => {
     console.log('Client connected');
+
+    // Obtener información del cliente (por ejemplo, IP y timestamp)
+    const clientIp = req.socket.remoteAddress;
+    const clientData = {
+        ip: clientIp,
+        connectedAt: new Date().toISOString()
+    };
+
+    // Cargar clientes existentes, agregar este cliente y guardarlos
+    const clients = loadClients();
+    clients.push(clientData);
+    saveClients(clients);
+
+    // Registrar en logs de auditoría
+    logAudit(`Nuevo cliente conectado desde ${clientIp}`);
+
     ws.on('message', async message => {
         try {
             const data = JSON.parse(message);
@@ -201,6 +250,7 @@ wss.on('connection', ws => {
                 }
                 db.data.reservations.push(reservation);
                 await db.write();
+
                 setTimeout(async () => {
                     await db.read();
                     const index = db.data.reservations.findIndex(r => r.id === reservation.id);

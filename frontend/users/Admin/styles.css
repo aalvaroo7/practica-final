@@ -477,3 +477,45 @@ form button:hover {
     width: 100% !important;
     height: auto !important;
 }
+
+/* Estilos para la tabla de logs */
+.table-logs {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-logs caption {
+    font-size: 1.4em;
+    margin: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.table-logs thead {
+    background-color: #0073e6;
+    color: #fff;
+}
+
+.table-logs th,
+.table-logs td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.table-logs tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.table-logs tbody tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.table-logs tbody tr:hover {
+    background-color: #ffe680;
+}

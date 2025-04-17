@@ -395,6 +395,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Cargar logs de auditoría
+    async function loadLogs() {
+        const logsContainer = document.getElementById('logs-container');
+        try {
+            const response = await fetch('/api/logs');
+            if (response.ok) {
+                const data = await response.json();
+                const logs = data.logs;
+                let tableHTML = '<table><thead><tr><th>IP</th><th>Conectado En</th></tr></thead><tbody>';
+                logs.forEach(log => {
+                    tableHTML += `<tr><td>${log.ip}</td><td>${log.connectedAt}</td></tr>`;
+                });
+                tableHTML += '</tbody></table>';
+                logsContainer.innerHTML = tableHTML;
+            } else {
+                logsContainer.textContent = 'No se pudieron cargar los logs.';
+            }
+        } catch (error) {
+            console.error('Error al cargar logs:', error);
+            logsContainer.textContent = 'Error al cargar logs.';
+        }
+    }
+
+
     // Cargar y configurar partículas
     particlesJS("particles-js", {
         particles: {
