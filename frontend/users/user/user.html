@@ -66,6 +66,7 @@
     <!-- Botón Editar Perfil, oculto al inicio -->
     <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
     <button id="show-map-btn" class="hidden">Mostrar Mapa</button>
+    <button id="reservation-history-btn">Ver Historial de Reservas</button>
 </div>
 
 <!-- PERFIL -->
@@ -116,6 +117,12 @@
         <input type="email" id="edit-email" name="edit-email" required>
         <button type="submit">Guardar Cambios</button>
     </form>
+</div>
+
+<!-- HISTORIAL DE RESERVAS -->
+<div id="reservation-history-container" class="hidden">
+    <h2>Historial de Reservas</h2>
+    <ul id="reservation-history-list"></ul>
 </div>
 
 </body>
