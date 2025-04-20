@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Variables de referencia a elementos del DOM
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
@@ -22,10 +21,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tecnicoBtn = document.getElementById('tecnico-btn');
     const editProfileContainer = document.getElementById('edit-profile-container');
     const editProfileForm = document.getElementById('edit-profile-form');
-    const editProfileButton = document.getElementById('edit-profile-btn'); // <- botón perfil
-
+    const editProfileButton = document.getElementById('edit-profile-btn');
     const socket = new WebSocket('ws://localhost:8080');
     const reservationMessage = document.createElement('p');
+
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
 
@@ -39,9 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedCharger = null;
     const currentUser = localStorage.getItem('currentUser');
 
-    // Ocultar botón de editar perfil si no hay usuario autenticado
     if (!currentUser) {
         editProfileButton.classList.add('hidden');
+        reservationHistoryBtn.classList.add('hidden');
     }
 
     if (!currentUser) {
@@ -83,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Mostrar el formulario de edición de perfil
     function showEditProfileForm() {
         const userData = JSON.parse(localStorage.getItem(currentUser));
         document.getElementById('edit-name').value = userData.name;
@@ -91,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         editProfileContainer.classList.remove('hidden');
     }
 
-    // Manejar la actualización del perfil
     editProfileForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -130,8 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             buttonContainer.classList.add('hidden');
             updateFilterVisibility();
 
-            // Mostrar botón "Editar Perfil" después del login exitoso
             editProfileButton.classList.remove('hidden');
+            reservationHistoryBtn.classList.remove('hidden');
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -330,4 +327,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     reservationHistoryBtn.addEventListener('click', () => {
         reservationHistoryContainer.classList.toggle('hidden');
     });
+
+    // Guardar una reserva en el historial
+    function saveReservationToHistory(chargerId, duration) {
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        const timestamp = new Date().toLocaleString();
+
+        reservationHistory.push({ chargerId, duration, timestamp });
+        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
+    }
+
+
+    function showReservationHistory() {
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        reservationHistoryList.innerHTML = '';
+
+        reservationHistory.forEach(reservation => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Cargador: ${reservation.chargerId}, Duración: ${reservation.duration} minutos, Fecha: ${reservation.timestamp}`;
+            reservationHistoryList.appendChild(listItem);
+        });
+
+        reservationHistoryContainer.classList.remove('hidden');
+    }
+
+
+    reserveForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const reservationTime = document.getElementById('reservation-time').value;
+
+        if (selectedCharger) {
+            saveReservationToHistory(selectedCharger.id, reservationTime);
+            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
+            reservationForm.classList.add('hidden');
+            modal.classList.add('hidden');
+
+            socket.send(JSON.stringify({
+                type: 'reserve',
+                chargerId: selectedCharger.id,
+                duration: reservationTime
+            }));
+        }
+    });
+
+    reservationHistoryBtn.addEventListener('click', showReservationHistory);
 });
