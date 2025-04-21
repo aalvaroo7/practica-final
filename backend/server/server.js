@@ -13,7 +13,18 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
+// Configuración de CORS
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || origin.startsWith('http://localhost:3000') || /https:\/\/.*\.ngrok-free\.app/.test(origin)) {
+            callback(null, true); // Permitir el origen
+        } else {
+            callback(new Error('No permitido por CORS')); // Bloquear el origen
+        }
+    },
+    credentials: true
+}));
 
 // Variables de rutas
 const __filename = fileURLToPath(import.meta.url);
