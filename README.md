@@ -1,5 +1,7 @@
 INICIAR LA APLICACIÓN:
 node backend/server/server.js (primero tienes en una terminal esto iniciado)
+
+
 ngrok http 3000 (abres otra terminal y metes este comando, te da un enlace que sirve para que cualquiera pueda entrar a nuestra página)
 
 
