@@ -94,6 +94,15 @@
         <label for="charger-lon">Longitud:</label>
         <input type="text" id="charger-lon" required>
 
+        <label for="availability-start">Hora de inicio:</label>
+        <input type="time" id="availability-start" required>
+
+        <label for="availability-end">Hora de fin:</label>
+        <input type="time" id="availability-end" required>
+
+        <label for="charger-price">Precio por kWh (€):</label>
+        <input type="number" id="charger-price" step="0.01" min="0" required>
+
         <button type="submit">Agregar Cargador</button>
       </form>
       <div id="charger-list"></div>
@@ -101,7 +110,10 @@
 
     <section id="view-stats">
       <h2>Ver Estadísticas</h2>
-      <div id="stats-container"></div>
+      <div id="stats-container">
+        <canvas id="statsChartBar"></canvas>
+        <canvas id="statsChartPie"></canvas>
+      </div>
     </section>
 
     <section id="view-logs">
@@ -143,6 +155,24 @@
             <option value="Ocupado">Ocupado</option>
             <option value="En reparacion">En Reparación</option>
           </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Hora de inicio:</td>
+        <td>
+          <input type="time" id="edit-availability-start" style="width: 100%;" required>
+        </td>
+      </tr>
+      <tr>
+        <td>Hora de fin:</td>
+        <td>
+          <input type="time" id="edit-availability-end" style="width: 100%;" required>
+        </td>
+      </tr>
+      <tr>
+        <td>Precio por kWh (€):</td>
+        <td>
+          <input type="number" id="edit-charger-price" step="0.01" min="0" style="width: 100%;" required>
         </td>
       </tr>
     </table>

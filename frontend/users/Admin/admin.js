@@ -154,13 +154,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const status = document.getElementById('charger-status').value;
             const lat = parseFloat(document.getElementById('charger-lat').value);
             const lon = parseFloat(document.getElementById('charger-lon').value);
+            const availability = {
+                start: document.getElementById('availability-start').value,
+                end: document.getElementById('availability-end').value
+            };
+            const price = parseFloat(document.getElementById('charger-price').value);
+
 
             if (!id || isNaN(lat) || isNaN(lon)) {
                 alert('Completa todos los campos correctamente.');
                 return;
             }
 
-            const newCharger = { id, lat, lon, type, status };
+            const newCharger = { id, lat, lon, type, status, price, availability };
 
             try {
                 const response = await fetch('/api/chargers', {
@@ -201,30 +207,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Listener único para editar cargadores (actualiza type y status)
     document.getElementById('edit-charger-form').addEventListener('submit', async (event) => {
         event.preventDefault();
-        const id = document.getElementById('edit-charger-id').textContent;
+
+        // Obtener los valores del formulario de edición
+        const id = document.getElementById('edit-charger-id').textContent.trim();
         const type = document.getElementById('edit-charger-type').value.trim();
-        const status = document.getElementById('edit-charger-status').value;
+        const status = document.getElementById('edit-charger-status').value.trim();
+        const availability = {
+            start: document.getElementById('edit-availability-start').value.trim(),
+            end: document.getElementById('edit-availability-end').value.trim()
+        };
+        const price = parseFloat(document.getElementById('edit-charger-price').value);
+
+        // Validar los campos
+        if (!id || !type || !status || !availability.start || !availability.end || isNaN(price)) {
+            alert('Por favor, completa todos los campos correctamente.');
+            return;
+        }
+
+        // Crear el objeto con los datos actualizados
+        const updatedCharger = { type, status, availability, price };
+
         try {
+            // Enviar la solicitud PUT al servidor
             const response = await fetch(`/api/chargers/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type, status })
+                body: JSON.stringify(updatedCharger)
             });
+
             if (response.ok) {
                 alert('Cargador actualizado correctamente.');
-                loadChargers();
+                editModal.classList.add('hidden'); // Ocultar el modal de edición
+                loadChargers(); // Recargar la lista de cargadores
             } else {
                 alert('Error al actualizar el cargador.');
             }
         } catch (error) {
-            console.error('Error al actualizar cargador:', error);
+            console.error('Error al actualizar el cargador:', error);
+            alert('Hubo un error al intentar actualizar el cargador.');
         }
-        editModal.classList.add('hidden');
     });
-
     // Función para eliminar un cargador
     async function deleteCharger(event) {
         const id = event.target.getAttribute('data-id');
@@ -257,6 +281,70 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
             chargerListDiv.appendChild(chargerItem);
         });
+        // Asignar listeners a los botones de eliminar y editar
+        chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
+            button.addEventListener('click', deleteCharger);
+        });
+        chargerListDiv.querySelectorAll('.edit-charger-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const chargerId = button.getAttribute('data-id');
+                const charger = chargers.find(ch => ch.id == chargerId);
+                if (!charger) return;
+                document.getElementById('edit-charger-id').textContent = charger.id;
+                document.getElementById('edit-charger-type').value = charger.type;
+                document.getElementById('edit-charger-status').value = charger.status.toLowerCase();
+                editModal.classList.remove('hidden');
+            });
+        });
+    }
+
+    function displayChargers(chargers) {
+        chargerListDiv.innerHTML = ''; // Limpiar el contenedor
+
+        // Crear la tabla
+        const table = document.createElement('table');
+        table.classList.add('charger-table');
+
+        // Crear el encabezado de la tabla
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Latitud</th>
+            <th>Longitud</th>
+            <th>Precio (€)</th>
+            <th>Disponibilidad</th>
+            <th>Acciones</th>
+        </tr>
+    `;
+        table.appendChild(thead);
+
+        // Crear el cuerpo de la tabla
+        const tbody = document.createElement('tbody');
+        chargers.forEach(charger => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${charger.id}</td>
+            <td>${charger.type}</td>
+            <td>${charger.status}</td>
+            <td>${charger.lat || 'N/A'}</td>
+            <td>${charger.lon || 'N/A'}</td>
+            <td>${charger.price || 'N/A'}</td>
+            <td>${charger.availability ? `${charger.availability.start} - ${charger.availability.end}` : 'N/A'}</td>
+            <td>
+                <button data-id="${charger.id}" class="edit-charger-btn">Editar</button>
+                <button data-id="${charger.id}" class="delete-charger-btn">Eliminar</button>
+            </td>
+        `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+
+        // Añadir la tabla al contenedor
+        chargerListDiv.appendChild(table);
+
         // Asignar listeners a los botones de eliminar y editar
         chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
             button.addEventListener('click', deleteCharger);
@@ -357,11 +445,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeEditUserModal();
     });
 
-    // Cargar estadísticas de uso
     async function loadStats() {
         const statsContainer = document.getElementById('stats-container');
-        statsContainer.innerHTML = '<canvas id="statsChart"></canvas>';
-        const ctx = document.getElementById('statsChart').getContext('2d');
+        statsContainer.innerHTML = `
+        <canvas id="statsChartBar"></canvas>
+        <canvas id="statsChartPie"></canvas>
+    `;
+        const ctxBar = document.getElementById('statsChartBar').getContext('2d');
+        const ctxPie = document.getElementById('statsChartPie').getContext('2d');
+
         try {
             const response = await fetch('/api/stats');
             if (!response.ok) {
@@ -369,15 +461,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             const stats = await response.json();
-            const labels = Object.keys(stats.chargersByType);
-            const dataValues = Object.values(stats.chargersByType);
-            new Chart(ctx, {
+
+            // Gráfico de barras: Reservas por tipo de cargador
+            const barLabels = Object.keys(stats.reservationsByChargerType);
+            const barDataValues = Object.values(stats.reservationsByChargerType);
+
+            new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: barLabels,
                     datasets: [{
-                        label: 'Cantidad de Cargadores',
-                        data: dataValues,
+                        label: 'Reservas por Tipo de Cargador',
+                        data: barDataValues,
+                        backgroundColor: ['#4caf50', '#2196f3', '#ff9800']
                     }]
                 },
                 options: {
@@ -390,11 +486,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             });
+
+            // Gráfico de pastel: Porcentaje de uso de cada cargador
+            const pieLabels = stats.usagePercentage.map(item => item.type);
+            const pieDataValues = stats.usagePercentage.map(item => parseFloat(item.usage));
+
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        label: 'Porcentaje de Uso por Cargador',
+                        data: pieDataValues,
+                        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
         } catch (error) {
             console.error('Error al cargar estadísticas:', error);
         }
     }
-
     // Cargar logs de auditoría
     async function loadLogs() {
         const logsContainer = document.getElementById('logs-container');
@@ -422,22 +536,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Cargar y configurar partículas
     particlesJS("particles-js", {
         particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
+            number: {
+                value: 100, // Número de partículas
+                density: {
+                    enable: true,
+                    value_area: 2000 // Asegúrate de que este valor sea amplio
+                }
+            },
             color: { value: "#ffffff" },
             shape: { type: "circle" },
             opacity: { value: 0.5 },
             size: { value: 3 },
-            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: "#ffffff",
+                opacity: 0.4,
+                width: 1
+            },
             move: { enable: true, speed: 3 }
         },
         interactivity: {
             detect_on: "canvas",
-            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
-            modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
+            events: {
+                onhover: { enable: true, mode: "repulse" },
+                onclick: { enable: true, mode: "push" }
+            },
+            modes: {
+                repulse: { distance: 100 },
+                push: { particles_nb: 4 }
+            }
         },
         retina_detect: true
     });
-
     // Carga inicial de cargadores
     loadChargers();
 });
