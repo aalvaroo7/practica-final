@@ -12,3 +12,7 @@
 2025-04-20T10:13:54.405Z: Nuevo cliente conectado desde ::1
 2025-04-20T10:23:45.557Z: Nuevo cliente conectado desde ::1
 2025-04-20T10:24:16.631Z: Nuevo cliente conectado desde ::1
+2025-04-21T11:01:25.976Z: Nuevo cliente conectado desde ::1
+2025-04-21T11:27:34.320Z: Nuevo cliente conectado desde ::1
+2025-04-21T11:39:13.202Z: Nuevo cliente conectado desde ::1
+2025-04-21T11:46:35.841Z: Nuevo cliente conectado desde ::1
