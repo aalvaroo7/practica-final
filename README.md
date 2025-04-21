@@ -46,23 +46,28 @@ node server/server.js
 - **RF-12:** Gestión de cargadores (CRUD).
 - **RF-31:** Middleware de validación de permisos según rol. esto se cumple en este repositorio****
 - **RF-32:** Interfaz de administración para gestionar cargadores.
-
+- **RF-14:** Consultar logs de auditoría.
 - 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-13:** Ver estadísticas de uso/rendimiento.
 - **RF-33:** Gráficos/estadísticas con Chart.js.
 - **RF-40:** Configurar horarios de disponibilidad.
-- **RF-14:** Consultar logs de auditoría.
 - - **RF-42:** Ajustar precios según demanda/horarios pico.
 
 ---
+#Para cumplir con los rf del admin
+para las estadisticas hay que hacer que compare los usos de los cargadores cogiendo las reservas desde el json de reservas 
 
+ESO es lo unico asi que se como hacer 100% el resto de RF no se 
 ## 👷 Técnico
 
 ### ❌ Requisitos Funcionales No Cumplidos
 - **RF-15:** Actualizar estado de cargadores.
 - **RF-16:** Ver detalles técnicos de los cargadores.
 - **RF-17:** Reportar problemas/incidencias.
+
+Para el RF 15 tiene que actualizar el estado en el chargers.json
+añadir en el chargers.json un apartado para cada cargador de detalles tecnicos 
 
 ---
 
