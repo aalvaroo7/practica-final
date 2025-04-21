@@ -325,7 +325,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     reservationHistoryBtn.addEventListener('click', () => {
-        reservationHistoryContainer.classList.toggle('hidden');
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            alert('Por favor, inicia sesión para ver tu historial de reservas.');
+            return;
+        }
+
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        reservationHistoryList.innerHTML = ''; // Limpia el contenido previo
+
+        if (reservationHistory.length === 0) {
+            reservationHistoryList.innerHTML = '<li>No tienes reservas registradas.</li>';
+        } else {
+            reservationHistory.forEach(reservation => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Cargador: ${reservation.chargerId}, Duración: ${reservation.duration} minutos, Fecha: ${reservation.timestamp}`;
+                reservationHistoryList.appendChild(listItem);
+            });
+        }
+
+        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+        reservationHistoryContainer.classList.remove('hidden'); // Muestra el contenedor
     });
 
     // Guardar una reserva en el historial
