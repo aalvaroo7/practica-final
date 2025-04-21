@@ -57,6 +57,10 @@ app.use(express.static(staticFrontendPath));
 const adapter = new JSONFile(path.join(__dirname, 'reservas.json'));
 const db = new Low(adapter, { default: { reservations: [] } });
 async function initLowDb() {
+    // Sobrescribir el archivo con un objeto vacío
+    db.data = { reservations: [] };
+    await db.write();
+
     await db.read();
     if (!db.data) {
         db.data = { reservations: [] };
@@ -69,13 +73,39 @@ await initLowDb();
 app.get('/api/chargers', (req, res) => {
     res.json(chargers);
 });
+// Función para inicializar el archivo clients.json y vaciarlo
+async function initClientsFile() {
+    const clientsFilePath = path.join(__dirname, 'clients.json');
+    try {
+        fs.writeFileSync(clientsFilePath, JSON.stringify([])); // Sobrescribe con un array vacío
+        console.log('Archivo clients.json inicializado.');
+    } catch (error) {
+        console.error('Error al inicializar clients.json:', error);
+    }
+}
+
+// Función para inicializar el archivo logs.txt y vaciarlo
+async function initLogsFile() {
+    const logsFilePath = path.join(__dirname, 'logs.txt');
+    try {
+        fs.writeFileSync(logsFilePath, ''); // Sobrescribe con un contenido vacío
+        console.log('Archivo logs.txt inicializado.');
+    } catch (error) {
+        console.error('Error al inicializar logs.txt:', error);
+    }
+}
+
+// Llamar a las funciones de inicialización
+await initLowDb(); // Inicializar reservas.json
+await initClientsFile(); // Inicializar clients.json
+await initLogsFile(); // Inicializar logs.txt
 
 app.post('/api/chargers', (req, res) => {
-    const { id, type, status, lat, lon } = req.body;
-    if (!id || !type || !status || lat === undefined || lon === undefined) {
+    const { id, type, status, lat, lon, price } = req.body;
+    if (!id || !type || !status || lat === undefined || lon === undefined || price === undefined) {
         return res.status(400).json({ error: 'Datos incompletos del cargador.' });
     }
-    const newCharger = { id, lat, lon, type, status };
+    const newCharger = { id, lat, lon, type, status, price };
     chargers.push(newCharger);
     fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
         if (err) {
@@ -92,18 +122,28 @@ app.post('/api/chargers', (req, res) => {
     res.status(201).json(newCharger);
 });
 
-app.put('/api/chargers/:id', (req, res) => {
-    const chargerId = req.params.id;
-    const { type, status, lat, lon } = req.body;
-    const index = chargers.findIndex(charger => charger.id == chargerId);
-    if (index === -1) {
-        return res.status(404).json({ error: 'Cargador no encontrado.' });
+app.post('/api/chargers', (req, res) => {
+    const { id, type, status, lat, lon, price, availability } = req.body;
+
+    // Validar que todos los campos requeridos estén presentes
+    if (!id || !type || !status || lat === undefined || lon === undefined || price === undefined || !availability || !availability.start || !availability.end) {
+        return res.status(400).json({ error: 'Datos incompletos o inválidos del cargador.' });
     }
-    chargers[index] = { ...chargers[index], type, status, lat, lon };
+
+    // Crear el nuevo cargador con los datos recibidos
+    const newCharger = { id, lat, lon, type, status, price, availability };
+
+    // Agregar el nuevo cargador a la lista
+    chargers.push(newCharger);
+
+    // Guardar en el archivo chargers.json
     fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
-        if (err) console.error('Error al escribir chargers.json:', err);
+        if (err) {
+            console.error('Error al escribir chargers.json:', err);
+            return res.status(500).json({ error: 'Error al guardar el cargador.' });
+        }
+        res.status(201).json(newCharger);
     });
-    res.json(chargers[index]);
 });
 
 app.delete('/api/chargers/:id', (req, res) => {
@@ -134,29 +174,73 @@ app.get('/login', (req, res) => {
 
 app.get('/api/stats', async (req, res) => {
     try {
-        await db.read();
+        await db.read(); // Leer datos de reservas
         const finishedReservations = db.data.reservations.filter(r => r.finished).length;
-        const reservationsByChargerType = { 'Rápido': 0, 'Normal': 0, 'Compatible': 0 };
 
-        db.data.reservations.forEach(reservation => {
-            if (reservation.finished) {
-                const charger = chargers.find(c => c.id === reservation.chargerId);
-                if (charger && reservationsByChargerType[charger.type] !== undefined) {
-                    reservationsByChargerType[charger.type]++;
+        // Calcular reservas por tipo de cargador
+        const reservationsByChargerType = chargers.reduce((acc, charger) => {
+            acc[charger.type] = acc[charger.type] || 0;
+            db.data.reservations.forEach(reservation => {
+                if (reservation.chargerId === charger.id && reservation.finished) {
+                    acc[charger.type]++;
                 }
-            }
+            });
+            return acc;
+        }, {});
+
+        // Calcular porcentaje de uso de cada cargador
+        const usagePercentage = chargers.map(charger => {
+            const totalReservations = db.data.reservations.filter(r => r.chargerId === charger.id).length;
+            return {
+                id: charger.id,
+                type: charger.type,
+                usage: ((totalReservations / finishedReservations) * 100).toFixed(2) + '%'
+            };
         });
 
         res.json({
             finishedReservations,
-            totalChargers: chargers.length,
-            totalUsers: 15,
-            reservationsByChargerType
+            reservationsByChargerType,
+            usagePercentage
         });
     } catch (error) {
         console.error('Error al cargar estadísticas:', error);
         res.status(500).json({ error: 'Error al cargar estadísticas' });
     }
+});
+
+app.put('/api/chargers/:id', (req, res) => {
+    const chargerId = req.params.id;
+    const { type, status, availability, price } = req.body;
+
+    // Validar que los datos requeridos estén presentes
+    if (!type || !status || !availability || !availability.start || !availability.end || price === undefined) {
+        return res.status(400).json({ error: 'Datos incompletos o inválidos.' });
+    }
+
+    // Buscar el cargador por ID
+    const chargerIndex = chargers.findIndex(charger => charger.id == chargerId);
+    if (chargerIndex === -1) {
+        return res.status(404).json({ error: 'Cargador no encontrado.' });
+    }
+
+    // Actualizar los datos del cargador
+    chargers[chargerIndex] = {
+        ...chargers[chargerIndex],
+        type,
+        status,
+        availability,
+        price
+    };
+
+    // Guardar los cambios en el archivo chargers.json
+    fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
+        if (err) {
+            console.error('Error al guardar chargers.json:', err);
+            return res.status(500).json({ error: 'Error al guardar los datos.' });
+        }
+        res.json(chargers[chargerIndex]);
+    });
 });
 
 // Endpoint para obtener los clientes registrados (para admin.js)

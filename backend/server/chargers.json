@@ -4,25 +4,71 @@
     "lat": 40.416775,
     "lon": -3.70379,
     "type": "fast",
-    "status": "Available"
+    "status": "available",
+    "price": 0.5,
+    "availability": {
+      "start": "08:00",
+      "end": "20:00"
+    }
   },
   {
     "id": 2,
     "lat": 41.385064,
     "lon": 2.173404,
     "type": "standard",
-    "status": "Available"
+    "status": "available",
+    "price": 0.3,
+    "availability": {
+      "start": "09:00",
+      "end": "18:00"
+    }
   },
   {
     "id": 3,
     "lat": 39.469907,
     "lon": -0.376288,
     "type": "compatible",
-    "status": "Available"
+    "status": "available",
+    "price": 0.4,
+    "availability": {
+      "start": "07:00",
+      "end": "19:00"
+    }
   },
   {
-    "id": "4",
+    "id": 4,
+    "lat": 0,
+    "lon": 0,
+    "type": "compatible",
+    "status": "available",
+    "price": 0,
+    "availability": {
+      "start": "00:00",
+      "end": "23:59"
+    }
+  },
+  {
+    "id": 5,
+    "lat": 10,
+    "lon": 20,
+    "type": "compatible",
+    "status": "occupied",
+    "price": 0.5,
+    "availability": {
+      "start": "06:00",
+      "end": "22:00"
+    }
+  },
+  {
+    "id": 123,
+    "lat": 10,
+    "lon": 20,
     "type": "Compatible",
-    "status": "Disponible"
+    "status": "Disponible",
+    "price": 1,
+    "availability": {
+      "start": "10:00",
+      "end": "15:00"
+    }
   }
 ]

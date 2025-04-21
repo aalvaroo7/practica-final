@@ -12,14 +12,14 @@ body {
     background-size: cover;
 }
 
-
 .link-container {
     display: flex;
     gap: 10px;
     align-items: center;
 }
+
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .visible {
@@ -58,6 +58,7 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #admin-login-form button:hover {
@@ -69,8 +70,11 @@ body {
     margin-top: 10px;
 }
 
-/* Estilos para el panel de administración */
+#admin-login-container h2 {
+    color: white;
+}
 
+/* Estilos para el panel de administración */
 #admin-container {
     margin: 20px auto;
     width: 80%;
@@ -81,30 +85,19 @@ body {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    position: relative;  /* Removemos fixed para que el panel se ajuste al contenido */
 }
 
-/* Fijar el header para que siempre esté visible */
 #admin-container header {
-    position: relative;
     background-color: #0073e6;
     color: white;
     padding: 10px;
     border-radius: 8px 8px 0 0;
 }
 
-/* Ajustar el main para que el contenido se desplace sin afectar al header */
 #admin-container main {
     margin-top: 20px;
     overflow-y: auto;
     padding: 20px;
-}
-
-header {
-    background-color: #0073e6;
-    color: white;
-    padding: 10px;
-    border-radius: 8px 8px 0 0;
 }
 
 header h1 {
@@ -118,10 +111,6 @@ nav ul {
     justify-content: space-around;
 }
 
-nav ul li {
-    margin: 0 10px;
-}
-
 nav ul li a {
     color: white;
     text-decoration: none;
@@ -132,12 +121,16 @@ nav ul li a:hover {
     text-decoration: underline;
 }
 
-main {
+main > section {
+    display: none;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-section {
-    margin-bottom: 20px;
+main > section.visible {
+    display: block;
 }
 
 section h2 {
@@ -147,44 +140,61 @@ section h2 {
 form {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
 }
 
 form input, form select, form button {
-    margin: 10px 0;
     padding: 10px;
+    font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 form button {
     background-color: #0073e6;
     color: white;
-    border: none;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 form button:hover {
     background-color: #005bb5;
 }
 
-#admin-login-container h2  {
-    color: white;
-}
-
-.index{
-    display: inline-block;
+/* Estilos para botones */
+button {
     padding: 10px 20px;
-    background-color: #0073e6;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ddd;
+}
+
+button.edit-charger-btn {
+    background-color: #2196f3;
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 20px;
 }
 
-.index:hover {
-    background-color: #005bb5;
+button.edit-charger-btn:hover {
+    background-color: #1976d2;
 }
 
+button.delete-charger-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+button.delete-charger-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para el contenedor de botones */
 #btns {
     margin: 20px auto;
     display: flex;
@@ -192,23 +202,11 @@ form button:hover {
     gap: 20px;
     width: 90%;
     max-width: 600px;
-    z-index: 101;
-}
-
-#btns > div {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-#btns button {
-    padding: 10px 20px;
 }
 
 #btns div button {
     width: 100%;
     height: 60px;
-    padding: 10px 20px;
     background-color: #0073e6;
     color: #fff;
     border: none;
@@ -222,123 +220,8 @@ form button:hover {
     background-color: #005bb5;
 }
 
-
-/* Estilos para el contenedor de botones de funcionalidad del Admin */
-#btns-admin {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-#btns-admin button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    background-color: #0073e6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#btns-admin button:hover {
-    background-color: #005bb5;
-}
-
-.btn-icon {
-    font-size: 1.5rem;
-}
-
-.btn-text {
-    margin-top: 5px;
-    font-size: 1rem;
-}
-
-/* Ocultar secciones de funcionalidad por defecto, si no lo está */
-#manage-users,
-#manage-chargers,
-#view-stats,
-#view-logs {
-    display: none;
-}
-
-/* Mostrar el contenido cuando se remueva la clase "hidden" */
-.hidden {
-    display: none !important;
-}
-
-
-/* Estilos para el encabezado de Gestión de Usuarios */
-.manage-users-header {
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.manage-users-header i {
-    margin-right: 10px;
-    color: #0073e6;
-}
-
-/*Particulas durisimas(enserio estan guapisimas y encima sin chat son de un repositorio de github*/
-#particles-js {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Para que quede detrás del contenido */
-    background-color: #1a1a1a; /* Cambia si quieres otro color de fondo */
-}
-
-/* Estilos para la tabla de usuarios */
-.user-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-/* Estilos para encabezados de la tabla */
-.user-th {
-    border: 1px solid #ccc;
-    padding: 8px;
-}
-
-/* Estilos para las celdas de la tabla */
-.user-td {
-    border: 1px solid #ccc;
-    padding: 8px;
-}
-
-/* Estilo específico para la celda de acciones, alinear a la derecha */
-.action-cell {
-    text-align: right;
-}
-
-/* Estilos para el botón Editar */
-.btn-edit {
-    background-color: #ffc107;
-    color: #000;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-right: 5px;
-}
-
-/* Estilos para el botón Eliminar */
-.btn-delete {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-#edit-charger-modal {
+/* Estilos para el modal */
+#edit-charger-modal, #edit-user-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -351,8 +234,7 @@ form button:hover {
     z-index: 1000;
 }
 
-/* Contenedor interno del modal */
-#edit-charger-modal .modal-content {
+#edit-charger-modal .modal-content, #edit-user-modal .modal-content {
     background: #fff;
     padding: 20px;
     width: 400px;
@@ -361,18 +243,31 @@ form button:hover {
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Animación de entrada */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.charger-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
 }
 
+.charger-table th, .charger-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.charger-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.charger-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.charger-table tr:hover {
+    background-color: #f1f1f1;
+}
 .modal-buttons {
     display: flex;
     justify-content: flex-end;
@@ -393,129 +288,72 @@ form button:hover {
     background-color: #005bb5;
 }
 
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Estilos para tablas */
+.user-table, .table-logs {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+}
+
+.user-table th, .user-table td, .table-logs th, .table-logs td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.table-logs caption {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.table-logs th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* Estilos para gráficos */
+#stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+#stats-container canvas {
+    max-width: 600px;
+    width: 100%;
+    height: auto;
+}
+
+/* Estilos para partículas */
 #particles-js {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     z-index: -1;
     background-color: #1a1a1a;
-}
-
-#edit-user-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-#edit-user-modal .modal-content {
-    background: #fff;
-    padding: 20px;
-    width: 400px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-#edit-user-modal h2 {
-    margin-top: 0;
-}
-
-#edit-user-modal form {
-    display: flex;
-    flex-direction: column;
-}
-
-#edit-user-modal form input,
-#edit-user-modal form select,
-#edit-user-modal form button {
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#edit-user-modal .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-#edit-user-modal button.btn {
-    background-color: #0073e6;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-#edit-user-modal button.btn:hover {
-    background-color: #005bb5;
-}
-
-/* Estilos para la sección de Estadísticas */
-#view-stats {
-    padding: 20px;
-}
-
-/* Contenedor para el canvas del gráfico */
-#stats-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-/* Estilo para el canvas del gráfico, asegurando que sea responsivo */
-#statsChart {
-    display: block;
-    width: 100% !important;
-    height: auto !important;
-}
-
-/* Estilos para la tabla de logs */
-.table-logs {
-    width: 80%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
     overflow: hidden;
 }
 
-.table-logs caption {
-    font-size: 1.4em;
-    margin: 10px;
-    font-weight: bold;
-    color: #333;
-}
-
-.table-logs thead {
-    background-color: #0073e6;
-    color: #fff;
-}
-
-.table-logs th,
-.table-logs td {
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    text-align: left;
-}
-
-.table-logs tbody tr {
-    transition: background-color 0.3s ease;
-}
-
-.table-logs tbody tr:nth-child(even) {
-    background-color: #f3f3f3;
-}
-
-.table-logs tbody tr:hover {
-    background-color: #ffe680;
+#particles-js canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
