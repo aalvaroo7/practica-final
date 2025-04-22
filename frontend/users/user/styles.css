@@ -194,3 +194,58 @@ footer a:hover {
     background-color: #0056b3;
 }
 
+/* Estilos para la tabla de reservas */
+.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+}
+
+.reservation-table caption {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.reservation-table thead tr {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+.reservation-table th,
+.reservation-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.reservation-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.reservation-table tbody tr:hover {
+    background-color: #ddd;
+}
+
+/* Ejemplo para botones creados en user.js en la tabla */
+.reservation-table button {
+    padding: 5px 10px;
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.reservation-table button:hover {
+    background-color: #003d80;
+}
+
+/* Estilos para atributos agregados en user.js, por ejemplo, mensajes de reserva */
+#reservation-message {
+    font-weight: bold;
+    color: #007700;
+    margin-top: 10px;
+}

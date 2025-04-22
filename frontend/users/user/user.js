@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const editProfileForm = document.getElementById('edit-profile-form');
     const editProfileButton = document.getElementById('edit-profile-btn');
     const socket = new WebSocket('ws://localhost:8080');
+    const showMapBtn = document.getElementById('show-map-btn');
     const reservationMessage = document.createElement('p');
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
@@ -35,6 +36,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    showMapBtn.addEventListener('click', () => {
+        // Se quita la clase 'hidden' para mostrar el contenedor del mapa
+        mapContainer.classList.remove('hidden');
+    });
+
+    // Función para mostrar el historial de reservas, ahora incluyendo el botón "Mostrar Todo"
     function showReservationHistory() {
         // Oculta el contenedor del mapa
         const mapContainer = document.getElementById('map-container');
@@ -44,8 +51,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         const reservationHistoryContainer = document.getElementById('reservation-history-container');
         reservationHistoryContainer.classList.remove('hidden');
 
-        // Carga el historial de reservas (verifica que la respuesta del servidor sea la esperada)
+        // Muestra el botón adicional "Mostrar Todo"
+        const showAllBtn = document.getElementById('show-all-btn');
+        if (showAllBtn) {
+            showAllBtn.classList.remove('hidden');
+        }
+
+        // Carga el historial de reservas
         loadReservationHistory();
+    }
+
+    // Evento para el botón "Mostrar Todo"
+    const showAllBtn = document.getElementById('show-all-btn');
+    if (showAllBtn) {
+        showAllBtn.addEventListener('click', () => {
+            // Oculta el contenedor de historial de reservas
+            const reservationHistoryContainer = document.getElementById('reservation-history-container');
+            reservationHistoryContainer.classList.add('hidden');
+
+            // Muestra nuevamente el contenedor del mapa y el contenedor de botones
+            const mapContainer = document.getElementById('map-container');
+            mapContainer.classList.remove('hidden');
+
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer) {
+                buttonContainer.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Asegurarse de que el botón "Ver historial de reserva" invoque showReservationHistory
+    if (reservationHistoryBtn) {
+        reservationHistoryBtn.addEventListener('click', showReservationHistory);
     }
 
     let selectedCharger = null;
@@ -263,12 +300,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    cancelReservationButton.addEventListener('click', () => {
-        alert('Tu reserva ha sido cancelada.');
-        reservationForm.classList.add('hidden');
-        modal.classList.add('hidden');
-    });
-
     reservationHistoryBtn.addEventListener('click', showReservationHistory);
 
     async function loadReservationHistory() {
@@ -316,6 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error:', error);
         }
     }
+
     function updateMap(chargerList) {
         markers.forEach(marker => map.removeLayer(marker));
         markers.length = 0;
