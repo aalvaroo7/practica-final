@@ -360,4 +360,15 @@ wss.on('connection', (ws, req) => {
             console.error('Error al procesar el mensaje:', err);
         }
     });
+
+    //endpoint para obtener las reservas desde reservas.json
+    app.get('/api/reservations', async (req, res) => {
+        try {
+            await db.read(); // Leer datos de reservas desde reservas.json
+            res.json(db.data.reservations || []);
+        } catch (error) {
+            console.error('Error al obtener reservas:', error);
+            res.status(500).json({ error: 'Error al obtener reservas' });
+        }
+    });
 });

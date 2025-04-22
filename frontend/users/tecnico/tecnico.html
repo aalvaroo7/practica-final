@@ -18,58 +18,20 @@
     </form>
 </div>
 
-<div id="buttons">
-    <button id="return-btn">Volver a la página de inicio de sesión</button>
-    <button id="return-btn2">Volver a la página principal</button>
-</div>
 
 <div id="tecnico-container" class="hidden">
     <header>
         <h1>Panel de Técnico</h1>
-        <nav>
-            <ul>
-                <li><button id="btn-update-charger-status">Actualizar Estado de Cargadores</button></li>
-                <li><button id="btn-view-charger-details">Ver Detalles Técnicos</button></li>
-                <li><button id="btn-report-issues">Reportar Problemas</button></li>
-            </ul>
-        </nav>
+        <button id="btn-show-chargers">Mostrar Cargadores</button>
     </header>
-
     <main>
-        <section id="update-charger-status">
-            <h2>Actualizar Estado de Cargadores</h2>
-            <form id="update-status-form">
-                <input type="text" id="charger-id" placeholder="ID del Cargador" required>
-                <select id="charger-status">
-                    <option value="available">Disponible</option>
-                    <option value="occupied">Ocupado</option>
-                    <option value="in-repair">En Reparación</option>
-                </select>
-                <button type="submit">Actualizar Estado</button>
-            </form>
-        </section>
-
-        <section id="view-charger-details">
-            <h2>Ver Detalles Técnicos</h2>
-            <form id="view-details-form">
-                <input type="text" id="detail-charger-id" placeholder="ID del Cargador" required>
-                <button type="submit">Ver Detalles</button>
-            </form>
-            <div id="charger-details">
-                <!-- Detalles técnicos del cargador -->
-            </div>
-        </section>
-
-        <section id="report-issues">
-            <h2>Reportar Problemas</h2>
-            <form id="report-issue-form">
-                <input type="text" id="issue-charger-id" placeholder="ID del Cargador" required>
-                <textarea id="issue-description" placeholder="Descripción del Problema" required></textarea>
-                <button type="submit">Reportar Problema</button>
-            </form>
-        </section>
+        <div id="charger-table-container" class="hidden"></div>
     </main>
 </div>
 
+<div id="tecnico-login-buttons">
+    <button id="return-btn">Volver a la página de inicio de sesión</button>
+    <button id="return-btn2">Volver a la página principal</button>
+</div>
 </body>
 </html>

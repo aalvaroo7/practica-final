@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buttonContainer = document.querySelector('.button-container');
     const reservationHistoryContainer = document.getElementById('reservation-history-container');
     const reservationHistoryBtn = document.getElementById('reservation-history-btn');
+    const reservationHistoryList = document.getElementById('reservationHistoryList');
     const adminBtn = document.getElementById('admin-btn');
     const tecnicoBtn = document.getElementById('tecnico-btn');
     const editProfileContainer = document.getElementById('edit-profile-container');
@@ -24,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const editProfileButton = document.getElementById('edit-profile-btn');
     const socket = new WebSocket('ws://localhost:8080');
     const reservationMessage = document.createElement('p');
-
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
 
@@ -36,39 +36,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     let selectedCharger = null;
-    const currentUser = localStorage.getItem('currentUser');
+    let currentUser = localStorage.getItem('currentUser');
 
     if (!currentUser) {
         editProfileButton.classList.add('hidden');
         reservationHistoryBtn.classList.add('hidden');
-    }
-
-    if (!currentUser) {
         window.location.href = '/login.html';
     }
 
-    let chargers = [
+    const chargers = [
         { id: 1, lat: 40.416775, lon: -3.703790, type: 'fast', status: 'Available' },
         { id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available' },
         { id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available' }
     ];
-
-    if (currentUser) {
-        fetch(`/user-reservations?email=${currentUser}`)
-            .then(response => response.json())
-            .then(reservations => {
-                if (reservations.length > 0) {
-                    reservationHistoryContainer.innerHTML = reservations.map(reservation =>
-                        `<div class="reservation">
-                            <p>Charger: ${reservation.charger}</p>
-                            <p>Time: ${reservation.time}</p>
-                        </div>`
-                    ).join('');
-                } else {
-                    reservationHistoryContainer.innerHTML = '<p>No reservations found.</p>';
-                }
-            });
-    }
 
     function isLoggedIn() {
         return localStorage.getItem('currentUser') !== null;
@@ -89,9 +69,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         editProfileContainer.classList.remove('hidden');
     }
 
+    if (editProfileButton) {
+        editProfileButton.addEventListener('click', showEditProfileForm);
+    }
+
     editProfileForm.addEventListener('submit', (event) => {
         event.preventDefault();
-
         const newName = document.getElementById('edit-name').value.trim();
         const newEmail = document.getElementById('edit-email').value.trim();
 
@@ -108,10 +91,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Perfil actualizado correctamente.');
         editProfileContainer.classList.add('hidden');
     });
-
-    if (editProfileButton) {
-        editProfileButton.addEventListener('click', showEditProfileForm);
-    }
 
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -143,25 +122,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    updateFilterVisibility();
-
-    adminBtn.addEventListener('click', () => {
-        window.location.href = '/users/Admin/admin.html';
-    });
-
-    tecnicoBtn.addEventListener('click', () => {
-        window.location.href = '/users/Tecnico/tecnico.html';
-    });
+    adminBtn.addEventListener('click', () => window.location.href = '/users/Admin/admin.html');
+    tecnicoBtn.addEventListener('click', () => window.location.href = '/users/Tecnico/tecnico.html');
 
     const registerForm = document.getElementById('register-form');
     registerForm.addEventListener('submit', (event) => {
         event.preventDefault();
-
         const email = document.getElementById('register-email').value.trim();
         const password = document.getElementById('register-password').value.trim();
 
         localStorage.setItem(email, password);
-
         alert('Registro exitoso. Ahora puedes iniciar sesión.');
         registerContainer.classList.add('hidden');
         loginContainer.classList.remove('hidden');
@@ -255,19 +225,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    function saveReservationToHistory(chargerId, duration) {
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        const timestamp = new Date().toLocaleString();
+        reservationHistory.push({ chargerId, duration, timestamp });
+        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
+    }
+
     reserveForm.addEventListener('submit', (event) => {
         event.preventDefault();
-
         const reservationTime = document.getElementById('reservation-time').value;
-        const currentUser = localStorage.getItem('currentUser');
-
-        if (!currentUser) {
-            alert("Tu sesión ha expirado. Por favor vuelve a iniciar sesión.");
-            window.location.href = '/login.html';
-            return;
-        }
 
         if (selectedCharger) {
+            saveReservationToHistory(selectedCharger.id, reservationTime);
             alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
             reservationForm.classList.add('hidden');
             modal.classList.add('hidden');
@@ -286,110 +256,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.classList.add('hidden');
     });
 
-    function scheduleReminder(chargerType, time) {
-        setTimeout(() => {
-            alert(`Recordatorio: Tu reserva de ${chargerType} expira en 10 minutos.`);
-        }, (time - 10) * 60000);
-    }
+    reservationHistoryBtn.addEventListener('click', async () => {
+        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+        try {
+            // Realizar una solicitud al servidor para obtener las reservas
+            const response = await fetch('/api/reservations');
+            if (!response.ok) {
+                throw new Error('Error al obtener el historial de reservas');
+            }
+
+            const reservations = await response.json();
+
+            // Crear la tabla
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID de Reserva</th>
+                            <th>ID de Cargador</th>
+                            <th>Duración (minutos)</th>
+                            <th>Fecha</th>
+                            <th>Finalizado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Agregar filas con los datos de las reservas
+            reservations.forEach(reservation => {
+                tableHTML += `
+                    <tr>
+                        <td>${reservation.id}</td>
+                        <td>${reservation.chargerId}</td>
+                        <td>${reservation.duration}</td>
+                        <td>${new Date(reservation.date).toLocaleString()}</td>
+                        <td>${reservation.finished ? 'Sí' : 'No'}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            // Insertar la tabla en el contenedor
+            reservationHistoryContainer.innerHTML = tableHTML;
+            reservationHistoryContainer.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error al cargar el historial de reservas:', error);
+            alert('No se pudo cargar el historial de reservas.');
+        }
+    });
 
     function updateMap(chargerList) {
-        markers.forEach(marker => {
-            map.removeLayer(marker);
-        });
+        markers.forEach(marker => map.removeLayer(marker));
         markers.length = 0;
 
         chargerList.forEach(charger => {
             const marker = L.marker([charger.lat, charger.lon])
                 .addTo(map)
-                .bindPopup(
-                    `<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`
-                );
+                .bindPopup(`<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`);
             markers.push(marker);
         });
     }
-
-    const chargerTypeSelect = document.getElementById('charger-type');
-    chargerTypeSelect.addEventListener('change', () => {
-        const selectedType = chargerTypeSelect.value;
-        let filteredChargers;
-
-        if (selectedType === 'all') {
-            filteredChargers = chargers;
-        } else {
-            filteredChargers = chargers.filter(charger =>
-                charger.type.toLowerCase() === selectedType.toLowerCase()
-            );
-        }
-
-        updateMap(filteredChargers);
-    });
-
-    reservationHistoryBtn.addEventListener('click', () => {
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
-            alert('Por favor, inicia sesión para ver tu historial de reservas.');
-            return;
-        }
-
-        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
-        reservationHistoryList.innerHTML = ''; // Limpia el contenido previo
-
-        if (reservationHistory.length === 0) {
-            reservationHistoryList.innerHTML = '<li>No tienes reservas registradas.</li>';
-        } else {
-            reservationHistory.forEach(reservation => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Cargador: ${reservation.chargerId}, Duración: ${reservation.duration} minutos, Fecha: ${reservation.timestamp}`;
-                reservationHistoryList.appendChild(listItem);
-            });
-        }
-
-        const reservationHistoryContainer = document.getElementById('reservation-history-container');
-        reservationHistoryContainer.classList.remove('hidden'); // Muestra el contenedor
-    });
-
-    // Guardar una reserva en el historial
-    function saveReservationToHistory(chargerId, duration) {
-        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
-        const timestamp = new Date().toLocaleString();
-
-        reservationHistory.push({ chargerId, duration, timestamp });
-        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
-    }
-
-
-    function showReservationHistory() {
-        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
-        reservationHistoryList.innerHTML = '';
-
-        reservationHistory.forEach(reservation => {
-            const listItem = document.createElement('li');
-            listItem.textContent = `Cargador: ${reservation.chargerId}, Duración: ${reservation.duration} minutos, Fecha: ${reservation.timestamp}`;
-            reservationHistoryList.appendChild(listItem);
-        });
-
-        reservationHistoryContainer.classList.remove('hidden');
-    }
-
-
-    reserveForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const reservationTime = document.getElementById('reservation-time').value;
-
-        if (selectedCharger) {
-            saveReservationToHistory(selectedCharger.id, reservationTime);
-            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
-            reservationForm.classList.add('hidden');
-            modal.classList.add('hidden');
-
-            socket.send(JSON.stringify({
-                type: 'reserve',
-                chargerId: selectedCharger.id,
-                duration: reservationTime
-            }));
-        }
-    });
-
-    reservationHistoryBtn.addEventListener('click', showReservationHistory);
 });
