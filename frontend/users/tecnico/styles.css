@@ -1,9 +1,7 @@
-/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    text-align: center;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -13,6 +11,40 @@ body {
     background-size: cover;
 }
 
+#main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-buttons .btn {
+    padding: 10px 20px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.modal-buttons .btn:hover {
+    background-color: #005bb5;
+}
+
+/* Ocultar elementos */
 .hidden {
     display: none;
 }
@@ -21,14 +53,42 @@ body {
     display: block;
 }
 
-/* Estilos para el contenedor de inicio de sesión */
+#tecnico-login-buttons {
+    display: flex;
+    flex-direction: row; /* Asegura que los botones estén en una fila */
+    justify-content: center; /* Centra los botones horizontalmente */
+    align-items: center; /* Centra los botones verticalmente */
+    gap: 20px; /* Espaciado entre los botones */
+    margin-top: 20px; /* Espaciado superior */
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    max-width: 600px; /* Limita el ancho máximo del contenedor */
+}
+
+#tecnico-login-buttons button {
+    flex: 0 1 auto; /* Permite que los botones mantengan su tamaño natural */
+    padding: 10px 20px; /* Tamaño uniforme para los botones */
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#tecnico-login-buttons button:hover {
+    background-color: #005bb5;
+}
+
+/* Contenedor de inicio de sesión */
 #tecnico-login-container {
     width: 400px;
     padding: 30px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: white;
 }
 
 #tecnico-login-form {
@@ -40,7 +100,7 @@ body {
 #tecnico-login-form input {
     width: 100%;
     padding: 12px;
-    margin: 12px 0;
+    margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -53,6 +113,7 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 #tecnico-login-form button:hover {
@@ -62,61 +123,62 @@ body {
 #tecnico-error-message {
     color: red;
     margin-top: 10px;
+    font-size: 14px;
 }
 
-/* Estilos para el panel de técnico */
+/* Contenedor del panel de técnico */
 #tecnico-container {
     width: 80%;
-    margin: 20px auto;
-    padding: 20px;
+    max-width: 800px;
+    padding: 30px;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: #333;
 }
 
 header {
-    background-color: #0073e6;
-    color: white;
-    padding: 10px;
-    border-radius: 8px 8px 0 0;
-}
-
-header h1 {
-    margin: 0;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: space-around;
-}
-
-nav ul li {
-    margin: 0 10px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-nav ul li a:hover {
-    text-decoration: underline;
-}
-
-main {
-    padding: 20px;
-}
-
-section {
     margin-bottom: 20px;
 }
 
+header h1 {
+    font-size: 24px;
+    color: #0073e6;
+}
+
+nav button {
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+    background-color: #005bb5;
+}
+
+main {
+    margin-top: 20px;
+}
+
+section {
+    margin: 20px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
 section h2 {
-    margin-top: 0;
+    color: #0073e6;
+    margin-bottom: 15px;
 }
 
 form {
@@ -124,11 +186,12 @@ form {
     flex-direction: column;
 }
 
-form input, form select, form button {
+form input, form select, form textarea, form button {
     margin: 10px 0;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 16px;
 }
 
 form button {
@@ -136,6 +199,7 @@ form button {
     color: white;
     border: none;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 form button:hover {
@@ -159,15 +223,20 @@ form button:hover {
 .index:hover {
     background-color: #005bb5;
 }
-#buttons {
+
+#tecnico-login-buttons {
     display: flex;
+    flex-direction: column; /* Cambia la dirección a columna */
     justify-content: center;
-    gap: 20px; /* Separación entre botones */
-    margin-top: 20px;
+    align-items: center;
+    gap: 20px; /* Espaciado entre los botones */
+    margin-top: 20px; /* Espaciado superior */
+    width: 100%; /* Asegura que ocupe todo el ancho */
 }
 
-#buttons button {
-    width: 100%;
+#tecnico-login-buttons button {
+    width: 100%; /* Asegura que los botones ocupen todo el ancho del contenedor */
+    max-width: 300px; /* Limita el ancho máximo de los botones */
     padding: 12px 20px;
     background-color: #0073e6;
     color: #fff;
@@ -175,9 +244,78 @@ form button:hover {
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto moderno */
 }
 
-#buttons button:hover {
+#tecnico-login-buttons button:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px); /* Efecto de elevación al pasar el cursor */
+}
+
+#tecnico-login-buttons button:active {
+    transform: translateY(0); /* Vuelve a la posición original al hacer clic */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#btn-show-chargers {
+    background-color: #4caf50; /* Color verde */
+    color: white; /* Texto blanco */
+    font-size: 18px; /* Tamaño de fuente más grande */
+    padding: 15px 30px; /* Más espacio interno */
+    border: none; /* Sin bordes */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+#btn-show-chargers:hover {
+    background-color: #45a049; /* Color más oscuro al pasar */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+    transform: scale(1.05); /* Efecto de agrandamiento */
+}
+
+table.charger-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table.charger-table th, table.charger-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+table.charger-table th {
+    background-color: #0073e6;
+    color: white;
+    text-transform: uppercase;
+}
+
+table.charger-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table.charger-table tr:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+table.charger-table td button {
+    padding: 8px 12px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+table.charger-table td button:hover {
     background-color: #005bb5;
 }
