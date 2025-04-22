@@ -218,6 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('favorites-container').classList.remove('hidden');
             localStorage.removeItem(`${email}-favorites`);
             document.getElementById('leave-review-btn').classList.remove('hidden');
+            showSurveyIfNeeded();
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
@@ -591,4 +592,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    const rating = document.querySelector('input[name="rating"]:checked')?.value;
+    if (!rating) {
+        alert('Por favor selecciona una calificación.');
+        return;
+    }
 });
