@@ -35,6 +35,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    function showReservationHistory() {
+        // Oculta el contenedor del mapa
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.classList.add('hidden');
+
+        // Muestra el contenedor del historial de reservas
+        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+        reservationHistoryContainer.classList.remove('hidden');
+
+        // Carga el historial de reservas (verifica que la respuesta del servidor sea la esperada)
+        loadReservationHistory();
+    }
+
     let selectedCharger = null;
     let currentUser = localStorage.getItem('currentUser');
 
@@ -256,59 +269,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.classList.add('hidden');
     });
 
-    reservationHistoryBtn.addEventListener('click', async () => {
-        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+    reservationHistoryBtn.addEventListener('click', showReservationHistory);
+
+    async function loadReservationHistory() {
         try {
-            // Realizar una solicitud al servidor para obtener las reservas
+            // Realiza la petición para obtener las reservas desde reservas.json
             const response = await fetch('/api/reservations');
             if (!response.ok) {
                 throw new Error('Error al obtener el historial de reservas');
             }
-
             const reservations = await response.json();
 
-            // Crear la tabla
-            let tableHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID de Reserva</th>
-                            <th>ID de Cargador</th>
-                            <th>Duración (minutos)</th>
-                            <th>Fecha</th>
-                            <th>Finalizado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            // Contenedor donde se mostrará el historial
+            const container = document.getElementById('reservation-history-container');
 
-            // Agregar filas con los datos de las reservas
-            reservations.forEach(reservation => {
-                tableHTML += `
-                    <tr>
-                        <td>${reservation.id}</td>
-                        <td>${reservation.chargerId}</td>
-                        <td>${reservation.duration}</td>
-                        <td>${new Date(reservation.date).toLocaleString()}</td>
-                        <td>${reservation.finished ? 'Sí' : 'No'}</td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            // Insertar la tabla en el contenedor
-            reservationHistoryContainer.innerHTML = tableHTML;
-            reservationHistoryContainer.classList.remove('hidden');
+            if (reservations && reservations.length > 0) {
+                // Construir la tabla con las reservas
+                let html = `
+        <table class="reservation-table">
+          <thead>
+            <tr>
+              <th>ID de Reserva</th>
+              <th>ID de Cargador</th>
+              <th>Duración (min)</th>
+              <th>Fecha</th>
+              <th>Finalizado</th>
+            </tr>
+          </thead>
+          <tbody>`;
+                reservations.forEach(reservation => {
+                    html += `
+            <tr>
+              <td>${reservation.id}</td>
+              <td>${reservation.chargerId}</td>
+              <td>${reservation.duration}</td>
+              <td>${new Date(reservation.date).toLocaleString()}</td>
+              <td>${reservation.finished ? 'Sí' : 'No'}</td>
+            </tr>`;
+                });
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = 'No hay reservas registradas.';
+            }
         } catch (error) {
-            console.error('Error al cargar el historial de reservas:', error);
-            alert('No se pudo cargar el historial de reservas.');
+            console.error('Error:', error);
         }
-    });
-
+    }
     function updateMap(chargerList) {
         markers.forEach(marker => map.removeLayer(marker));
         markers.length = 0;
