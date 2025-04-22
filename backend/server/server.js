@@ -6,6 +6,7 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
+import fsPromises from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -91,8 +92,19 @@ async function initLogsFile() {
     }
 }
 
+// Función para inicializar el archivo de reseñas
+async function initResenasFile() {
+    try {
+        await fsPromises.writeFile(resenasFilePath, JSON.stringify([]));
+        console.log('Archivo resenas.json inicializado.');
+    } catch (error) {
+        console.error('Error al inicializar resenas.json:', error);
+    }
+}
+
 await initClientsFile();
 await initLogsFile();
+await initResenasFile();
 
 // Endpoint para obtener cargadores
 app.get('/api/chargers', (req, res) => {
@@ -353,52 +365,51 @@ wss.on('connection', (ws, req) => {
 
     logAudit(`Nuevo cliente conectado desde ${clientIp}`);
 
-    // Función para cargar reseñas
-    function loadResenas() {
+
+// Función para cargar reseñas (actualizada para usar fs/promises)
+    async function loadResenas() {
         try {
-            if (!fs.existsSync(resenasFilePath)) {
-                fs.writeFileSync(resenasFilePath, JSON.stringify([]));
-                return [];
-            }
-            const data = fs.readFileSync(resenasFilePath, 'utf-8');
+            await fs.access(resenasFilePath);
+            const data = await fsPromises.readFile(resenasFilePath, 'utf-8');
             return data.trim() ? JSON.parse(data) : [];
         } catch (error) {
-            console.error(`Error al cargar resenas: ${error}`);
+            console.error('Error al cargar resenas:', error);
             return [];
         }
     }
 
-// Función para guardar reseñas
-    function saveResenas(resenas) {
-        fs.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2), err => {
-            if (err) console.error(`Error al escribir resenas.json: ${err}`);
-        });
+// Función para guardar reseñas (actualizada para usar fs/promises)
+    async function saveResenas(resenas) {
+        try {
+            await fsPromises.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2));
+            console.log('Reseña guardada correctamente.');
+        } catch (error) {
+            console.error('Error al guardar resenas:', error);
+        }
     }
 
-// Endpoint para obtener reseñas
-    app.get('/api/resenas', (req, res) => {
-        const resenas = loadResenas();
-        res.json(resenas);
-    });
-
-// Endpoint para agregar una reseña
-    app.post('/api/resenas', (req, res) => {
+    app.post('/api/resenas', async (req, res) => {
         const { user, rating, comentario, chargerId } = req.body;
         if (!user || rating === undefined || !comentario) {
             return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
         }
-        const resenas = loadResenas();
-        const nuevaResena = {
-            id: Date.now(),
-            user,
-            rating,
-            comentario,
-            chargerId: chargerId || null,
-            fecha: new Date().toISOString()
-        };
-        resenas.push(nuevaResena);
-        saveResenas(resenas);
-        res.status(201).json(nuevaResena);
+        try {
+            const resenas = await loadResenas();
+            const nuevaResena = {
+                id: Date.now(),
+                user,
+                rating,
+                comentario,
+                chargerId: chargerId || null,
+                fecha: new Date().toISOString()
+            };
+            resenas.push(nuevaResena);
+            await saveResenas(resenas);
+            res.status(201).json(nuevaResena);
+        } catch (error) {
+            console.error('Error al procesar el POST de reseñas:', error);
+            res.status(500).json({ error: 'Error interno al guardar la reseña.' });
+        }
     });
 
     ws.on('message', async message => {

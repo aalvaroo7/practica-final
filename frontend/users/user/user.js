@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const showMapBtn = document.getElementById('show-map-btn');
     const viewStatsBtn = document.getElementById('view-stats-btn');
     const reservationMessage = document.createElement('p');
+    const reviewForm = document.getElementById('review-form');
 
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
@@ -144,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const chargers = [
-        { id: 1, lat: 40.416775, lon: -3.70379, type: 'fast', status: 'Available' },
-        { id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available' },
-        { id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available' }
+        {id: 1, lat: 40.416775, lon: -3.70379, type: 'fast', status: 'Available'},
+        {id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available'},
+        {id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available'}
     ];
 
     function isLoggedIn() {
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const newEmail = document.getElementById('edit-email').value.trim();
         if (newEmail !== currentUser) {
             localStorage.removeItem(currentUser);
-            localStorage.setItem(newEmail, JSON.stringify({ name: newName, email: newEmail }));
+            localStorage.setItem(newEmail, JSON.stringify({name: newName, email: newEmail}));
             localStorage.setItem('currentUser', newEmail);
         } else {
             const userData = JSON.parse(localStorage.getItem(currentUser));
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function saveReservationToHistory(chargerId, duration) {
         const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
         const timestamp = new Date().toLocaleString();
-        reservationHistory.push({ chargerId, duration, timestamp });
+        reservationHistory.push({chargerId, duration, timestamp});
         localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
     }
 
@@ -484,37 +485,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateFavoritesDisplay();
 
     // Función para enviar una reseña al servidor
-    document.addEventListener('DOMContentLoaded', () => {
-        const reviewForm = document.getElementById('review-form');
 
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const user = document.getElementById('review-user').value.trim();
-                const rating = Number(document.getElementById('review-rating').value);
-                const comentario = document.getElementById('review-comentario').value.trim();
-                const chargerId = document.getElementById('review-chargerId') ? document.getElementById('review-chargerId').value.trim() : null;
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const user = document.getElementById('review-user').value.trim();
+            const rating = Number(document.getElementById('review-rating').value);
+            const comentario = document.getElementById('review-comentario').value.trim();
+            const chargerId = document.getElementById('review-chargerId') ? document.getElementById('review-chargerId').value.trim() : null;
 
-                try {
-                    const response = await fetch('/api/resenas', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user, rating, comentario, chargerId })
-                    });
-                    if (response.ok) {
-                        const nuevaResena = await response.json();
-                        alert('Reseña guardada correctamente.');
-                        // Opcional: actualizar la vista o limpiar el formulario
-                        reviewForm.reset();
-                    } else {
-                        const errorData = await response.json();
-                        alert(`Error: ${errorData.error}`);
-                    }
-                } catch (error) {
-                    console.error('Error al enviar la reseña:', error);
+            try {
+                const response = await fetch('/api/resenas', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user, rating, comentario, chargerId})
+                });
+                if (response.ok) {
+                    const nuevaResena = await response.json();
+                    alert('Reseña guardada correctamente.');
+                    // Opcional: actualizar la vista o limpiar el formulario
+                    reviewForm.reset();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.error}`);
                 }
-            });
-        }
-    });
+            } catch (error) {
+                console.error('Error al enviar la reseña:', error);
+            }
+        });
+
+    }
 
 });
