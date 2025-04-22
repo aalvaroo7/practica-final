@@ -249,3 +249,91 @@ footer a:hover {
     color: #007700;
     margin-top: 10px;
 }
+
+/* Estilos mejorados para el contenedor de editar perfil */
+#edit-profile-container {
+    max-width: 700px;
+    margin: 30px auto;
+    width: 90%;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffffff, #f7f7f7);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+    border: 1px solid #ddd;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+#edit-profile-container:hover {
+    transform: scale(1.02);
+}
+#edit-profile-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5em;
+}
+#edit-profile-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+#edit-profile-container form label {
+    font-weight: 600;
+    color: #555;
+}
+#edit-profile-container form input {
+    width: 97%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+#edit-profile-container form button {
+    padding: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#edit-profile-container form button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos mejorados para la tabla de estadísticas */
+#personal-stat-table {
+    width: 80%;                 /* Ajusta el ancho de la tabla */
+    margin: 20px auto;          /* Centra la tabla y añade margen vertical */
+    border-collapse: collapse;  /* Elimina espacios entre bordes */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);  /* Sombra sutil para profundidad */
+    background-color: #ffffff;  /* Fondo blanco para la tabla */
+    border-radius: 8px;         /* Bordes redondeados */
+    overflow: hidden;           /* Evita que el redondeo se sobresalga */
+}
+
+#personal-stat-table th,
+#personal-stat-table td {
+    padding: 12px;              /* Espaciado interno de celdas */
+    border: 1px solid #ddd;     /* Bordes suaves en celdas */
+    text-align: center;         /* Centrado del contenido */
+}
+
+#personal-stat-table thead {
+    background-color: #007bff;  /* Color de fondo para encabezado */
+    color: #fff;                /* Texto en blanco */
+    font-size: 1.1em;           /* Tamaño de fuente */
+}
+
+#personal-stat-table tbody tr:hover {
+    background-color: #f1f1f1;  /* Efecto hover para resaltar filas */
+}
+
+#personal-stat-table caption {
+    font-size: 1.5em;           /* Tamaño de fuente para el caption */
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}

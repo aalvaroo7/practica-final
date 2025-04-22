@@ -9,7 +9,7 @@ import { JSONFile } from 'lowdb/node';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const resenasFilePath = path.join(__dirname, 'resenas.json');
 const problemasFilePath = path.join(__dirname, 'problemas.json');
 const chargersFilePath = path.join(__dirname, 'chargers.json');
 const staticPublicPath = path.join(__dirname, '../../frontend/public');
@@ -352,6 +352,54 @@ wss.on('connection', (ws, req) => {
     saveClients(clients);
 
     logAudit(`Nuevo cliente conectado desde ${clientIp}`);
+
+    // Función para cargar reseñas
+    function loadResenas() {
+        try {
+            if (!fs.existsSync(resenasFilePath)) {
+                fs.writeFileSync(resenasFilePath, JSON.stringify([]));
+                return [];
+            }
+            const data = fs.readFileSync(resenasFilePath, 'utf-8');
+            return data.trim() ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error(`Error al cargar resenas: ${error}`);
+            return [];
+        }
+    }
+
+// Función para guardar reseñas
+    function saveResenas(resenas) {
+        fs.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2), err => {
+            if (err) console.error(`Error al escribir resenas.json: ${err}`);
+        });
+    }
+
+// Endpoint para obtener reseñas
+    app.get('/api/resenas', (req, res) => {
+        const resenas = loadResenas();
+        res.json(resenas);
+    });
+
+// Endpoint para agregar una reseña
+    app.post('/api/resenas', (req, res) => {
+        const { user, rating, comentario, chargerId } = req.body;
+        if (!user || rating === undefined || !comentario) {
+            return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
+        }
+        const resenas = loadResenas();
+        const nuevaResena = {
+            id: Date.now(),
+            user,
+            rating,
+            comentario,
+            chargerId: chargerId || null,
+            fecha: new Date().toISOString()
+        };
+        resenas.push(nuevaResena);
+        saveResenas(resenas);
+        res.status(201).json(nuevaResena);
+    });
 
     ws.on('message', async message => {
         try {
