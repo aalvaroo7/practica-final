@@ -365,11 +365,18 @@ wss.on('connection', (ws, req) => {
 
     logAudit(`Nuevo cliente conectado desde ${clientIp}`);
 
-
+    async function initResenasFile() {
+        try {
+            await fsPromises.writeFile(resenasFilePath, JSON.stringify([], null, 2));
+            console.log('Archivo resenas.json inicializado y vaciado.');
+        } catch (error) {
+            console.error('Error al inicializar resenas.json:', error);
+        }
+    }
 // Función para cargar reseñas (actualizada para usar fs/promises)
     async function loadResenas() {
         try {
-            await fs.access(resenasFilePath);
+            await fsPromises.access(resenasFilePath);
             const data = await fsPromises.readFile(resenasFilePath, 'utf-8');
             return data.trim() ? JSON.parse(data) : [];
         } catch (error) {

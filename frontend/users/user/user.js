@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         editProfileContainer.classList.add('hidden');
         reservationHistoryContainer.classList.add('hidden');
         document.getElementById('personal-stat-table').classList.add('hidden');
+        document.getElementById('review-section').classList.add('hidden');
     }
 
 
@@ -515,5 +516,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
     }
+
+    // Agregar el manejador para el botón de la reseña
+    const reviewRatingButtons = document.querySelectorAll('.rating-btn');
+    reviewRatingButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Desmarcar todas las estrellas
+            document.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Marcar la estrella seleccionada
+            button.classList.add('selected');
+
+            // Actualizar el valor del input oculto con el valor correspondiente
+            document.getElementById('review-rating').value = button.getAttribute('data-value');
+        });
+    });
+
+    // Verificar si el usuario ya está autenticado al cargar la página
+    window.onload = function() {
+        const currentUser = localStorage.getItem('currentUser');
+        const surveySection = document.getElementById('survey-section');
+
+        // Si no hay usuario logueado, la encuesta no se mostrará
+        if (!currentUser) {
+            surveySection.classList.add('hidden');
+        }
+    };
+
+// Llamar a la función que muestra la encuesta solo si el usuario está logueado y no ha completado la encuesta
+    function showSurveyIfNeeded() {
+        const currentUser = localStorage.getItem('currentUser');
+        const surveySection = document.getElementById('survey-section');
+
+        // Solo mostrar la encuesta si el usuario está logueado y no ha completado la encuesta
+        if (currentUser && !localStorage.getItem(`${currentUser}-surveyCompleted`)) {
+            surveySection.classList.remove('hidden');
+
+            // Ocultar la encuesta automáticamente después de 30 segundos si no se rellena
+            setTimeout(() => {
+                surveySection.classList.add('hidden');
+            }, 30000);  // 30 segundos para rellenar la encuesta
+        }
+    }
+
+// Lógica para enviar la encuesta
+    const surveyForm = document.getElementById('survey-form');
+    surveyForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const rating = document.getElementById('survey-rating-value').value;
+        const comments = document.getElementById('survey-comments').value.trim();
+        const currentUser = localStorage.getItem('currentUser');
+        const surveySection = document.getElementById('survey-section');
+
+        try {
+            const response = await fetch('/api/satisfaction-survey', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating, comments })
+            });
+
+            if (response.ok) {
+                alert('Gracias por completar la encuesta de satisfacción.');
+                surveySection.classList.add('hidden');  // Ocultar la encuesta después de enviarla
+                localStorage.setItem(`${currentUser}-surveyCompleted`, 'true');  // Marcar la encuesta como completada
+            } else {
+                alert('Error al enviar la encuesta. Por favor, inténtalo nuevamente.');
+            }
+        } catch (error) {
+            console.error('Error al enviar la encuesta:', error);
+            alert('Hubo un problema al enviar la encuesta. Por favor, intenta más tarde.');
+        }
+    });
 
 });

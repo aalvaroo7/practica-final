@@ -19,12 +19,12 @@
 - RF-06: Consultar historial de reservas
 - RF-38: Historial detallado de actividades de carga
 - RF-28: Guardar cargadores frecuentes como favoritos.
+- RF-26: Calificar y dejar reseñas
+- RF-36: Encuestas de satisfacción
 
 ### No Cumplidos
 - RF-37: Recomendaciones basadas en uso anterior
-- RF-36: Encuestas de satisfacción
 - RF-39: Validar compatibilidad entre coche y cargador
-- RF-26: Calificar y dejar reseñas
 
 
 - RF-41: Modificar/extender reservas antes de que comiencen
