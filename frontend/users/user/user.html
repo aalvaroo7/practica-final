@@ -84,7 +84,8 @@
     <button id="view-stats-btn" class="hidden">Ver Estadísticas de Uso</button>
     <button id="leave-review-btn" class="hidden">Dejar Reseña</button>
     <button id="show-survey-btn" class="hidden">Mostrar Encuesta</button>
-    <button id="show-recommendations-btn">Ver Recomendaciones</button>
+    <button id="show-recommendations-btn" class="hidden">Ver Recomendaciones</button>
+    <button id="report-issue-btn" class="hidden">Reportar Incidencia</button>
     <div id="favorites-container" class="hidden"></div>
 </div>
 
@@ -215,15 +216,14 @@
     </form>
 </div>
 
-<section id=\"incidences-section\">
+<section id="report-issue-section" class="hidden">
     <h2>Reportar Incidencia</h2>
-    <form id=\"incidence-form\">
-        <label for=\"incidence-description\">Descripción:</label>
-        <textarea id=\"incidence-description\" required></textarea>
-        <button type=\"submit\">Reportar Incidencia</button>
+    <form id="report-issue-form">
+        <label for="issue-description">Descripción:</label>
+        <textarea id="issue-description" required></textarea>
+        <button type="submit">Reportar Incidencia</button>
     </form>
-    <!-- Contenedor opcional para listar incidencias -->
-    <div id=\"incidences-list\"></div>
+    <div id="issues-list"></div>
 </section>
 
 </body>

@@ -19,12 +19,12 @@
 - RF-38: Historial detallado de actividades de carga
 - RF-28: Guardar cargadores frecuentes como favoritos.
 - RF-26: Calificar y dejar reseñas
-- RF-36: Encuestas de satisfacción 
+- RF-36: Encuestas de satisfacción
+  RF--> MOSTRAR RECOMENDACIONES DE CARGADORES
 
 ### No Cumplidos
 - RF-39: Validar compatibilidad entre coche y cargador
 
-RF--> MOSTRAR RECOMENDACIONES DE CARGADORES
 
 - RF-41: Modificar/extender reservas antes de que comiencen
 - RF-20: Ver y gestionar historial de pagos/facturas
@@ -56,9 +56,8 @@ RF--> MOSTRAR RECOMENDACIONES DE CARGADORES
 ## Técnico
 
 ### Cumplidos
-(Ninguno cumplido por ahora)
+- RF-16: Ver detalles técnicos de los cargadores
 
 ### No Cumplidos
 - RF-15: Actualizar estado en el chargers.json (añadir detalles técnicos por cargador)
-- RF-16: Ver detalles técnicos de los cargadores
 - RF-17: Reportar problemas/incidencias  

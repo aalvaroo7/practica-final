@@ -36,18 +36,6 @@
     }
   },
   {
-    "id": "4",
-    "lat": 10,
-    "lon": 20,
-    "type": "compatible",
-    "status": "occupied",
-    "price": 5,
-    "availability": {
-      "start": "10:00",
-      "end": "05:00"
-    }
-  },
-  {
     "id": "5",
     "lat": 80,
     "lon": 20,

@@ -338,13 +338,13 @@ function saveProblems(problems) {
     });
 }
 
-// Endpoints para problemas
-app.post('/api/problems', (req, res) => {
+// Endpoint para reportar incidencias
+app.post('/api/incidences', (req, res) => {
     const { description } = req.body;
     if (!description) {
-        return res.status(400).json({ error: 'La descripción del problema es obligatoria.' });
+        return res.status(400).json({ error: 'La descripción es obligatoria.' });
     }
-    const problems = loadProblems();
+    const problems = loadProblems(); // loadProblems debe estar definido globalmente
     const newProblem = {
         id: Date.now(),
         description,
@@ -352,7 +352,7 @@ app.post('/api/problems', (req, res) => {
         reportedAt: new Date().toISOString()
     };
     problems.push(newProblem);
-    saveProblems(problems);
+    saveProblems(problems); // saveProblems también debe estar definido globalmente
     res.status(201).json(newProblem);
 });
 
@@ -360,17 +360,35 @@ app.get('/api/problems', (req, res) => {
     const problems = loadProblems();
     res.json(problems);
 });
-
+// Endpoint para consultar y, si se indican parámetros, para crear una reserva vía GET
 app.get('/api/reservations', async (req, res) => {
     try {
         await db.read();
-        const { userEmail } = req.query;
+        const { userEmail, chargerId, duration, create } = req.query;
 
+        // Si se indica que se crea y se tienen los parámetros requeridos,
+        // se crea la nueva reserva.
+        if (create && userEmail && chargerId && duration) {
+            const newReservation = {
+                id: Date.now(),
+                chargerId: Number(chargerId),
+                user: userEmail,
+                duration: duration,
+                date: new Date().toISOString(),
+                finished: false
+            };
+            db.data.reservations.push(newReservation);
+            await db.write();
+            return res.status(201).json(newReservation);
+        }
+
+        // Si se especifica userEmail, se devuelven solo sus reservas.
         if (userEmail) {
             const userReservations = db.data.reservations.filter(r => r.user === userEmail);
             return res.json(userReservations);
         }
 
+        // En otro caso se devuelven todas las reservas.
         res.json(db.data.reservations || []);
     } catch (error) {
         console.error('Error al obtener reservas:', error);
