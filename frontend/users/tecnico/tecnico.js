@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnUpdateStatus) {
         btnUpdateStatus.addEventListener('click', () => {
             showSection('update-charger-status');
-            loadChargers();
+            loadAndDisplayChargers();
         });
     }
 
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(chargers => {
                 const charger = chargers.find(ch => ch.id == chargerId);
                 if (charger) {
-                    const row = document.getElementById(charger-row-${charger.id});
+                    const row = document.getElementById(`charger-row-${charger.id}`);
 
                     if (!headersExpanded) {
                         const thead = row.closest('table').querySelector('thead tr');
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Incidencia reportada correctamente.');
             } else {
                 const errorData = await response.json();
-                alert(Error al reportar la incidencia: ${errorData.error});
+                alert(`Error al reportar la incidencia: ${errorData.error}`);
             }
         } catch (error) {
             console.error('Error al reportar la incidencia:', error);
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateChargerStatus(chargerId, status) {
         try {
-            const response = await fetch(/api/chargers/${chargerId}, {
+            const response = await fetch(`/api/chargers/${chargerId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -238,21 +238,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadAndDisplayChargers();
             } else {
                 const errorData = await response.json();
-                alert(Error al actualizar el cargador: ${errorData.error});
+                alert(`Error al actualizar el cargador: ${errorData.error}`);
             }
         } catch (error) {
             console.error('Error al actualizar el estado del cargador:', error);
             alert('Error al actualizar el estado del cargador.');
-        }
-    }
-
-    async function loadChargers() {
-        try {
-            const response = await fetch('/api/chargers');
-            const chargers = await response.json();
-            displayChargers(chargers);
-        } catch (error) {
-            console.error('Error al cargar los cargadores:', error);
         }
     }
 
@@ -262,5 +252,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('El boton Mostrar Cargadores no se encontro en el DOM.');
     }
 
-    loadChargers();
+    loadAndDisplayChargers();
 });
