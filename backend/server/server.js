@@ -452,7 +452,7 @@ wss.on('connection', (ws, req) => {
         }
     }
 
-// Función para guardar reseñas (actualizada para usar fs/promises)
+//  Función para guardar reseñas (actualizada para usar fs/promises)
     async function saveResenas(resenas) {
         try {
             await fsPromises.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2));

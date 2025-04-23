@@ -25,10 +25,13 @@
 ### No Cumplidos
 - RF-39: Validar compatibilidad entre coche y cargador
 
+RF--> FILTRAR CARGADORES POR TIPO
 
 - RF-41: Modificar/extender reservas antes de que comiencen
+
 - RF-20: Ver y gestionar historial de pagos/facturas
-- 
+
+
 - RF-19: Reportar problemas y ver estado de resolución
 - RF-27: Reportar incidencias
 ---

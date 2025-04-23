@@ -31,9 +31,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
     const showSurveyBtn = document.getElementById('show-survey-btn');
-    const verRecomendacionesBtn = document.getElementById('show-recommendations-btn');
-    const incidenciasformulario = document.getElementById('report-issue-section');
-    // Mostrar/ocultar elementos según si el usuario está autenticado
+    const reportIssueBtn = document.getElementById("report-issue-btn");
+    const reportIssueSection = document.getElementById("report-issue-section");
+
     if (!localStorage.getItem('currentUser')) {
         document.getElementById('favorites-container').classList.add('hidden');
     }
@@ -79,6 +79,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         editProfileContainer.classList.remove('hidden');
     }
+
+    const incidenceForm = document.getElementById('incidence-form');
+    if (incidenceForm) {
+        incidenceForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const description = document.getElementById('issue-description').value.trim();
+            if (!description) return alert('La descripción es obligatoria.');
+
+            try {
+                const response = await fetch('/api/problemas', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ description })
+                });
+
+                if (!response.ok) throw new Error('Error al reportar incidencia.');
+                const newIncidence = await response.json();
+
+                const incidencesList = document.getElementById('incidences-list');
+                if (incidencesList) {
+                    const item = document.createElement('div');
+                    item.textContent = `Incidencia: ${newIncidence.description} / Estado: ${newIncidence.status}`;
+                    incidencesList.appendChild(item);
+                }
+
+                incidenceForm.reset();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
+        });
+    }
+
 
     // Función para mostrar la sección de editar perfil
     function showEditProfile() {
@@ -227,13 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Función para agregar una reserva al historial (almacenado en localStorage)
-    function saveReservationToHistory(chargerId, duration) {
-        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
-        const timestamp = new Date().toLocaleString();
-        reservationHistory.push({chargerId, duration, timestamp});
-        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
-    }
+
 
     // Cargar historial de reservas desde API
     async function loadReservationHistory() {
@@ -244,27 +271,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('reservation-history-container');
             if (reservations && reservations.length > 0) {
                 let html = `
-          <table class="reservation-table">
-            <thead>
-              <tr>
-                <th>ID de Reserva</th>
-                <th>ID de Cargador</th>
-                <th>Duración (min)</th>
-                <th>Fecha</th>
-                <th>Finalizado</th>
-              </tr>
-            </thead>
-            <tbody>`;
+            <table class="reservation-table">
+                <thead>
+                    <tr>
+                        <th>ID de Reserva</th>
+                        <th>ID de Cargador</th>
+                        <th>Duración (min)</th>
+                        <th>Fecha</th>
+                        <th>Finalizado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
                 reservations.forEach(reservation => {
                     html += `
-              <tr>
-                <td>${reservation.id}</td>
-                <td>${reservation.chargerId}</td>
-                <td>${reservation.duration}</td>
-                <td>${new Date(reservation.date).toLocaleString()}</td>
-                <td>${reservation.finished ? 'Sí' : 'No'}</td>
-              </tr>`;
+                <tr>
+                    <td>${reservation.id}</td>
+                    <td>${reservation.chargerId}</td>
+                    <td>${reservation.duration}</td>
+                    <td>${new Date(reservation.date).toLocaleString()}</td>
+                    <td>${reservation.finished ? 'Sí' : 'No'}</td>
+                    <td>
+                        ${!reservation.finished ? `
+                            <button onclick='showModifyReservationForm(${JSON.stringify(reservation)})'>Modificar</button>
+                            <button onclick='extendReservation(${JSON.stringify(reservation)})'>Extender</button>` : '—'}
+                    </td>
+                </tr>`;
                 });
+
                 html += `</tbody></table>`;
                 container.innerHTML = html;
             } else {
@@ -490,6 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.removeItem(`${email}-favorites`);
             document.getElementById('leave-review-btn').classList.remove('hidden');
             document.getElementById('show-recommendations-btn').classList.remove('hidden');
+            document.getElementById('report-issue-btn').classList.remove('hidden');
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -545,36 +581,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showError(error) {
         alert("Unable to retrieve location: " + error.message);
     }
+    const response = await fetch('/api/problemas', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ description })
+    });
 
-// Manejador para el formulario de incidencias
-    const incidenceForm = document.getElementById('incidence-form');
-    if (incidenceForm) {
-        incidenceForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const description = document.getElementById('incidence-description').value.trim();
-            if (!description) return alert('La descripción es obligatoria.');
-            try {
-                const response = await fetch('/api/incidences', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({description})
-                });
-                if (!response.ok) throw new Error('Error al reportar incidencia.');
-                const newIncidence = await response.json();
-                // Actualizar la lista de incidencias en la UI
-                const incidencesList = document.getElementById('incidences-list');
-                if (incidencesList) {
-                    const item = document.createElement('div');
-                    item.textContent = `Incidencia: ${newIncidence.description} / Estado: ${newIncidence.status}`;
-                    incidencesList.appendChild(item);
-                }
-                incidenceForm.reset();
-            } catch (error) {
-                console.error(error);
-                alert(error.message);
-            }
-        });
-    }
 
 // Obtener los chargers desde el archivo JSON (si es local o desde una base de datos)
     function obtenerChargers() {
@@ -673,13 +685,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         mostrarRecomendaciones(); // Llama a la función para mostrar las recomendaciones
     });
 
-    if (localStorage.getItem("currentUser")) {
-        const reportIssueBtn = document.getElementById("report-issue-btn");
-        reportIssueBtn.classList.remove("hidden");
-
+    if (reportIssueBtn && reportIssueSection) {
         reportIssueBtn.addEventListener("click", () => {
-            const reportIssueSection = document.getElementById("report-issue-section");
+            hideSideMenuSections();
             reportIssueSection.classList.toggle("hidden");
         });
     }
 });
+
+window.extendReservation = extendReservation;
+window.showModifyReservationForm = showModifyReservationForm;
+
+function showModifyReservationForm(reservation) {
+    const newDuration = prompt(`Duración actual: ${reservation.duration} minutos.\nIntroduce nueva duración:`);
+    if (!newDuration || isNaN(newDuration) || newDuration <= 0) {
+        alert("Duración inválida.");
+        return;
+    }
+
+    fetch(`/api/reservations/${reservation.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ duration: parseInt(newDuration) })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) throw new Error(data.error);
+            alert('Reserva modificada correctamente.');
+            loadReservationHistory(); // refresca la tabla
+        })
+        .catch(err => alert(err.message));
+}
+
+function extendReservation(reservation) {
+    const extension = prompt("¿Cuántos minutos deseas extender la reserva?");
+    if (!extension || isNaN(extension) || extension <= 0) {
+        alert("Duración inválida.");
+        return;
+    }
+
+    fetch(`/api/reservations/extend/${reservation.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extensionDuration: parseInt(extension) })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) throw new Error(data.error);
+            alert('Reserva extendida correctamente.');
+            loadReservationHistory();
+        })
+        .catch(err => alert(err.message));
+}
+
