@@ -200,35 +200,78 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// Endpoint para actualizar un cargador
-app.put('/api/chargers/:id', (req, res) => {
-    const chargerId = req.params.id;
-    const { type, status, availability, price } = req.body;
+// Endpoint para modificar una reserva
+app.put('/api/reservations/:id', async (req, res) => {
+    const reservationId = req.params.id;
+    const { duration } = req.body;  // Duración a modificar
+    const currentDate = new Date().toISOString();  // Fecha actual
 
-    if (!type || !status || !availability || !availability.start || !availability.end || price === undefined) {
-        return res.status(400).json({ error: 'Datos incompletos o inválidos.' });
+    if (!duration || isNaN(duration) || duration <= 0) {
+        return res.status(400).json({ error: 'Duración inválida.' });
     }
 
-    const chargerIndex = chargers.findIndex(charger => charger.id == chargerId);
-    if (chargerIndex === -1) {
-        return res.status(404).json({ error: 'Cargador no encontrado.' });
-    }
+    try {
+        await db.read();
+        const reservationIndex = db.data.reservations.findIndex(r => r.id === reservationId);
 
-    chargers[chargerIndex] = {
-        ...chargers[chargerIndex],
-        type,
-        status,
-        availability,
-        price
-    };
-
-    fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
-        if (err) {
-            console.error('Error al guardar chargers.json:', err);
-            return res.status(500).json({ error: 'Error al guardar los datos.' });
+        if (reservationIndex === -1) {
+            return res.status(404).json({ error: 'Reserva no encontrada.' });
         }
-        res.json(chargers[chargerIndex]);
-    });
+
+        const reservation = db.data.reservations[reservationIndex];
+
+        // Verificar si la reserva ya ha comenzado
+        if (new Date(reservation.startTime) <= new Date(currentDate)) {
+            return res.status(400).json({ error: 'No se puede modificar una reserva que ya ha comenzado.' });
+        }
+
+        // Modificar la duración
+        reservation.duration = duration;
+        reservation.startTime = new Date().toISOString();  // Se puede modificar también la fecha de inicio si es necesario
+
+        await db.write();
+
+        res.json(reservation);
+    } catch (error) {
+        console.error('Error al modificar la reserva:', error);
+        res.status(500).json({ error: 'Error al modificar la reserva.' });
+    }
+});
+
+// Endpoint para extender una reserva
+app.put('/api/reservations/extend/:id', async (req, res) => {
+    const reservationId = req.params.id;
+    const { extensionDuration } = req.body;  // Duración de extensión en minutos
+    const currentDate = new Date().toISOString();
+
+    if (!extensionDuration || isNaN(extensionDuration) || extensionDuration <= 0) {
+        return res.status(400).json({ error: 'Duración de extensión inválida.' });
+    }
+
+    try {
+        await db.read();
+        const reservationIndex = db.data.reservations.findIndex(r => r.id === reservationId);
+
+        if (reservationIndex === -1) {
+            return res.status(404).json({ error: 'Reserva no encontrada.' });
+        }
+
+        const reservation = db.data.reservations[reservationIndex];
+
+        // Verificar si la reserva ya ha comenzado
+        if (new Date(reservation.startTime) <= new Date(currentDate)) {
+            return res.status(400).json({ error: 'No se puede extender una reserva que ya ha comenzado.' });
+        }
+
+        // Extender la duración
+        reservation.duration += extensionDuration;  // Aumentamos la duración actual
+        await db.write();
+
+        res.json(reservation);
+    } catch (error) {
+        console.error('Error al extender la reserva:', error);
+        res.status(500).json({ error: 'Error al extender la reserva.' });
+    }
 });
 
 // Funciones para manejar clientes
@@ -295,13 +338,13 @@ function saveProblems(problems) {
     });
 }
 
-// Endpoints para problemas
-app.post('/api/problems', (req, res) => {
+// Endpoint para reportar incidencias
+app.post('/api/incidences', (req, res) => {
     const { description } = req.body;
     if (!description) {
-        return res.status(400).json({ error: 'La descripción del problema es obligatoria.' });
+        return res.status(400).json({ error: 'La descripción es obligatoria.' });
     }
-    const problems = loadProblems();
+    const problems = loadProblems(); // loadProblems debe estar definido globalmente
     const newProblem = {
         id: Date.now(),
         description,
@@ -309,7 +352,7 @@ app.post('/api/problems', (req, res) => {
         reportedAt: new Date().toISOString()
     };
     problems.push(newProblem);
-    saveProblems(problems);
+    saveProblems(problems); // saveProblems también debe estar definido globalmente
     res.status(201).json(newProblem);
 });
 
@@ -317,11 +360,35 @@ app.get('/api/problems', (req, res) => {
     const problems = loadProblems();
     res.json(problems);
 });
-
-// Endpoint para obtener reservas
+// Endpoint para consultar y, si se indican parámetros, para crear una reserva vía GET
 app.get('/api/reservations', async (req, res) => {
     try {
         await db.read();
+        const { userEmail, chargerId, duration, create } = req.query;
+
+        // Si se indica que se crea y se tienen los parámetros requeridos,
+        // se crea la nueva reserva.
+        if (create && userEmail && chargerId && duration) {
+            const newReservation = {
+                id: Date.now(),
+                chargerId: Number(chargerId),
+                user: userEmail,
+                duration: duration,
+                date: new Date().toISOString(),
+                finished: false
+            };
+            db.data.reservations.push(newReservation);
+            await db.write();
+            return res.status(201).json(newReservation);
+        }
+
+        // Si se especifica userEmail, se devuelven solo sus reservas.
+        if (userEmail) {
+            const userReservations = db.data.reservations.filter(r => r.user === userEmail);
+            return res.json(userReservations);
+        }
+
+        // En otro caso se devuelven todas las reservas.
         res.json(db.data.reservations || []);
     } catch (error) {
         console.error('Error al obtener reservas:', error);
@@ -419,6 +486,30 @@ wss.on('connection', (ws, req) => {
         }
     });
 
+    app.get('/api/chargers', (req, res) => {
+        const { type } = req.query;
+        if (type && type !== 'all') {
+            const filtered = chargers.filter(c => c.type.toLowerCase() === type.toLowerCase());
+            return res.json(filtered);
+        }
+        res.json(chargers);
+    });
+    app.post('/api/incidences', (req, res) => {
+        const { description } = req.body;
+        if (!description) {
+            return res.status(400).json({ error: 'La descripción es obligatoria.' });
+        }
+        const problems = loadProblems();
+        const newProblem = {
+            id: Date.now(),
+            description,
+            status: 'pendiente',
+            reportedAt: new Date().toISOString()
+        };
+        problems.push(newProblem);
+        saveProblems(problems);
+        res.status(201).json(newProblem);
+    });
     ws.on('message', async message => {
         try {
             const data = JSON.parse(message);
@@ -431,7 +522,8 @@ wss.on('connection', (ws, req) => {
                     chargerId: data.chargerId,
                     duration: data.duration,
                     date: new Date(),
-                    finished: false
+                    finished: false,
+                    user: data.user || null
                 };
                 if (!db.data) {
                     db.data = { reservations: [] };
@@ -475,4 +567,33 @@ wss.on('connection', (ws, req) => {
             console.error('Error al procesar el mensaje:', err);
         }
     });
+
+// Definición global para guardar problemas en problemas.json
+    function saveProblems(problems) {
+        fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
+            if (err) {
+                console.error('Error al guardar problemas:', err);
+            } else {
+                console.log('Problemas guardados correctamente.');
+            }
+        });
+    }
+
+// Función para cargar problemas (existente)
+    function loadProblems() {
+        try {
+            if (!fs.existsSync(problemasFilePath)) {
+                fs.writeFileSync(problemasFilePath, JSON.stringify([]));
+                return [];
+            }
+            const data = fs.readFileSync(problemasFilePath, 'utf-8');
+            return data.trim() ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Error al cargar problemas:', error);
+            return [];
+        }
+    }
+
+
+
 });
