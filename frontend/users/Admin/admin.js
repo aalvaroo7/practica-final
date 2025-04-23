@@ -14,9 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnViewStats = document.getElementById('btn-view-stats');
     const btnViewLogs = document.getElementById('btn-view-logs');
     const addChargerForm = document.getElementById('add-charger-form');
-    const addChargerBtn = document.getElementById('add-charger-btn');
-    const chargerListContainer = document.getElementById('charger-list'); // contenedor para actualizar la lista
-    let users = [];
 
     // Función para ocultar todos los paneles y el modal de cargadores
     function hideAllPanels() {
@@ -71,14 +68,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnManageUsers) {
         btnManageUsers.addEventListener('click', () => {
-            console.log('Click en Gestión de Usuarios');
             togglePanel('manage-users');
         });
     }
 
     if (btnViewStats) {
         btnViewStats.addEventListener('click', () => {
-            console.log('Click en Ver Estadísticas');
             togglePanel('view-stats');
             loadStats();
         });
@@ -86,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnViewLogs) {
         btnViewLogs.addEventListener('click', () => {
-            console.log('Click en Ver Logs de Auditoría');
             togglePanel('view-logs');
             loadLogs();
         });
@@ -110,40 +104,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         event.preventDefault();
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
-        console.log('Intento de login:', username, password);
 
         try {
             const response = await fetch('/config');
-            if (!response.ok) {
-                console.error('Error en el servidor:', response.status);
-                return;
-            }
-            const data = await response.json();
-            console.log('Datos recibidos:', data);
-            const adminCreds = data.admin;
-            if (!adminCreds) {
-                console.error('Credenciales de admin no encontradas');
-                return;
-            }
+            if (!response.ok) return;
 
-            // Configura el fondo
-            document.body.style.backgroundImage = "url('FOTO.jpg')";
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundRepeat = 'no-repeat';
-            document.body.style.backgroundPosition = 'center';
+            const data = await response.json();
+            const adminCreds = data.admin;
 
             if (username === adminCreds.username && password === adminCreds.password) {
                 document.getElementById('admin-login-container').classList.add('hidden');
                 document.getElementById('admin-container').classList.remove('hidden');
             } else {
                 document.getElementById('admin-error-message').classList.remove('hidden');
-                console.warn('Credenciales incorrectas');
             }
         } catch (error) {
             console.error('Error al obtener credenciales:', error);
         }
     });
 
+    // Cerrar modal al hacer clic fuera
+    document.addEventListener('click', (event) => {
+        if (editModal && !editModal.contains(event.target) && !event.target.classList.contains('edit-charger-btn')) {
+            editModal.classList.add('hidden');
+        }
+    });
 
     if (addChargerForm) {
         addChargerForm.addEventListener('submit', async (event) => {
@@ -160,7 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             const price = parseFloat(document.getElementById('charger-price').value);
 
-
             if (!id || isNaN(lat) || isNaN(lon)) {
                 alert('Completa todos los campos correctamente.');
                 return;
@@ -175,15 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: JSON.stringify(newCharger)
                 });
                 if (response.ok) {
-                    const chargerAdded = await response.json();
                     alert('Cargador agregado correctamente.');
-                    chargerListContainer.appendChild(document.createElement('div')).innerHTML = `
-          <p>ID: ${chargerAdded.id}</p>
-          <p>Tipo: ${chargerAdded.type}</p>
-          <p>Estado: ${chargerAdded.status}</p>
-          <p>Latitud: ${chargerAdded.lat}</p>
-          <p>Longitud: ${chargerAdded.lon}</p>
-        `;
                     addChargerForm.reset();
                     loadChargers();
                 } else {
@@ -191,12 +167,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             } catch (error) {
                 console.error('Error en la petición:', error);
-                alert('Hubo un error en el servidor.');
             }
         });
     }
 
-    // Función para cargar los cargadores desde el servidor
     async function loadChargers() {
         try {
             const response = await fetch('/api/chargers');
@@ -210,27 +184,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('edit-charger-form').addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Obtener los valores del formulario de edición
         const id = document.getElementById('edit-charger-id').textContent.trim();
         const type = document.getElementById('edit-charger-type').value.trim();
         const status = document.getElementById('edit-charger-status').value.trim();
+        const lat = parseFloat(document.getElementById('edit-charger-lat').value);
+        const lon = parseFloat(document.getElementById('edit-charger-lon').value);
         const availability = {
             start: document.getElementById('edit-availability-start').value.trim(),
             end: document.getElementById('edit-availability-end').value.trim()
         };
         const price = parseFloat(document.getElementById('edit-charger-price').value);
 
-        // Validar los campos
-        if (!id || !type || !status || !availability.start || !availability.end || isNaN(price)) {
+        if (!id || !type || !status || isNaN(lat) || isNaN(lon) || !availability.start || !availability.end || isNaN(price)) {
             alert('Por favor, completa todos los campos correctamente.');
             return;
         }
 
-        // Crear el objeto con los datos actualizados
-        const updatedCharger = { type, status, availability, price };
+        const updatedCharger = { id, type, status, lat, lon, availability, price };
 
         try {
-            // Enviar la solicitud PUT al servidor
             const response = await fetch(`/api/chargers/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -239,17 +211,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response.ok) {
                 alert('Cargador actualizado correctamente.');
-                editModal.classList.add('hidden'); // Ocultar el modal de edición
-                loadChargers(); // Recargar la lista de cargadores
+                document.getElementById('edit-charger-modal').classList.add('hidden');
+                loadChargers();
             } else {
+                const errorText = await response.text();
+                console.error('Error del servidor:', errorText);
                 alert('Error al actualizar el cargador.');
             }
         } catch (error) {
             console.error('Error al actualizar el cargador:', error);
-            alert('Hubo un error al intentar actualizar el cargador.');
         }
     });
-    // Función para eliminar un cargador
+
     async function deleteCharger(event) {
         const id = event.target.getAttribute('data-id');
         if (confirm('¿Estás seguro de eliminar este cargador?')) {
@@ -267,45 +240,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Función para mostrar los cargadores en la interfaz
     function displayChargers(chargers) {
         chargerListDiv.innerHTML = '';
-        chargers.forEach(charger => {
-            const chargerItem = document.createElement('div');
-            chargerItem.innerHTML = `
-        <p>ID: ${charger.id}</p>
-        <p>Tipo: ${charger.type}</p>
-        <p>Estado: ${charger.status}</p>
-        <button data-id="${charger.id}" class="edit-charger-btn">Editar</button>
-        <button data-id="${charger.id}" class="delete-charger-btn">Eliminar</button>
-      `;
-            chargerListDiv.appendChild(chargerItem);
-        });
-        // Asignar listeners a los botones de eliminar y editar
-        chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
-            button.addEventListener('click', deleteCharger);
-        });
-        chargerListDiv.querySelectorAll('.edit-charger-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const chargerId = button.getAttribute('data-id');
-                const charger = chargers.find(ch => ch.id == chargerId);
-                if (!charger) return;
-                document.getElementById('edit-charger-id').textContent = charger.id;
-                document.getElementById('edit-charger-type').value = charger.type;
-                document.getElementById('edit-charger-status').value = charger.status.toLowerCase();
-                editModal.classList.remove('hidden');
-            });
-        });
-    }
-
-    function displayChargers(chargers) {
-        chargerListDiv.innerHTML = ''; // Limpiar el contenedor
-
-        // Crear la tabla
         const table = document.createElement('table');
         table.classList.add('charger-table');
 
-        // Crear el encabezado de la tabla
         const thead = document.createElement('thead');
         thead.innerHTML = `
         <tr>
@@ -317,11 +256,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <th>Precio (€)</th>
             <th>Disponibilidad</th>
             <th>Acciones</th>
-        </tr>
-    `;
+        </tr>`;
         table.appendChild(thead);
 
-        // Crear el cuerpo de la tabla
         const tbody = document.createElement('tbody');
         chargers.forEach(charger => {
             const row = document.createElement('tr');
@@ -336,16 +273,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td>
                 <button data-id="${charger.id}" class="edit-charger-btn">Editar</button>
                 <button data-id="${charger.id}" class="delete-charger-btn">Eliminar</button>
-            </td>
-        `;
+            </td>`;
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
-
-        // Añadir la tabla al contenedor
         chargerListDiv.appendChild(table);
 
-        // Asignar listeners a los botones de eliminar y editar
         chargerListDiv.querySelectorAll('.delete-charger-btn').forEach(button => {
             button.addEventListener('click', deleteCharger);
         });
@@ -357,112 +290,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('edit-charger-id').textContent = charger.id;
                 document.getElementById('edit-charger-type').value = charger.type;
                 document.getElementById('edit-charger-status').value = charger.status.toLowerCase();
+                document.getElementById('edit-charger-lat').value = charger.lat;
+                document.getElementById('edit-charger-lon').value = charger.lon;
+                document.getElementById('edit-availability-start').value = charger.availability.start;
+                document.getElementById('edit-availability-end').value = charger.availability.end;
+                document.getElementById('edit-charger-price').value = charger.price;
                 editModal.classList.remove('hidden');
             });
         });
     }
 
-    // Funciones para gestionar usuarios (sin duplicidad)
-    function updateUserList(users) {
-        const userListDiv = document.getElementById("user-list");
-        userListDiv.innerHTML = "";
-        const table = document.createElement("table");
-        table.classList.add("user-table");
-        const thead = document.createElement("thead");
-        const headerRow = document.createElement("tr");
-        const headers = ["Usuario", "Correo", "Rol", "Acciones"];
-        headers.forEach(text => {
-            const th = document.createElement("th");
-            th.textContent = text;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-        const tbody = document.createElement("tbody");
-        users.forEach((user, index) => {
-            const tr = document.createElement("tr");
-            ["username", "email", "role"].forEach(prop => {
-                const td = document.createElement("td");
-                td.textContent = user[prop];
-                tr.appendChild(td);
-            });
-            const tdActions = document.createElement("td");
-            const btnEdit = document.createElement("button");
-            btnEdit.textContent = "Editar";
-            btnEdit.addEventListener("click", () => openEditUserModal(user, index));
-            const btnDelete = document.createElement("button");
-            btnDelete.textContent = "Eliminar";
-            btnDelete.addEventListener("click", () => {
-                if (confirm("¿Seguro que deseas eliminar este usuario?")) {
-                    users.splice(index, 1);
-                    updateUserList(users);
-                }
-            });
-            tdActions.appendChild(btnEdit);
-            tdActions.appendChild(btnDelete);
-            tr.appendChild(tdActions);
-            tbody.appendChild(tr);
-        });
-        table.appendChild(tbody);
-        userListDiv.appendChild(table);
-    }
-
-    addUserForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const newUser = {
-            username: document.getElementById("new-username").value.trim(),
-            email: document.getElementById("new-email").value.trim(),
-            password: document.getElementById("new-password").value.trim(),
-            role: document.getElementById("new-role").value
-        };
-        users.push(newUser);
-        updateUserList(users);
-        addUserForm.reset();
-    });
-
-    // Modal para edición de usuario
-    function openEditUserModal(user, index) {
-        const modal = document.getElementById('edit-user-modal');
-        modal.querySelector('#edit-user-index').value = index;
-        modal.querySelector('#edit-username').value = user.username;
-        modal.querySelector('#edit-email').value = user.email;
-        modal.querySelector('#edit-role').value = user.role;
-        modal.classList.remove('hidden');
-    }
-
-    function closeEditUserModal() {
-        document.getElementById('edit-user-modal').classList.add('hidden');
-    }
-
-    document.getElementById('edit-user-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const index = parseInt(document.getElementById('edit-user-index').value, 10);
-        const newUsername = document.getElementById('edit-username').value.trim();
-        const newEmail = document.getElementById('edit-email').value.trim();
-        const newRole = document.getElementById('edit-role').value;
-        users[index] = { ...users[index], username: newUsername, email: newEmail, role: newRole };
-        updateUserList(users);
-        closeEditUserModal();
-    });
-
     async function loadStats() {
         const statsContainer = document.getElementById('stats-container');
         statsContainer.innerHTML = `
         <canvas id="statsChartBar"></canvas>
-        <canvas id="statsChartPie"></canvas>
-    `;
+        <canvas id="statsChartPie"></canvas>`;
         const ctxBar = document.getElementById('statsChartBar').getContext('2d');
         const ctxPie = document.getElementById('statsChartPie').getContext('2d');
 
         try {
             const response = await fetch('/api/stats');
-            if (!response.ok) {
-                console.error('Error al obtener estadísticas:', response.status);
-                return;
-            }
-            const stats = await response.json();
+            if (!response.ok) return;
 
-            // Gráfico de barras: Reservas por tipo de cargador
+            const stats = await response.json();
             const barLabels = Object.keys(stats.reservationsByChargerType);
             const barDataValues = Object.values(stats.reservationsByChargerType);
 
@@ -487,7 +337,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            // Gráfico de pastel: Porcentaje de uso de cada cargador
             const pieLabels = stats.usagePercentage.map(item => item.type);
             const pieDataValues = stats.usagePercentage.map(item => parseFloat(item.usage));
 
@@ -509,7 +358,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error al cargar estadísticas:', error);
         }
     }
-    // Cargar logs de auditoría
+
     async function loadLogs() {
         const logsContainer = document.getElementById('logs-container');
         try {
@@ -532,28 +381,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-
-    // Cargar y configurar partículas
     particlesJS("particles-js", {
         particles: {
-            number: {
-                value: 100, // Número de partículas
-                density: {
-                    enable: true,
-                    value_area: 2000 // Asegúrate de que este valor sea amplio
-                }
-            },
+            number: { value: 100, density: { enable: true, value_area: 2000 } },
             color: { value: "#ffffff" },
             shape: { type: "circle" },
             opacity: { value: 0.5 },
             size: { value: 3 },
-            line_linked: {
-                enable: true,
-                distance: 150,
-                color: "#ffffff",
-                opacity: 0.4,
-                width: 1
-            },
+            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
             move: { enable: true, speed: 3 }
         },
         interactivity: {
@@ -562,13 +397,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 onhover: { enable: true, mode: "repulse" },
                 onclick: { enable: true, mode: "push" }
             },
-            modes: {
-                repulse: { distance: 100 },
-                push: { particles_nb: 4 }
-            }
+            modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
         },
         retina_detect: true
     });
-    // Carga inicial de cargadores
+
     loadChargers();
 });

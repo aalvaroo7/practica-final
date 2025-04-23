@@ -223,6 +223,35 @@ app.put('/api/reservations/:id', async (req, res) => {
 
         const reservation = db.data.reservations[reservationIndex];
 
+        // Endpoint para actualizar un cargador
+        app.put('/api/chargers/:id', async (req, res) => {
+            const chargerId = req.params.id;
+            const updatedCharger = req.body;
+
+            try {
+                const chargers = JSON.parse(await fs.readFile(chargersFilePath, 'utf-8'));
+                const index = chargers.findIndex(charger => charger.id == chargerId);
+
+                if (index === -1) {
+                    return res.status(404).send('Cargador no encontrado');
+                }
+
+                chargers[index] = { ...chargers[index], ...updatedCharger };
+                await fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2));
+
+                res.status(200).send('Cargador actualizado correctamente');
+            } catch (error) {
+                console.error('Error al actualizar el cargador:', error);
+                res.status(500).send('Error al actualizar el cargador');
+            }
+        });
+
+        app.listen(PORT, () => {
+            console.log(Servidor, escuchando, en, el, puerto, $,{PORT});
+        });
+
+
+
         // Verificar si la reserva ya ha comenzado
         if (new Date(reservation.startTime) <= new Date(currentDate)) {
             return res.status(400).json({ error: 'No se puede modificar una reserva que ya ha comenzado.' });
@@ -426,7 +455,7 @@ wss.on('connection', (ws, req) => {
     clients.push(clientData);
     saveClients(clients);
 
-    logAudit(`Nuevo cliente conectado desde ${clientIp}`);
+    logAudit(Nuevo, cliente, conectado, desde, $,{clientIp});
 
     async function initResenasFile() {
         try {
@@ -448,7 +477,7 @@ wss.on('connection', (ws, req) => {
         }
     }
 
-//  Función para guardar reseñas (actualizada para usar fs/promises)
+// Función para guardar reseñas (actualizada para usar fs/promises)
     async function saveResenas(resenas) {
         try {
             await fsPromises.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2));
