@@ -130,56 +130,33 @@
 
 <div id="edit-charger-modal" class="hidden">
   <div class="modal-content">
-  <h2>Editar Cargador</h2>
-  <form id="edit-charger-form">
-    <table style="width: 100%; margin-bottom: 20px;">
-      <tr>
-        <td>ID:</td>
-        <td><span id="edit-charger-id"></span></td>
-      </tr>
-      <tr>
-        <td>Tipo:</td>
-        <td>
-          <select id="edit-charger-type" style="width: 100%;" required>
-            <option value="Rapido">Rápido</option>
-            <option value="Compatible">Compatible</option>
-            <option value="Normal">Normal</option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>Estado:</td>
-        <td>
-          <select id="edit-charger-status" style="width: 100%;" required>
-            <option value="Disponible">Disponible</option>
-            <option value="Ocupado">Ocupado</option>
-            <option value="En reparacion">En Reparación</option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>Hora de inicio:</td>
-        <td>
-          <input type="time" id="edit-availability-start" style="width: 100%;" required>
-        </td>
-      </tr>
-      <tr>
-        <td>Hora de fin:</td>
-        <td>
-          <input type="time" id="edit-availability-end" style="width: 100%;" required>
-        </td>
-      </tr>
-      <tr>
-        <td>Precio por kWh (€):</td>
-        <td>
-          <input type="number" id="edit-charger-price" step="0.01" min="0" style="width: 100%;" required>
-        </td>
-      </tr>
-    </table>
-    <button type="submit" style="padding: 10px 20px; margin-right: 10px;">Guardar</button>
-    <button type="button" id="cancel-edit" style="padding: 10px 20px;">Cancelar</button>
-  </form>
-    </div>
+    <h3>Editar Cargador</h3>
+    <form id="edit-charger-form">
+      <p><strong>ID:</strong> <span id="edit-charger-id"></span></p>
+      <label for="edit-charger-type">Tipo:</label>
+      <input type="text" id="edit-charger-type" required>
+      <label for="edit-charger-status">Estado:</label>
+      <select id="edit-charger-status" required>
+        <option value="available">Disponible</option>
+        <option value="occupied">Ocupado</option>
+        <option value="in-repair">En Reparación</option>
+      </select>
+      <label for="edit-charger-lat">Latitud:</label>
+      <input type="number" id="edit-charger-lat" step="any" required>
+      <label for="edit-charger-lon">Longitud:</label>
+      <input type="number" id="edit-charger-lon" step="any" required>
+      <label for="edit-availability-start">Inicio Disponibilidad:</label>
+      <input type="time" id="edit-availability-start" required>
+      <label for="edit-availability-end">Fin Disponibilidad:</label>
+      <input type="time" id="edit-availability-end" required>
+      <label for="edit-charger-price">Precio (€):</label>
+      <input type="number" id="edit-charger-price" step="0.01" required>
+      <div class="modal-buttons">
+        <button type="submit" class="btn">Guardar</button>
+        <button type="button" class="btn" id="cancel-edit">Cancelar</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Modal para editar usuario -->
