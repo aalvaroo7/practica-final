@@ -550,4 +550,8 @@ footer a:hover {
 .hidden {
     display: none;
 }
-
+#report-issue-btn {
+    position: relative;
+    margin: 10px auto;
+    display: none; /* oculto por defecto */
+}

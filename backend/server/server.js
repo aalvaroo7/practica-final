@@ -300,7 +300,29 @@ app.get('/api/clients', (req, res) => {
     const clients = loadClients();
     res.json({ clients });
 });
+function loadProblems() {
+    try {
+        if (!fs.existsSync(problemasFilePath)) {
+            fs.writeFileSync(problemasFilePath, JSON.stringify([]));
+            return [];
+        }
+        const data = fs.readFileSync(problemasFilePath, 'utf-8');
+        return data.trim() ? JSON.parse(data) : [];
+    } catch (error) {
+        console.error('Error al cargar problemas:', error);
+        return [];
+    }
+}
 
+function saveProblems(problems) {
+    fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
+        if (err) {
+            console.error('Error al guardar problemas:', err);
+        } else {
+            console.log('Problemas guardados correctamente.');
+        }
+    });
+}
 // Endpoint para obtener logs de auditoría (usando clients.json)
 app.get('/api/logs', (req, res) => {
     fs.readFile(clientsFilePath, 'utf-8', (err, data) => {
@@ -317,26 +339,6 @@ app.get('/api/logs', (req, res) => {
         }
     });
 });
-
-// Funciones para problemas
-function loadProblems() {
-    try {
-        if (!fs.existsSync(problemasFilePath)) {
-            fs.writeFileSync(problemasFilePath, JSON.stringify([]));
-            return [];
-        }
-        const data = fs.readFileSync(problemasFilePath, 'utf-8');
-        return data.trim() ? JSON.parse(data) : [];
-    } catch (error) {
-        console.error('Error al cargar problemas:', error);
-        return [];
-    }
-}
-function saveProblems(problems) {
-    fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
-        if (err) console.error('Error al guardar problemas:', err);
-    });
-}
 
 // Endpoint para reportar incidencias
 app.post('/api/incidences', (req, res) => {
@@ -494,22 +496,6 @@ wss.on('connection', (ws, req) => {
         }
         res.json(chargers);
     });
-    app.post('/api/incidences', (req, res) => {
-        const { description } = req.body;
-        if (!description) {
-            return res.status(400).json({ error: 'La descripción es obligatoria.' });
-        }
-        const problems = loadProblems();
-        const newProblem = {
-            id: Date.now(),
-            description,
-            status: 'pendiente',
-            reportedAt: new Date().toISOString()
-        };
-        problems.push(newProblem);
-        saveProblems(problems);
-        res.status(201).json(newProblem);
-    });
     ws.on('message', async message => {
         try {
             const data = JSON.parse(message);
@@ -567,33 +553,6 @@ wss.on('connection', (ws, req) => {
             console.error('Error al procesar el mensaje:', err);
         }
     });
-
-// Definición global para guardar problemas en problemas.json
-    function saveProblems(problems) {
-        fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
-            if (err) {
-                console.error('Error al guardar problemas:', err);
-            } else {
-                console.log('Problemas guardados correctamente.');
-            }
-        });
-    }
-
-// Función para cargar problemas (existente)
-    function loadProblems() {
-        try {
-            if (!fs.existsSync(problemasFilePath)) {
-                fs.writeFileSync(problemasFilePath, JSON.stringify([]));
-                return [];
-            }
-            const data = fs.readFileSync(problemasFilePath, 'utf-8');
-            return data.trim() ? JSON.parse(data) : [];
-        } catch (error) {
-            console.error('Error al cargar problemas:', error);
-            return [];
-        }
-    }
-
 
 
 });

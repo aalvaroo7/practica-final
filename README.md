@@ -33,7 +33,6 @@ RF--> FILTRAR CARGADORES POR TIPO
 
 
 - RF-19: Reportar problemas y ver estado de resolución
-- RF-27: Reportar incidencias
 ---
 
 ## Administrador
