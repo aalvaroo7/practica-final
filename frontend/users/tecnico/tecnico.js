@@ -183,10 +183,33 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.removeChild(modal);
         });
 
-        document.getElementById('confirm-update').addEventListener('click', () => {
+        document.getElementById('confirm-update').addEventListener('click', async () => {
             const selectedStatus = document.getElementById('status-select').value;
-            updateChargerStatus(chargerId, selectedStatus);
-            document.body.removeChild(modal);
+
+            try {
+                const response = await fetch(`/api/chargers/${chargerId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: "fast", // Cambiar según el tipo necesario
+                        status: selectedStatus,
+                        availability: { start: "08:00", end: "20:00" }, // Cambiar según disponibilidad
+                        price: 0.5 // Cambiar según precio
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Estado del cargador actualizado correctamente.');
+                    document.body.removeChild(modal);
+                    loadAndDisplayChargers();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error al actualizar el cargador: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error al actualizar el estado del cargador:', error);
+                alert('Error al actualizar el estado del cargador.');
+            }
         });
     }
 
@@ -235,27 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Error al reportar el problema.');
             }
         });
-    }
-
-    async function updateChargerStatus(chargerId, status) {
-        try {
-            const response = await fetch(`/api/chargers/${chargerId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-
-            if (response.ok) {
-                alert('Estado del cargador actualizado correctamente.');
-                loadAndDisplayChargers();
-            } else {
-                const errorData = await response.json();
-                alert(`Error al actualizar el cargador: ${errorData.error}`);
-            }
-        } catch (error) {
-            console.error('Error al actualizar el estado del cargador:', error);
-            alert('Error al actualizar el estado del cargador.');
-        }
     }
 
     if (btnShowChargers) {
