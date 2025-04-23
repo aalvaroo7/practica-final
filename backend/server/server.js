@@ -330,6 +330,7 @@ wss.on('connection', (ws, req) => {
     ws.on('message', async message => {
         try {
             const data = JSON.parse(message);
+
             if (data.type === 'reserve') {
                 ws.send(JSON.stringify({ type: 'notification', message: 'Tu tiempo de reserva ha comenzado.' }));
                 await db.read();
@@ -355,6 +356,28 @@ wss.on('connection', (ws, req) => {
                     }
                     ws.send(JSON.stringify({ type: 'notification', message: 'Tu tiempo de reserva ha terminado.' }));
                 }, data.duration * 60000);
+            }
+
+            if (data.type === 'modify-reservation') {
+                const { chargerId, newDuration } = data;
+
+                await db.read();
+                const reservation = db.data.reservations.find(r => r.chargerId === chargerId && !r.finished);
+
+                if (reservation) {
+                    const remainingTime = reservation.date.getTime() + reservation.duration * 60000 - Date.now();
+
+                    if (remainingTime > 0) {
+                        reservation.duration = newDuration;
+                        await db.write();
+
+                        ws.send(JSON.stringify({ type: 'notification', message: 'Tu reserva ha sido modificada.' }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'error', message: 'No se puede modificar la reserva porque ya ha terminado.' }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', message: 'No se encontró una reserva activa para modificar.' }));
+                }
             }
         } catch (err) {
             console.error('Error al procesar el mensaje:', err);

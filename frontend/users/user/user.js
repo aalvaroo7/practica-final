@@ -35,6 +35,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Función para mostrar el historial de reservas, ahora incluyendo el botón "Mostrar Todo"
+    function showReservationHistory() {
+        // Oculta el contenedor del mapa
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.classList.add('hidden');
+
+        // Muestra el contenedor del historial de reservas
+        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+        reservationHistoryContainer.classList.remove('hidden');
+
+        // Muestra el botón adicional "Mostrar Todo"
+        const showAllBtn = document.getElementById('show-all-btn');
+        if (showAllBtn) {
+            showAllBtn.classList.remove('hidden');
+        }
+
+        // Carga el historial de reservas
+        loadReservationHistory();
+    }
+
+    // Evento para el botón "Mostrar Todo"
+    const showAllBtn = document.getElementById('show-all-btn');
+    if (showAllBtn) {
+        showAllBtn.addEventListener('click', () => {
+            // Oculta el contenedor de historial de reservas
+            const reservationHistoryContainer = document.getElementById('reservation-history-container');
+            reservationHistoryContainer.classList.add('hidden');
+
+            // Muestra nuevamente el contenedor del mapa y el contenedor de botones
+            const mapContainer = document.getElementById('map-container');
+            mapContainer.classList.remove('hidden');
+
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer) {
+                buttonContainer.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Asegurarse de que el botón "Ver historial de reserva" invoque showReservationHistory
+    if (reservationHistoryBtn) {
+        reservationHistoryBtn.addEventListener('click', showReservationHistory);
+    }
+
     let selectedCharger = null;
     let currentUser = localStorage.getItem('currentUser');
 
@@ -176,8 +220,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `);
 
             marker.on('popupopen', () => {
-                const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
-                const navigateButton = document.getElementById(`navigate-btn-${charger.id}`);
+                const reserveButton = document.getElementById(reserve-btn-${charger.id});
+                const navigateButton = document.getElementById(navigate-btn-${charger.id});
                 if (reserveButton) {
                     reserveButton.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -211,7 +255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function openNavigationApp(lat, lon) {
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+        const url = https://www.google.com/maps/dir/?api=1&destination=${lat},${lon};
         window.open(url, '_blank');
     }
 
@@ -226,10 +270,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     function saveReservationToHistory(chargerId, duration) {
-        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        const reservationHistory = JSON.parse(localStorage.getItem(${currentUser}-history)) || [];
         const timestamp = new Date().toLocaleString();
         reservationHistory.push({ chargerId, duration, timestamp });
-        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
+        localStorage.setItem(${currentUser}-history, JSON.stringify(reservationHistory));
     }
 
     reserveForm.addEventListener('submit', (event) => {
@@ -238,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (selectedCharger) {
             saveReservationToHistory(selectedCharger.id, reservationTime);
-            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
+            alert(Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.);
             reservationForm.classList.add('hidden');
             modal.classList.add('hidden');
 
@@ -250,64 +294,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    cancelReservationButton.addEventListener('click', () => {
-        alert('Tu reserva ha sido cancelada.');
-        reservationForm.classList.add('hidden');
-        modal.classList.add('hidden');
-    });
+    reservationHistoryBtn.addEventListener('click', showReservationHistory);
 
-    reservationHistoryBtn.addEventListener('click', async () => {
-        const reservationHistoryContainer = document.getElementById('reservation-history-container');
+    async function loadReservationHistory() {
         try {
-            // Realizar una solicitud al servidor para obtener las reservas
+            // Realiza la petición para obtener las reservas desde reservas.json
             const response = await fetch('/api/reservations');
             if (!response.ok) {
                 throw new Error('Error al obtener el historial de reservas');
             }
-
             const reservations = await response.json();
 
-            // Crear la tabla
-            let tableHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID de Reserva</th>
-                            <th>ID de Cargador</th>
-                            <th>Duración (minutos)</th>
-                            <th>Fecha</th>
-                            <th>Finalizado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            // Contenedor donde se mostrará el historial
+            const container = document.getElementById('reservation-history-container');
 
-            // Agregar filas con los datos de las reservas
-            reservations.forEach(reservation => {
-                tableHTML += `
-                    <tr>
-                        <td>${reservation.id}</td>
-                        <td>${reservation.chargerId}</td>
-                        <td>${reservation.duration}</td>
-                        <td>${new Date(reservation.date).toLocaleString()}</td>
-                        <td>${reservation.finished ? 'Sí' : 'No'}</td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            // Insertar la tabla en el contenedor
-            reservationHistoryContainer.innerHTML = tableHTML;
-            reservationHistoryContainer.classList.remove('hidden');
+            if (reservations && reservations.length > 0) {
+                // Construir la tabla con las reservas
+                let html = `
+        <table class="reservation-table">
+          <thead>
+            <tr>
+              <th>ID de Reserva</th>
+              <th>ID de Cargador</th>
+              <th>Duración (min)</th>
+              <th>Fecha</th>
+              <th>Finalizado</th>
+            </tr>
+          </thead>
+          <tbody>`;
+                reservations.forEach(reservation => {
+                    html += `
+            <tr>
+              <td>${reservation.id}</td>
+              <td>${reservation.chargerId}</td>
+              <td>${reservation.duration}</td>
+              <td>${new Date(reservation.date).toLocaleString()}</td>
+              <td>${reservation.finished ? 'Sí' : 'No'}</td>
+            </tr>`;
+                });
+                html += </tbody></table>;
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = 'No hay reservas registradas.';
+            }
         } catch (error) {
-            console.error('Error al cargar el historial de reservas:', error);
-            alert('No se pudo cargar el historial de reservas.');
+            console.error('Error:', error);
         }
-    });
+    }
 
     function updateMap(chargerList) {
         markers.forEach(marker => map.removeLayer(marker));
@@ -316,8 +349,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         chargerList.forEach(charger => {
             const marker = L.marker([charger.lat, charger.lon])
                 .addTo(map)
-                .bindPopup(`<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`);
-            markers.push(marker);
-        });
-    }
-});
+                .bindPopup(<b>Cargador ${charger.type}</b><br>Status: ${charger.status});
+                markers.push(marker);
+                });
+                }
+                });
