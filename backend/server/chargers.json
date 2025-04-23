@@ -46,5 +46,17 @@
       "start": "10:00",
       "end": "05:00"
     }
+  },
+  {
+    "id": "5",
+    "lat": 80,
+    "lon": 20,
+    "type": "Rápido",
+    "status": "available",
+    "price": 4,
+    "availability": {
+      "start": "10:55",
+      "end": "05:00"
+    }
   }
 ]

@@ -28,6 +28,7 @@ RF--> MOSTRAR RECOMENDACIONES DE CARGADORES
 
 - RF-41: Modificar/extender reservas antes de que comiencen
 - RF-20: Ver y gestionar historial de pagos/facturas
+- 
 - RF-19: Reportar problemas y ver estado de resolución
 - RF-27: Reportar incidencias
 ---
