@@ -4,39 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const tecnicoLoginContainer = document.getElementById('tecnico-login-container');
     const tecnicoContainer = document.getElementById('tecnico-container');
     const errorMessage = document.getElementById('tecnico-error-message');
-    const sections = document.querySelectorAll('main > section');
-    const btnUpdateStatus = document.getElementById('btn-update-charger-status');
-    const btnViewDetails = document.getElementById('btn-view-charger-details');
-    const btnReportIssues = document.getElementById('btn-report-issues');
-    const updateStatusForm = document.getElementById('update-status-form');
-    const tableContainer = document.getElementById('charger-table-container');
     const btnShowChargers = document.getElementById('btn-show-chargers');
     const loginForm = document.getElementById('tecnico-login-form');
+    const tableContainer = document.getElementById('charger-table-container');
 
-    let headersExpanded = false;
+    let detailsShown = {};
 
     function hideAllSections() {
-        sections.forEach(section => section.classList.add('hidden'));
+        document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
     }
 
     function showSection(sectionId) {
         hideAllSections();
         document.getElementById(sectionId).classList.remove('hidden');
-    }
-
-    if (btnUpdateStatus) {
-        btnUpdateStatus.addEventListener('click', () => {
-            showSection('update-charger-status');
-            loadAndDisplayChargers();
-        });
-    }
-
-    if (btnViewDetails) {
-        btnViewDetails.addEventListener('click', () => showSection('view-charger-details'));
-    }
-
-    if (btnReportIssues) {
-        btnReportIssues.addEventListener('click', () => showSection('report-issues'));
     }
 
     if (returnBtn) {
@@ -81,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const chargers = await response.json();
 
             const tableHTML = `
-                <table>
+                <table class="charger-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -106,70 +86,78 @@ document.addEventListener('DOMContentLoaded', () => {
             tableContainer.innerHTML = tableHTML;
             tableContainer.classList.remove('hidden');
 
+            detailsShown = {};
+
+            chargers.forEach(charger => {
+                detailsShown[charger.id] = false;
+            });
+
             tableContainer.querySelectorAll('.btn-details').forEach(button => {
-                button.addEventListener('click', () => {
-                    const chargerId = button.dataset.id;
-                    showChargerDetails(chargerId);
-                });
+                button.addEventListener('click', () => toggleChargerDetails(button.dataset.id));
             });
 
-            tableContainer.querySelectorAll('.btn-update').forEach(button => {
-                button.addEventListener('click', () => {
-                    const chargerId = button.dataset.id;
-                    showUpdateFormModal(chargerId);
-                });
-            });
-
-            tableContainer.querySelectorAll('.btn-report').forEach(button => {
-                button.addEventListener('click', () => {
-                    const chargerId = button.dataset.id;
-                    reportIssue(chargerId);
-                });
-            });
-
+            reloadButtons();
         } catch (error) {
             console.error('Error al cargar los cargadores:', error);
             tableContainer.innerHTML = '<p>Error al cargar los cargadores.</p>';
         }
     }
 
-    function showChargerDetails(chargerId) {
-        fetch('/api/chargers')
-            .then(response => response.json())
-            .then(chargers => {
-                const charger = chargers.find(ch => ch.id == chargerId);
-                if (charger) {
-                    const row = document.getElementById(`charger-row-${charger.id}`);
+    function toggleChargerDetails(chargerId) {
+        const row = document.getElementById(`charger-row-${chargerId}`);
+        const isDetailsShown = detailsShown[chargerId];
 
-                    if (!headersExpanded) {
-                        const thead = row.closest('table').querySelector('thead tr');
-                        thead.innerHTML = `
-                            <th>ID</th>
-                            <th>Estado</th>
-                            <th>Coordenadas</th>
-                            <th>Precio</th>
-                            <th>Horario</th>
-                            <th style="text-align: right; padding-left: 100px;">Acciones</th>
+        if (!isDetailsShown) {
+            fetch('/api/chargers')
+                .then(response => response.json())
+                .then(chargers => {
+                    const charger = chargers.find(ch => ch.id == chargerId);
+                    if (charger) {
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.id = `details-div-${chargerId}`;
+                        detailsDiv.innerHTML = `
+                            <strong>Estado:</strong> ${charger.status}<br>
+                            <strong>Coordenadas:</strong> ${charger.lat}, ${charger.lon}<br>
+                            <strong>Precio:</strong> ${charger.price} €<br>
+                            <strong>Horario:</strong> ${charger.availability.start} - ${charger.availability.end}
                         `;
-                        headersExpanded = true;
-                    }
+                        detailsDiv.style.marginTop = '10px';
+                        row.querySelector('td').appendChild(detailsDiv);
 
-                    row.innerHTML = `
-                        <td>${charger.id}</td>
-                        <td>${charger.status}</td>
-                        <td>${charger.lat}, ${charger.lon}</td>
-                        <td>${charger.price}</td>
-                        <td>${charger.availability.start} - ${charger.availability.end}</td>
-                        <td style="text-align: right; padding-left: 100px; white-space: nowrap;">
-                            <button class="btn-update" data-id="${charger.id}">Actualizar</button>
-                            <button class="btn-report" data-id="${charger.id}">Reportar</button>
-                        </td>
-                    `;
-                } else {
-                    alert('Cargador no encontrado.');
-                }
-            })
-            .catch(error => console.error('Error al obtener detalles del cargador:', error));
+                        detailsShown[chargerId] = true;
+
+                        const detailsButton = row.querySelector('.btn-details');
+                        if (detailsButton) detailsButton.textContent = 'Ocultar';
+                    } else {
+                        alert('Cargador no encontrado.');
+                    }
+                })
+                .catch(error => console.error('Error al obtener detalles del cargador:', error));
+        } else {
+            const detailsDiv = document.getElementById(`details-div-${chargerId}`);
+            if (detailsDiv) detailsDiv.remove();
+
+            detailsShown[chargerId] = false;
+
+            const detailsButton = row.querySelector('.btn-details');
+            if (detailsButton) detailsButton.textContent = 'Detalles';
+        }
+    }
+
+    function reloadButtons() {
+        tableContainer.querySelectorAll('.btn-update').forEach(button => {
+            button.addEventListener('click', () => {
+                const chargerId = button.dataset.id;
+                showUpdateFormModal(chargerId);
+            });
+        });
+
+        tableContainer.querySelectorAll('.btn-report').forEach(button => {
+            button.addEventListener('click', () => {
+                const chargerId = button.dataset.id;
+                showReportIssueModal(chargerId);
+            });
+        });
     }
 
     function showUpdateFormModal(chargerId) {
@@ -202,27 +190,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function reportIssue(chargerId) {
-        const issue = prompt('Describe la incidencia:');
-        if (!issue) return alert('La descripcion de la incidencia es obligatoria.');
+    function showReportIssueModal(chargerId) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal-overlay');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Reportar Problema</h3>
+                <textarea id="issue-description" placeholder="Describe el problema..." rows="5" style="width: 100%;"></textarea>
+                <div class="modal-buttons">
+                    <button id="confirm-report" class="btn">Reportar</button>
+                    <button id="cancel-report" class="btn">Cancelar</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
 
-        try {
-            const response = await fetch('/api/issues', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chargerId, issue })
-            });
+        document.getElementById('cancel-report').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
 
-            if (response.ok) {
-                alert('Incidencia reportada correctamente.');
-            } else {
-                const errorData = await response.json();
-                alert(`Error al reportar la incidencia: ${errorData.error}`);
+        document.getElementById('confirm-report').addEventListener('click', async () => {
+            const description = document.getElementById('issue-description').value.trim();
+            if (!description) {
+                alert('La descripción del problema es obligatoria.');
+                return;
             }
-        } catch (error) {
-            console.error('Error al reportar la incidencia:', error);
-            alert('Error al reportar la incidencia.');
-        }
+
+            try {
+                const response = await fetch('/api/problems', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chargerId, description })
+                });
+
+                if (response.ok) {
+                    alert('Problema reportado correctamente.');
+                    document.body.removeChild(modal);
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error al reportar el problema: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error al reportar el problema:', error);
+                alert('Error al reportar el problema.');
+            }
+        });
     }
 
     async function updateChargerStatus(chargerId, status) {
@@ -249,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnShowChargers) {
         btnShowChargers.addEventListener('click', loadAndDisplayChargers);
     } else {
-        console.error('El boton Mostrar Cargadores no se encontro en el DOM.');
+        console.error('El botón Mostrar Cargadores no se encontró en el DOM.');
     }
 
     loadAndDisplayChargers();
