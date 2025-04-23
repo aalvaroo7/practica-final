@@ -40,16 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!localStorage.getItem('currentUser')) {
         document.getElementById('favorites-container').classList.add('hidden');
     }
-    const chargerTypeSelect = document.getElementById('charger-type');
 
-    if (chargerTypeSelect) {
-        chargerTypeSelect.addEventListener('change', async () => {
-            const selectedType = chargerTypeSelect.value;
-            const chargers = await fetchChargers(selectedType);
-            updateMap(chargers);
-        });
-    }
-    showSurveyBtn.classList.add('hidden');
+        showSurveyBtn.classList.add('hidden');
     if (localStorage.getItem('currentUser')) {
         showSurveyBtn.classList.remove('hidden');
     }
