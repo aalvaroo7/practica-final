@@ -2,43 +2,48 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import cors from 'cors';
-import { WebSocketServer } from 'ws';
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
 import fsPromises from 'fs/promises';
-
+import cors from 'cors';
+import {JSONFile} from "lowdb/node";
+import {Low} from "lowdb";
+import {WebSocketServer} from "ws";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const staticUsersPath = path.join(__dirname, '../../frontend/users');
+const staticFrontendPath = path.join(__dirname, '../../frontend');
 const resenasFilePath = path.join(__dirname, 'resenas.json');
 const problemasFilePath = path.join(__dirname, 'problemas.json');
 const chargersFilePath = path.join(__dirname, 'chargers.json');
-const staticPublicPath = path.join(__dirname, '../../frontend/public');
-const staticUsersPath = path.join(__dirname, '../../frontend/users');
-const staticFrontendPath = path.join(__dirname, '..', 'frontend');
-
+const adapter = new JSONFile(path.join(__dirname, 'reservas.json'));
 const app = express();
 const PORT = process.env.PORT || 3000;
+const wss = new WebSocketServer({ port: 8000 });
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Archivos estáticos
+app.use(express.static(staticFrontendPath));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(staticUsersPath, 'user', 'user.html'));
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(staticUsersPath, 'user', 'user.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+});
+const db = new Low(adapter, { default: { reservations: [] } });
+
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Configuración de CORS
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || origin.startsWith('http://localhost:3000') || /https:\/\/.*\.ngrok\-free\.app/.test(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('No permitido por CORS'));
-        }
-    },
-    credentials: true
-}));
-
-// Rutas de archivos estáticos
-app.use(express.static(staticPublicPath));
-app.use('/users', express.static(staticUsersPath));
+app.use('users', express.static(staticUsersPath));
 app.use(express.static(staticFrontendPath));
 
 // Carga inicial de cargadores
@@ -56,8 +61,6 @@ function loadChargers() {
 loadChargers();
 
 // Configuración de la base de datos lowdb
-const adapter = new JSONFile(path.join(__dirname, 'reservas.json'));
-const db = new Low(adapter, { default: { reservations: [] } });
 async function initLowDb() {
     // Sobrescribir el archivo con un objeto vacío
     db.data = { reservations: [] };
@@ -329,7 +332,29 @@ app.get('/api/clients', (req, res) => {
     const clients = loadClients();
     res.json({ clients });
 });
+function loadProblems() {
+    try {
+        if (!fs.existsSync(problemasFilePath)) {
+            fs.writeFileSync(problemasFilePath, JSON.stringify([]));
+            return [];
+        }
+        const data = fs.readFileSync(problemasFilePath, 'utf-8');
+        return data.trim() ? JSON.parse(data) : [];
+    } catch (error) {
+        console.error('Error al cargar problemas:', error);
+        return [];
+    }
+}
 
+function saveProblems(problems) {
+    fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
+        if (err) {
+            console.error('Error al guardar problemas:', err);
+        } else {
+            console.log('Problemas guardados correctamente.');
+        }
+    });
+}
 // Endpoint para obtener logs de auditoría (usando clients.json)
 app.get('/api/logs', (req, res) => {
     fs.readFile(clientsFilePath, 'utf-8', (err, data) => {
@@ -346,26 +371,6 @@ app.get('/api/logs', (req, res) => {
         }
     });
 });
-
-// Funciones para problemas
-function loadProblems() {
-    try {
-        if (!fs.existsSync(problemasFilePath)) {
-            fs.writeFileSync(problemasFilePath, JSON.stringify([]));
-            return [];
-        }
-        const data = fs.readFileSync(problemasFilePath, 'utf-8');
-        return data.trim() ? JSON.parse(data) : [];
-    } catch (error) {
-        console.error('Error al cargar problemas:', error);
-        return [];
-    }
-}
-function saveProblems(problems) {
-    fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
-        if (err) console.error('Error al guardar problemas:', err);
-    });
-}
 
 // Endpoint para reportar incidencias
 app.post('/api/incidences', (req, res) => {
@@ -435,18 +440,9 @@ function logAudit(message) {
     });
 }
 
-// Rutas comodín
-app.get('*', (req, res) => {
-    res.sendFile(path.join(staticPublicPath, 'index.html'));
-});
 
-// Arranque del servidor HTTP
-app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-});
 
 // Configuración de WebSocket
-const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', (ws, req) => {
     console.log('Client connected');
     const clientIp = req.socket.remoteAddress;
@@ -523,22 +519,6 @@ wss.on('connection', (ws, req) => {
         }
         res.json(chargers);
     });
-    app.post('/api/incidences', (req, res) => {
-        const { description } = req.body;
-        if (!description) {
-            return res.status(400).json({ error: 'La descripción es obligatoria.' });
-        }
-        const problems = loadProblems();
-        const newProblem = {
-            id: Date.now(),
-            description,
-            status: 'pendiente',
-            reportedAt: new Date().toISOString()
-        };
-        problems.push(newProblem);
-        saveProblems(problems);
-        res.status(201).json(newProblem);
-    });
     ws.on('message', async message => {
         try {
             const data = JSON.parse(message);
@@ -596,33 +576,6 @@ wss.on('connection', (ws, req) => {
             console.error('Error al procesar el mensaje:', err);
         }
     });
-
-// Definición global para guardar problemas en problemas.json
-    function saveProblems(problems) {
-        fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
-            if (err) {
-                console.error('Error al guardar problemas:', err);
-            } else {
-                console.log('Problemas guardados correctamente.');
-            }
-        });
-    }
-
-// Función para cargar problemas (existente)
-    function loadProblems() {
-        try {
-            if (!fs.existsSync(problemasFilePath)) {
-                fs.writeFileSync(problemasFilePath, JSON.stringify([]));
-                return [];
-            }
-            const data = fs.readFileSync(problemasFilePath, 'utf-8');
-            return data.trim() ? JSON.parse(data) : [];
-        } catch (error) {
-            console.error('Error al cargar problemas:', error);
-            return [];
-        }
-    }
-
 
 
 });

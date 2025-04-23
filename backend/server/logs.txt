@@ -1,1 +1,0 @@
-2025-04-23T17:23:56.692Z: Nuevo cliente conectado desde ::1
