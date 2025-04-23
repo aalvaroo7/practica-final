@@ -32,7 +32,6 @@ RF--> FILTRAR CARGADORES POR TIPO
 - RF-20: Ver y gestionar historial de pagos/facturas
 
 
-- RF-19: Reportar problemas y ver estado de resolución
 ---
 
 ## Administrador

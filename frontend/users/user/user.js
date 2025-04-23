@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', async () => {
     // Declaración de variables y elementos del DOM
     const loginForm = document.getElementById('login-form');
