@@ -7,6 +7,15 @@ import { WebSocketServer } from 'ws';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const problemasFilePath = path.join(__dirname, 'problemas.json');
+const chargersFilePath = path.join(__dirname, 'chargers.json');
+const staticPublicPath = path.join(__dirname, '../../frontend/public');
+const staticUsersPath = path.join(__dirname, '../../frontend/users');
+const staticFrontendPath = path.join(__dirname, '..', 'frontend');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,22 +26,19 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de CORS
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || origin.startsWith('http://localhost:3000') || /https:\/\/.*\.ngrok-free\.app/.test(origin)) {
-            callback(null, true); // Permitir el origen
+        if (!origin || origin.startsWith('http://localhost:3000') || /https:\/\/.*\.ngrok\-free\.app/.test(origin)) {
+            callback(null, true);
         } else {
-            callback(new Error('No permitido por CORS')); // Bloquear el origen
+            callback(new Error('No permitido por CORS'));
         }
     },
     credentials: true
 }));
 
-// Variables de rutas
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const chargersFilePath = path.join(__dirname, 'chargers.json');
-const staticPublicPath = path.join(__dirname, '../../frontend/public');
-const staticUsersPath = path.join(__dirname, '../../frontend/users');
-const staticFrontendPath = path.join(__dirname, '..', 'frontend');
+// Rutas de archivos estáticos
+app.use(express.static(staticPublicPath));
+app.use('/users', express.static(staticUsersPath));
+app.use(express.static(staticFrontendPath));
 
 // Carga inicial de cargadores
 let chargers = [];
@@ -47,11 +53,6 @@ function loadChargers() {
     }
 }
 loadChargers();
-
-// Rutas de archivos estáticos
-app.use(express.static(staticPublicPath));
-app.use('/users', express.static(staticUsersPath));
-app.use(express.static(staticFrontendPath));
 
 // Configuración de la base de datos lowdb
 const adapter = new JSONFile(path.join(__dirname, 'reservas.json'));
@@ -69,47 +70,48 @@ async function initLowDb() {
 }
 await initLowDb();
 
-// Endpoints de cargadores
-app.get('/api/chargers', (req, res) => {
-    res.json(chargers);
-});
-// Función para inicializar el archivo clients.json y vaciarlo
+// Funciones para inicializar archivos de clientes y logs
 async function initClientsFile() {
     const clientsFilePath = path.join(__dirname, 'clients.json');
     try {
-        fs.writeFileSync(clientsFilePath, JSON.stringify([])); // Sobrescribe con un array vacío
+        fs.writeFileSync(clientsFilePath, JSON.stringify([]));
         console.log('Archivo clients.json inicializado.');
     } catch (error) {
         console.error('Error al inicializar clients.json:', error);
     }
 }
 
-// Función para inicializar el archivo logs.txt y vaciarlo
 async function initLogsFile() {
     const logsFilePath = path.join(__dirname, 'logs.txt');
     try {
-        fs.writeFileSync(logsFilePath, ''); // Sobrescribe con un contenido vacío
+        fs.writeFileSync(logsFilePath, '');
         console.log('Archivo logs.txt inicializado.');
     } catch (error) {
         console.error('Error al inicializar logs.txt:', error);
     }
 }
 
-// Llamar a las funciones de inicialización
-await initLowDb(); // Inicializar reservas.json
-await initClientsFile(); // Inicializar clients.json
-await initLogsFile(); // Inicializar logs.txt
+await initClientsFile();
+await initLogsFile();
 
+// Endpoint para obtener cargadores
+app.get('/api/chargers', (req, res) => {
+    res.json(chargers);
+});
+
+// Endpoint para agregar un nuevo cargador (con disponibilidad obligatoria)
 app.post('/api/chargers', (req, res) => {
-    const { id, type, status, lat, lon, price } = req.body;
-    if (!id || !type || !status || lat === undefined || lon === undefined || price === undefined) {
-        return res.status(400).json({ error: 'Datos incompletos del cargador.' });
+    const { id, type, status, lat, lon, price, availability } = req.body;
+    if (!id || !type || !status || lat === undefined || lon === undefined || price === undefined ||
+        !availability || !availability.start || !availability.end) {
+        return res.status(400).json({ error: 'Datos incompletos o inválidos del cargador.' });
     }
-    const newCharger = { id, lat, lon, type, status, price };
+    const newCharger = { id, lat, lon, type, status, price, availability };
     chargers.push(newCharger);
     fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
         if (err) {
             console.error('Error al escribir chargers.json:', err);
+            return res.status(500).json({ error: 'Error al guardar el cargador.' });
         } else {
             // Notificar a clientes conectados vía WebSocket
             wss.clients.forEach(client => {
@@ -117,35 +119,12 @@ app.post('/api/chargers', (req, res) => {
                     client.send(JSON.stringify({ type: 'chargerUpdate', charger: newCharger }));
                 }
             });
+            res.status(201).json(newCharger);
         }
-    });
-    res.status(201).json(newCharger);
-});
-
-app.post('/api/chargers', (req, res) => {
-    const { id, type, status, lat, lon, price, availability } = req.body;
-
-    // Validar que todos los campos requeridos estén presentes
-    if (!id || !type || !status || lat === undefined || lon === undefined || price === undefined || !availability || !availability.start || !availability.end) {
-        return res.status(400).json({ error: 'Datos incompletos o inválidos del cargador.' });
-    }
-
-    // Crear el nuevo cargador con los datos recibidos
-    const newCharger = { id, lat, lon, type, status, price, availability };
-
-    // Agregar el nuevo cargador a la lista
-    chargers.push(newCharger);
-
-    // Guardar en el archivo chargers.json
-    fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
-        if (err) {
-            console.error('Error al escribir chargers.json:', err);
-            return res.status(500).json({ error: 'Error al guardar el cargador.' });
-        }
-        res.status(201).json(newCharger);
     });
 });
 
+// Endpoint para eliminar un cargador
 app.delete('/api/chargers/:id', (req, res) => {
     const chargerId = req.params.id;
     const index = chargers.findIndex(charger => charger.id == chargerId);
@@ -159,6 +138,7 @@ app.delete('/api/chargers/:id', (req, res) => {
     res.json(deletedCharger[0]);
 });
 
+// Endpoint para obtener configuraciones de usuarios predefinidos
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 app.get('/config', (req, res) => {
@@ -172,12 +152,12 @@ app.get('/login', (req, res) => {
     res.redirect('/users/user/user.html');
 });
 
+// Endpoint para obtener estadísticas
 app.get('/api/stats', async (req, res) => {
     try {
-        await db.read(); // Leer datos de reservas
+        await db.read();
         const finishedReservations = db.data.reservations.filter(r => r.finished).length;
 
-        // Calcular reservas por tipo de cargador
         const reservationsByChargerType = chargers.reduce((acc, charger) => {
             acc[charger.type] = acc[charger.type] || 0;
             db.data.reservations.forEach(reservation => {
@@ -188,7 +168,6 @@ app.get('/api/stats', async (req, res) => {
             return acc;
         }, {});
 
-        // Calcular porcentaje de uso de cada cargador
         const usagePercentage = chargers.map(charger => {
             const totalReservations = db.data.reservations.filter(r => r.chargerId === charger.id).length;
             return {
@@ -209,22 +188,20 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
+// Endpoint para actualizar un cargador
 app.put('/api/chargers/:id', (req, res) => {
     const chargerId = req.params.id;
     const { type, status, availability, price } = req.body;
 
-    // Validar que los datos requeridos estén presentes
     if (!type || !status || !availability || !availability.start || !availability.end || price === undefined) {
         return res.status(400).json({ error: 'Datos incompletos o inválidos.' });
     }
 
-    // Buscar el cargador por ID
     const chargerIndex = chargers.findIndex(charger => charger.id == chargerId);
     if (chargerIndex === -1) {
         return res.status(404).json({ error: 'Cargador no encontrado.' });
     }
 
-    // Actualizar los datos del cargador
     chargers[chargerIndex] = {
         ...chargers[chargerIndex],
         type,
@@ -233,7 +210,6 @@ app.put('/api/chargers/:id', (req, res) => {
         price
     };
 
-    // Guardar los cambios en el archivo chargers.json
     fs.writeFile(chargersFilePath, JSON.stringify(chargers, null, 2), err => {
         if (err) {
             console.error('Error al guardar chargers.json:', err);
@@ -243,7 +219,7 @@ app.put('/api/chargers/:id', (req, res) => {
     });
 });
 
-// Endpoint para obtener los clientes registrados (para admin.js)
+// Funciones para manejar clientes
 const clientsFilePath = path.join(__dirname, 'clients.json');
 function loadClients() {
     try {
@@ -270,7 +246,7 @@ app.get('/api/clients', (req, res) => {
     res.json({ clients });
 });
 
-// Definición global del endpoint para obtener logs (usando clients.json)
+// Endpoint para obtener logs de auditoría (usando clients.json)
 app.get('/api/logs', (req, res) => {
     fs.readFile(clientsFilePath, 'utf-8', (err, data) => {
         if (err) {
@@ -287,7 +263,61 @@ app.get('/api/logs', (req, res) => {
     });
 });
 
-// Función logAudit para registrar logs de auditoría
+// Funciones para problemas
+function loadProblems() {
+    try {
+        if (!fs.existsSync(problemasFilePath)) {
+            fs.writeFileSync(problemasFilePath, JSON.stringify([]));
+            return [];
+        }
+        const data = fs.readFileSync(problemasFilePath, 'utf-8');
+        return data.trim() ? JSON.parse(data) : [];
+    } catch (error) {
+        console.error('Error al cargar problemas:', error);
+        return [];
+    }
+}
+function saveProblems(problems) {
+    fs.writeFile(problemasFilePath, JSON.stringify(problems, null, 2), err => {
+        if (err) console.error('Error al guardar problemas:', err);
+    });
+}
+
+// Endpoints para problemas
+app.post('/api/problems', (req, res) => {
+    const { description } = req.body;
+    if (!description) {
+        return res.status(400).json({ error: 'La descripción del problema es obligatoria.' });
+    }
+    const problems = loadProblems();
+    const newProblem = {
+        id: Date.now(),
+        description,
+        status: 'pendiente',
+        reportedAt: new Date().toISOString()
+    };
+    problems.push(newProblem);
+    saveProblems(problems);
+    res.status(201).json(newProblem);
+});
+
+app.get('/api/problems', (req, res) => {
+    const problems = loadProblems();
+    res.json(problems);
+});
+
+// Endpoint para obtener reservas
+app.get('/api/reservations', async (req, res) => {
+    try {
+        await db.read();
+        res.json(db.data.reservations || []);
+    } catch (error) {
+        console.error('Error al obtener reservas:', error);
+        res.status(500).json({ error: 'Error al obtener reservas' });
+    }
+});
+
+// Función para registrar logs de auditoría
 function logAudit(message) {
     const logsFilePath = path.join(__dirname, 'logs.txt');
     const timestamp = new Date().toISOString();
@@ -302,7 +332,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(staticPublicPath, 'index.html'));
 });
 
-// Arranque del servidor
+// Arranque del servidor HTTP
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
@@ -311,20 +341,16 @@ app.listen(PORT, () => {
 const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', (ws, req) => {
     console.log('Client connected');
-
-    // Obtener información del cliente (por ejemplo, IP y timestamp)
     const clientIp = req.socket.remoteAddress;
     const clientData = {
         ip: clientIp,
         connectedAt: new Date().toISOString()
     };
 
-    // Cargar clientes existentes, agregar este cliente y guardarlos
     const clients = loadClients();
     clients.push(clientData);
     saveClients(clients);
 
-    // Registrar en logs de auditoría
     logAudit(`Nuevo cliente conectado desde ${clientIp}`);
 
     ws.on('message', async message => {
@@ -381,17 +407,6 @@ wss.on('connection', (ws, req) => {
             }
         } catch (err) {
             console.error('Error al procesar el mensaje:', err);
-        }
-    });
-
-    //endpoint para obtener las reservas desde reservas.json
-    app.get('/api/reservations', async (req, res) => {
-        try {
-            await db.read(); // Leer datos de reservas desde reservas.json
-            res.json(db.data.reservations || []);
-        } catch (error) {
-            console.error('Error al obtener reservas:', error);
-            res.status(500).json({ error: 'Error al obtener reservas' });
         }
     });
 });

@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Función para mostrar el historial de reservas, ahora incluyendo el botón "Mostrar Todo"
     function showReservationHistory() {
         // Oculta el contenedor del mapa
         const mapContainer = document.getElementById('map-container');
@@ -45,38 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const reservationHistoryContainer = document.getElementById('reservation-history-container');
         reservationHistoryContainer.classList.remove('hidden');
 
-        // Muestra el botón adicional "Mostrar Todo"
-        const showAllBtn = document.getElementById('show-all-btn');
-        if (showAllBtn) {
-            showAllBtn.classList.remove('hidden');
-        }
-
-        // Carga el historial de reservas
+        // Carga el historial de reservas (verifica que la respuesta del servidor sea la esperada)
         loadReservationHistory();
-    }
-
-    // Evento para el botón "Mostrar Todo"
-    const showAllBtn = document.getElementById('show-all-btn');
-    if (showAllBtn) {
-        showAllBtn.addEventListener('click', () => {
-            // Oculta el contenedor de historial de reservas
-            const reservationHistoryContainer = document.getElementById('reservation-history-container');
-            reservationHistoryContainer.classList.add('hidden');
-
-            // Muestra nuevamente el contenedor del mapa y el contenedor de botones
-            const mapContainer = document.getElementById('map-container');
-            mapContainer.classList.remove('hidden');
-
-            const buttonContainer = document.querySelector('.button-container');
-            if (buttonContainer) {
-                buttonContainer.classList.remove('hidden');
-            }
-        });
-    }
-
-    // Asegurarse de que el botón "Ver historial de reserva" invoque showReservationHistory
-    if (reservationHistoryBtn) {
-        reservationHistoryBtn.addEventListener('click', showReservationHistory);
     }
 
     let selectedCharger = null;
@@ -220,8 +189,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `);
 
             marker.on('popupopen', () => {
-                const reserveButton = document.getElementById(reserve-btn-${charger.id});
-                const navigateButton = document.getElementById(navigate-btn-${charger.id});
+                const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
+                const navigateButton = document.getElementById(`navigate-btn-${charger.id}`);
                 if (reserveButton) {
                     reserveButton.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -255,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function openNavigationApp(lat, lon) {
-        const url = https://www.google.com/maps/dir/?api=1&destination=${lat},${lon};
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
         window.open(url, '_blank');
     }
 
@@ -270,10 +239,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     function saveReservationToHistory(chargerId, duration) {
-        const reservationHistory = JSON.parse(localStorage.getItem(${currentUser}-history)) || [];
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
         const timestamp = new Date().toLocaleString();
         reservationHistory.push({ chargerId, duration, timestamp });
-        localStorage.setItem(${currentUser}-history, JSON.stringify(reservationHistory));
+        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
     }
 
     reserveForm.addEventListener('submit', (event) => {
@@ -282,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (selectedCharger) {
             saveReservationToHistory(selectedCharger.id, reservationTime);
-            alert(Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.);
+            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
             reservationForm.classList.add('hidden');
             modal.classList.add('hidden');
 
@@ -292,6 +261,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 duration: reservationTime
             }));
         }
+    });
+
+    cancelReservationButton.addEventListener('click', () => {
+        alert('Tu reserva ha sido cancelada.');
+        reservationForm.classList.add('hidden');
+        modal.classList.add('hidden');
     });
 
     reservationHistoryBtn.addEventListener('click', showReservationHistory);
@@ -332,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <td>${reservation.finished ? 'Sí' : 'No'}</td>
             </tr>`;
                 });
-                html += </tbody></table>;
+                html += `</tbody></table>`;
                 container.innerHTML = html;
             } else {
                 container.innerHTML = 'No hay reservas registradas.';
@@ -341,7 +316,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error:', error);
         }
     }
-
     function updateMap(chargerList) {
         markers.forEach(marker => map.removeLayer(marker));
         markers.length = 0;
@@ -349,8 +323,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         chargerList.forEach(charger => {
             const marker = L.marker([charger.lat, charger.lon])
                 .addTo(map)
-                .bindPopup(<b>Cargador ${charger.type}</b><br>Status: ${charger.status});
-                markers.push(marker);
-                });
-                }
-                });
+                .bindPopup(`<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`);
+            markers.push(marker);
+        });
+    }
+});
