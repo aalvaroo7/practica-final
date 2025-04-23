@@ -1,1 +1,6 @@
-2025-04-23T13:03:00.692Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:06:25.738Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:06:30.907Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:09:06.040Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:09:07.972Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:16:53.811Z: Nuevo cliente conectado desde ::1
+2025-04-23T15:21:31.140Z: Nuevo cliente conectado desde ::1

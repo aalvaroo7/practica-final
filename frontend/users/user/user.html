@@ -60,6 +60,19 @@
     </div>
 </div>
 
+<!-- SECCIÓN DE MODIFICACIÓN Y EXTENSIÓN DE RESERVA -->
+<div id="modify-extend-reservation" class="hidden">
+    <h3>Tu reserva ha comenzado</h3>
+    <p id="reservation-status-message">Tu reserva está activa.</p>
+
+    <!-- Opción de editar la reserva -->
+    <form id="modify-extend-form">
+        <label for="new-duration">Nueva duración (minutos):</label>
+        <input type="number" id="new-duration" min="1" max="120">
+        <button type="button" id="modify-btn">Modificar Reserva</button>
+        <button type="button" id="extend-btn">Extender Reserva</button>
+    </form>
+</div>
 
 
 <!-- MENÚ LATERAL -->
@@ -70,7 +83,35 @@
     <button id="reservation-history-btn" class="hidden">Ver Historial de Reservas</button>
     <button id="view-stats-btn" class="hidden">Ver Estadísticas de Uso</button>
     <button id="leave-review-btn" class="hidden">Dejar Reseña</button>
+    <button id="show-survey-btn" class="hidden">Mostrar Encuesta</button>
+    <button id="show-recommendations-btn" class="hidden">Ver Recomendaciones</button>
+    <button id="report-issue-btn" class="hidden">Reportar Incidencia</button>
     <div id="favorites-container" class="hidden"></div>
+</div>
+
+<!-- CONTENEDOR PARA LA ENCUESTA -->
+<div id="survey-container">
+    <div id="survey-section" class="hidden">
+        <h2>Encuesta de Satisfacción</h2>
+        <form id="survey-form">
+            <label>Puntuación (1-5):</label>
+            <div>
+                <input type="radio" id="rating-1" name="rating" value="1" required>
+                <label for="rating-1">1</label>
+                <input type="radio" id="rating-2" name="rating" value="2">
+                <label for="rating-2">2</label>
+                <input type="radio" id="rating-3" name="rating" value="3">
+                <label for="rating-3">3</label>
+                <input type="radio" id="rating-4" name="rating" value="4">
+                <label for="rating-4">4</label>
+                <input type="radio" id="rating-5" name="rating" value="5">
+                <label for="rating-5">5</label>
+            </div>
+            <label for="survey-comments">Comentarios:</label>
+            <textarea id="survey-comments" name="comments"></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
 </div>
 
 <!-- PERFIL -->
@@ -174,30 +215,16 @@
         <button type="submit">Enviar Reseña</button>
     </form>
 </div>
-<!-- Sección de la encuesta -->
-<div id="survey-section" class="survey-container hidden">
-    <h2>Encuesta de Satisfacción</h2>
-    <form id="survey-form">
-        <label>Puntuación (1-5):</label>
-        <div>
-            <input type="radio" id="rating-1" name="rating" value="1" required>
-            <label for="rating-1">1</label>
-            <input type="radio" id="rating-2" name="rating" value="2">
-            <label for="rating-2">2</label>
-            <input type="radio" id="rating-3" name="rating" value="3">
-            <label for="rating-3">3</label>
-            <input type="radio" id="rating-4" name="rating" value="4">
-            <label for="rating-4">4</label>
-            <input type="radio" id="rating-5" name="rating" value="5">
-            <label for="rating-5">5</label>
-        </div>
 
-        <label for="survey-comments">Comentarios:</label>
-        <textarea id="survey-comments" name="comments"></textarea>
-
-        <button type="submit">Enviar</button>
+<section id="report-issue-section" class="hidden">
+    <h2>Reportar Incidencia</h2>
+    <form id="report-issue-form">
+        <label for="issue-description">Descripción:</label>
+        <textarea id="issue-description" required></textarea>
+        <button type="submit">Reportar Incidencia</button>
     </form>
-</div>
+    <div id="issues-list"></div>
+</section>
 
 </body>
 </html>

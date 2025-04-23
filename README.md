@@ -7,7 +7,6 @@
 ### Cumplidos
 - RF-01: Localización de cargadores cercanos usando geolocalización
 - RF-02: Mostrar cargadores en el mapa con estado y nivel de carga
-- RF-03: Filtros por tipo de cargador
 - RF-04: Ver detalles del cargador
 - RF-05: Reservar plaza con límite de tiempo
 - RF-10: Registro y autenticación
@@ -20,15 +19,16 @@
 - RF-38: Historial detallado de actividades de carga
 - RF-28: Guardar cargadores frecuentes como favoritos.
 - RF-26: Calificar y dejar reseñas
+- RF-36: Encuestas de satisfacción
+  RF--> MOSTRAR RECOMENDACIONES DE CARGADORES
 
 ### No Cumplidos
-- RF-37: Recomendaciones basadas en uso anterior
 - RF-39: Validar compatibilidad entre coche y cargador
 
-- RF-36: Encuestas de satisfacción --> a esto le falta que se genere al azar si se muestra o no la encuesta / cambiarlo por un boton
 
 - RF-41: Modificar/extender reservas antes de que comiencen
 - RF-20: Ver y gestionar historial de pagos/facturas
+- 
 - RF-19: Reportar problemas y ver estado de resolución
 - RF-27: Reportar incidencias
 ---
@@ -56,9 +56,8 @@
 ## Técnico
 
 ### Cumplidos
-(Ninguno cumplido por ahora)
+- RF-16: Ver detalles técnicos de los cargadores
 
 ### No Cumplidos
 - RF-15: Actualizar estado en el chargers.json (añadir detalles técnicos por cargador)
-- RF-16: Ver detalles técnicos de los cargadores
 - RF-17: Reportar problemas/incidencias  

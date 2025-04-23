@@ -36,15 +36,15 @@
     }
   },
   {
-    "id": 4,
-    "lat": 0,
-    "lon": 0,
-    "type": "compatible",
+    "id": "5",
+    "lat": 80,
+    "lon": 20,
+    "type": "Rápido",
     "status": "available",
-    "price": 0,
+    "price": 4,
     "availability": {
-      "start": "00:00",
-      "end": "23:59"
+      "start": "10:55",
+      "end": "05:00"
     }
   }
 ]

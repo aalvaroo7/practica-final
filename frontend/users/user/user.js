@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Declaración de variables y elementos del DOM
     const loginForm = document.getElementById('login-form');
     const loginContainer = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
@@ -27,25 +28,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     const showMapBtn = document.getElementById('show-map-btn');
     const viewStatsBtn = document.getElementById('view-stats-btn');
     const reservationMessage = document.createElement('p');
-    const reviewForm = document.getElementById('review-form');
-
     reservationMessage.id = 'reservation-message';
     reserveForm.appendChild(reservationMessage);
-
+    const showSurveyBtn = document.getElementById('show-survey-btn');
+    const verRecomendacionesBtn = document.getElementById('show-recommendations-btn');
+    const incidenciasformulario = document.getElementById('report-issue-section');
+    // Mostrar/ocultar elementos según si el usuario está autenticado
     if (!localStorage.getItem('currentUser')) {
         document.getElementById('favorites-container').classList.add('hidden');
     }
+    showSurveyBtn.classList.add('hidden');
+    if (localStorage.getItem('currentUser')) {
+        showSurveyBtn.classList.remove('hidden');
+    }
+    showSurveyBtn.classList.add('hidden');
 
-    // Función que oculta todas las secciones relacionadas al menú lateral
+    // Función que oculta todas las secciones del menú lateral
     function hideSideMenuSections() {
         mapContainer.classList.add('hidden');
         editProfileContainer.classList.add('hidden');
         reservationHistoryContainer.classList.add('hidden');
         document.getElementById('personal-stat-table').classList.add('hidden');
         document.getElementById('review-section').classList.add('hidden');
+        document.getElementById('survey-section').classList.add('hidden');
+        showSurveyBtn.classList.add('hidden');
     }
 
-
+    // Manejador de mensajes del WebSocket para notificaciones
     socket.addEventListener('message', event => {
         const data = JSON.parse(event.data);
         if (data.type === 'notification') {
@@ -59,72 +68,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         mapContainer.classList.remove('hidden');
     });
 
-    // Manejador para el botón "Editar Perfil"
-    editProfileButton.removeEventListener('click', showEditProfileForm);
-    editProfileButton.addEventListener('click', () => {
-        hideSideMenuSections();
-        editProfileContainer.classList.remove('hidden');
-        showEditProfileForm();
-    });
-
-    // Manejador para el botón "Ver Historial de Reservas"
-    reservationHistoryBtn.addEventListener('click', () => {
-        hideSideMenuSections();
-        reservationHistoryContainer.classList.remove('hidden');
-        // Si existe el botón "Mostrar Todo", se hace visible
-        const showAllBtn = document.getElementById('show-all-btn');
-        if (showAllBtn) {
-            showAllBtn.classList.remove('hidden');
+    // Función para pre-cargar el formulario de edición de perfil
+    function showEditProfileForm() {
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            const userData = JSON.parse(localStorage.getItem(currentUser));
+            // Asegurarse de que userData contenga el campo "name" y "email"
+            document.getElementById('edit-name').value = userData && userData.name ? userData.name : '';
+            document.getElementById('edit-email').value = userData && userData.email ? userData.email : '';
         }
-        // Se puede llamar a la función para cargar el historial
-        loadReservationHistory();
-    });
-
-// Manejador para el botón "Ver Estadísticas de Uso"
-    viewStatsBtn.addEventListener('click', () => {
-        hideSideMenuSections();
-        mapContainer.classList.add('hidden'); // Asegurarse que el mapa esté oculto
-        reservationHistoryContainer.classList.add('hidden');
-        // Cargar estadísticas y mostrar la tabla correspondiente
-        loadStatistics();
-    });
-
-    // Manejador para el botón "Dejar Reseña"
-    const leaveReviewBtn = document.getElementById('leave-review-btn');
-    const reviewSection = document.getElementById('review-section');
-
-    if (leaveReviewBtn && reviewSection) {
-        leaveReviewBtn.addEventListener('click', () => {
-            hideSideMenuSections();
-            reviewSection.classList.remove('hidden');
-        });
+        editProfileContainer.classList.remove('hidden');
     }
 
-    // Función para mostrar el historial de reservas, ahora incluyendo el botón "Mostrar Todo"
-    function showReservationHistory() {
-        // Oculta el contenedor del mapa
+    // Función para mostrar la sección de editar perfil
+    function showEditProfile() {
         mapContainer.classList.add('hidden');
-        // Muestra el contenedor del historial de reservas
+        editProfileContainer.classList.remove('hidden');
+        showMapBtn.classList.remove('hidden');
+        showEditProfileForm();
+    }
+
+    // Manejador para el botón "Editar Perfil"
+    if (editProfileButton) {
+        editProfileButton.removeEventListener('click', showEditProfileForm);
+        editProfileButton.addEventListener('click', showEditProfile);
+    }
+
+    editProfileForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const newName = document.getElementById('edit-name').value.trim();
+        const newEmail = document.getElementById('edit-email').value.trim();
+        let currentUser = localStorage.getItem('currentUser');
+        let userData = JSON.parse(localStorage.getItem(currentUser)) || {};
+
+        if (newEmail !== currentUser) {
+            // Cambiar la clave en localStorage si se modificó el correo
+            localStorage.removeItem(currentUser);
+            localStorage.setItem(newEmail, JSON.stringify({name: newName, email: newEmail}));
+            localStorage.setItem('currentUser', newEmail);
+            currentUser = newEmail;  // 🔁 ACTUALIZA LA VARIABLE para futuras referencias
+        } else {
+            userData.name = newName;
+            userData.email = newEmail;
+            localStorage.setItem(currentUser, JSON.stringify(userData));
+        }
+
+        alert('Perfil actualizado correctamente.');
+        editProfileContainer.classList.add('hidden');
+    });
+
+    // Manejador para mostrar el historial de reservas
+    function showReservationHistory() {
+        mapContainer.classList.add('hidden');
         reservationHistoryContainer.classList.remove('hidden');
         document.getElementById('personal-stat-table').classList.add('hidden');
-        // Muestra el botón adicional "Mostrar Todo"
         const showAllBtn = document.getElementById('show-all-btn');
         if (showAllBtn) {
             showAllBtn.classList.remove('hidden');
         }
-        // Muestra el botón "Mostrar Mapa"
         showMapBtn.classList.remove('hidden');
-        // Carga el historial de reservas
         loadReservationHistory();
     }
 
-    // Evento para el botón "Mostrar Todo"
+    if (reservationHistoryBtn) {
+        reservationHistoryBtn.addEventListener('click', showReservationHistory);
+    }
+
     const showAllBtn = document.getElementById('show-all-btn');
     if (showAllBtn) {
         showAllBtn.addEventListener('click', () => {
-            // Oculta el contenedor del historial de reservas
             reservationHistoryContainer.classList.add('hidden');
-            // Muestra nuevamente el contenedor del mapa y el contenedor de botones
             mapContainer.classList.remove('hidden');
             if (buttonContainer) {
                 buttonContainer.classList.remove('hidden');
@@ -132,24 +145,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if (reservationHistoryBtn) {
-        reservationHistoryBtn.addEventListener('click', showReservationHistory);
-    }
-
-    let selectedCharger = null;
+    // Verificar que el usuario esté autenticado y redirigir si no
     let currentUser = localStorage.getItem('currentUser');
-
     if (!currentUser) {
         editProfileButton.classList.add('hidden');
         reservationHistoryBtn.classList.add('hidden');
         window.location.href = '/login.html';
     }
 
-    const chargers = [
-        {id: 1, lat: 40.416775, lon: -3.70379, type: 'fast', status: 'Available'},
-        {id: 2, lat: 41.385064, lon: 2.173404, type: 'standard', status: 'Available'},
-        {id: 3, lat: 39.469907, lon: -0.376288, type: 'compatible', status: 'Available'}
-    ];
+    async function fetchChargers(type = 'all') {
+        try {
+            const response = await fetch(`/api/chargers?type=${type}`);
+            if (!response.ok) throw new Error('Error al obtener los cargadores');
+            return await response.json(); // Devuelve la lista de cargadores
+        } catch (error) {
+            console.error('Error al cargar cargadores:', error);
+            return []; // Devuelve una lista vacía si falla
+        }
+    }
 
     function isLoggedIn() {
         return localStorage.getItem('currentUser') !== null;
@@ -163,44 +176,302 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Función que pre-carga el formulario de edición de perfil
-    function showEditProfileForm() {
-        const userData = JSON.parse(localStorage.getItem(currentUser));
-        document.getElementById('edit-name').value = userData.name;
-        document.getElementById('edit-email').value = currentUser;
-        editProfileContainer.classList.remove('hidden');
-    }
-
-    // Función para mostrar la sección de editar perfil con el comportamiento deseado
-    function showEditProfile() {
-        mapContainer.classList.add('hidden');
-        editProfileContainer.classList.remove('hidden');
-        showMapBtn.classList.remove('hidden');
-        showEditProfileForm();
-    }
-
-    if (editProfileButton) {
-        editProfileButton.removeEventListener('click', showEditProfileForm);
-        editProfileButton.addEventListener('click', showEditProfile);
-    }
-
-    editProfileForm.addEventListener('submit', event => {
-        event.preventDefault();
-        const newName = document.getElementById('edit-name').value.trim();
-        const newEmail = document.getElementById('edit-email').value.trim();
-        if (newEmail !== currentUser) {
-            localStorage.removeItem(currentUser);
-            localStorage.setItem(newEmail, JSON.stringify({name: newName, email: newEmail}));
-            localStorage.setItem('currentUser', newEmail);
-        } else {
-            const userData = JSON.parse(localStorage.getItem(currentUser));
-            userData.name = newName;
-            localStorage.setItem(currentUser, JSON.stringify(userData));
+    // Manejadores para otras secciones del menú lateral
+    reservationHistoryBtn.addEventListener('click', () => {
+        hideSideMenuSections();
+        reservationHistoryContainer.classList.remove('hidden');
+        const showAllBtn = document.getElementById('show-all-btn');
+        if (showAllBtn) {
+            showAllBtn.classList.remove('hidden');
         }
-        alert('Perfil actualizado correctamente.');
-        editProfileContainer.classList.add('hidden');
+        loadReservationHistory();
     });
 
+    viewStatsBtn.addEventListener('click', () => {
+        hideSideMenuSections();
+        mapContainer.classList.add('hidden');
+        reservationHistoryContainer.classList.add('hidden');
+        loadStatistics();
+    });
+
+    showSurveyBtn.addEventListener('click', () => {
+        hideSideMenuSections();
+        document.getElementById('survey-section').classList.remove('hidden');
+        showSurveyBtn.classList.add('hidden');
+    });
+
+    const leaveReviewBtn = document.getElementById('leave-review-btn');
+    const reviewSection = document.getElementById('review-section');
+    if (leaveReviewBtn && reviewSection) {
+        leaveReviewBtn.addEventListener('click', () => {
+            hideSideMenuSections();
+            reviewSection.classList.remove('hidden');
+        });
+    }
+
+    // Manejador de WebSocket para reserva de cargador
+    reserveForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const reservationTime = document.getElementById('reservation-time').value;
+        if (selectedCharger) {
+            saveReservationToHistory(selectedCharger.id, reservationTime);
+            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
+            reservationForm.classList.add('hidden');
+            modal.classList.add('hidden');
+            socket.send(JSON.stringify({
+                type: 'reserve',
+                chargerId: selectedCharger.id,
+                duration: reservationTime,
+                user: localStorage.getItem('currentUser')
+            }));
+        }
+    });
+
+    // Función para agregar una reserva al historial (almacenado en localStorage)
+    function saveReservationToHistory(chargerId, duration) {
+        const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
+        const timestamp = new Date().toLocaleString();
+        reservationHistory.push({chargerId, duration, timestamp});
+        localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
+    }
+
+    // Cargar historial de reservas desde API
+    async function loadReservationHistory() {
+        try {
+            const response = await fetch('/api/reservations');
+            if (!response.ok) throw new Error('Error al obtener el historial de reservas');
+            const reservations = await response.json();
+            const container = document.getElementById('reservation-history-container');
+            if (reservations && reservations.length > 0) {
+                let html = `
+          <table class="reservation-table">
+            <thead>
+              <tr>
+                <th>ID de Reserva</th>
+                <th>ID de Cargador</th>
+                <th>Duración (min)</th>
+                <th>Fecha</th>
+                <th>Finalizado</th>
+              </tr>
+            </thead>
+            <tbody>`;
+                reservations.forEach(reservation => {
+                    html += `
+              <tr>
+                <td>${reservation.id}</td>
+                <td>${reservation.chargerId}</td>
+                <td>${reservation.duration}</td>
+                <td>${new Date(reservation.date).toLocaleString()}</td>
+                <td>${reservation.finished ? 'Sí' : 'No'}</td>
+              </tr>`;
+                });
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = 'No hay reservas registradas.';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    let selectedCharger = null;
+    let map;
+    let markers = [];
+
+    function initMap(lat, lon, chargers) {
+        map = L.map('map').setView([lat, lon], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        chargers.forEach(charger => {
+            const marker = L.marker([charger.lat, charger.lon])
+                .addTo(map)
+                .bindPopup(`
+                <b>Charger ${charger.type}</b><br>Status: ${charger.status}<br>
+                <button id="reserve-btn-${charger.id}" class="reserve-btn">Reservar</button>
+                <button id="navigate-btn-${charger.id}" class="navigate-btn button-margin">Navegar</button>
+                <button id="fav-btn-${charger.id}" class="fav-btn button-margin">Favorito</button>
+            `);
+
+            marker.on('popupopen', () => {
+                const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
+                const navigateButton = document.getElementById(`navigate-btn-${charger.id}`);
+                const favButton = document.getElementById(`fav-btn-${charger.id}`);
+
+                if (reserveButton) {
+                    reserveButton.addEventListener('click', e => {
+                        e.preventDefault();
+                        selectedCharger = charger;
+                        showReservationForm(charger);
+                    });
+                }
+
+                if (navigateButton) {
+                    navigateButton.addEventListener('click', e => {
+                        e.preventDefault();
+                        openNavigationApp(charger.lat, charger.lon);
+                    });
+                }
+
+                if (favButton) {
+                    favButton.addEventListener('click', e => {
+                        e.preventDefault();
+                        addChargerToFavorites(charger);
+                    });
+                }
+            });
+
+            markers.push(marker);
+        });
+    }
+
+    function showReservationForm(charger) {
+        // Valores aleatorios generados cada vez
+        const batteryLevel = Math.floor(Math.random() * 101); // 0 a 100%
+        const estimatedTime = Math.floor(Math.random() * 31) + 10; // 10 a 40 min
+        const cost = (Math.random() * 10 + 5).toFixed(2); // €5.00 a €15.00
+
+        // Insertamos esos valores en el HTML
+        chargerDetails.innerHTML = `
+        <h3>Detalles del Cargador</h3>
+        <p>Tipo: ${charger.type}</p>
+        <p>Estado: ${charger.status}</p>
+        <p>Nivel de Batería: ${batteryLevel}%</p>
+        <p>Tiempo Estimado: ${estimatedTime} min</p>
+        <p>Coste: €${cost}</p>
+    `;
+
+        reservationForm.classList.remove('hidden');
+        modal.classList.remove('hidden');
+    }
+
+    // Abrir aplicación de navegación (Google Maps)
+    function openNavigationApp(lat, lon) {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+        window.open(url, '_blank');
+    }
+
+    closeModalButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', event => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+
+    // Actualizar mapa con una lista filtrada de cargadores
+    function updateMap(chargerList) {
+        markers.forEach(marker => map.removeLayer(marker));
+        markers.length = 0;
+        chargerList.forEach(charger => {
+            const marker = L.marker([charger.lat, charger.lon])
+                .addTo(map)
+                .bindPopup(`<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`);
+            markers.push(marker);
+        });
+    }
+
+    // Cargar y mostrar estadísticas de reservas
+    async function loadStatistics() {
+        mapContainer.classList.add('hidden');
+        showMapBtn.classList.remove('hidden');
+        reservationHistoryContainer.classList.add('hidden');
+        try {
+            const response = await fetch('/api/reservations');
+            if (!response.ok) throw new Error('Error al obtener las reservas');
+            const reservations = await response.json();
+            const finishedReservations = reservations.filter(r => r.finished);
+            const totalReservations = finishedReservations.length;
+            const totalDuration = finishedReservations.reduce((sum, r) => sum + Number(r.duration), 0);
+            const averageDuration = totalReservations > 0 ? (totalDuration / totalReservations).toFixed(2) : 0;
+            const statsTableBody = document.querySelector('#personal-stat-table tbody');
+            statsTableBody.innerHTML = `
+        <tr>
+          <td>${totalReservations}</td>
+          <td>${totalDuration}</td>
+          <td>${averageDuration}</td>
+        </tr>
+      `;
+            document.getElementById('personal-stat-table').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error al cargar estadísticas:', error);
+        }
+    }
+
+    if (viewStatsBtn) {
+        viewStatsBtn.addEventListener('click', loadStatistics);
+    }
+
+    // Funciones para favoritos
+    function addChargerToFavorites(charger) {
+        let favorites = JSON.parse(localStorage.getItem(`${currentUser}-favorites`)) || [];
+        if (!favorites.find(fav => fav.id === charger.id)) {
+            favorites.push(charger);
+            localStorage.setItem(`${currentUser}-favorites`, JSON.stringify(favorites));
+        }
+        updateFavoritesDisplay();
+    }
+
+    function updateFavoritesDisplay() {
+        const container = document.getElementById('favorites-container');
+        let favorites = JSON.parse(localStorage.getItem(`${currentUser}-favorites`)) || [];
+        if (favorites.length > 0) {
+            let html = '<h3>Favoritos</h3><ul>';
+            favorites.forEach(charger => {
+                html += `<li>Cargador ${charger.type} - ID: ${charger.id}</li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<p>No tienes cargadores en favoritos.</p>';
+        }
+    }
+
+    updateFavoritesDisplay();
+
+    // Funcionalidad para enviar reseñas
+    const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const user = document.getElementById('review-user').value.trim();
+            const rating = Number(document.getElementById('review-rating').value);
+            const comentario = document.getElementById('review-comentario').value.trim();
+            const chargerId = document.getElementById('review-chargerId') ? document.getElementById('review-chargerId').value.trim() : null;
+            try {
+                const response = await fetch('/api/resenas', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user, rating, comentario, chargerId})
+                });
+                if (response.ok) {
+                    await response.json();
+                    alert('Reseña guardada correctamente.');
+                    reviewForm.reset();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error al enviar la reseña:', error);
+            }
+        });
+    }
+
+    const reviewRatingButtons = document.querySelectorAll('.rating-btn');
+    reviewRatingButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            document.getElementById('review-rating').value = button.getAttribute('data-value');
+        });
+    });
+
+    // Manejo del formulario de login y registro
     loginForm.addEventListener('submit', event => {
         event.preventDefault();
         const email = document.getElementById('login-email').value.trim();
@@ -218,11 +489,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('favorites-container').classList.remove('hidden');
             localStorage.removeItem(`${email}-favorites`);
             document.getElementById('leave-review-btn').classList.remove('hidden');
-            showSurveyIfNeeded();
+            document.getElementById('show-recommendations-btn').classList.remove('hidden');
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
-                alert("Geolocation not supported.");
+                alert('Geolocation not supported.');
             }
             adminBtn.classList.add('hidden');
             tecnicoBtn.classList.add('hidden');
@@ -263,338 +535,151 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showPosition(position) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-        initMap(lat, lon);
+
+        fetchChargers().then(chargers => {
+            initMap(lat, lon, chargers); // Le pasamos los cargadores como parámetro
+        });
     }
+
 
     function showError(error) {
         alert("Unable to retrieve location: " + error.message);
     }
 
-    let map;
-    let markers = [];
-
-    // Dentro de la función initMap se modifica el contenido del popup para incluir el botón de favoritos
-    function initMap(lat, lon) {
-        map = L.map('map').setView([lat, lon], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        chargers.forEach(charger => {
-            const marker = L.marker([charger.lat, charger.lon])
-                .addTo(map)
-                .bindPopup(`
-        <b>Charger ${charger.type}</b><br>Status: ${charger.status}<br>
-        <button id="reserve-btn-${charger.id}" class="reserve-btn">Reserve Now</button>
-        <button id="navigate-btn-${charger.id}" class="navigate-btn button-margin">Navigate</button>
-        <button id="fav-btn-${charger.id}" class="fav-btn button-margin">Favorite</button>
-      `);
-            marker.on('popupopen', () => {
-                const reserveButton = document.getElementById(`reserve-btn-${charger.id}`);
-                const navigateButton = document.getElementById(`navigate-btn-${charger.id}`);
-                const favButton = document.getElementById(`fav-btn-${charger.id}`);
-                if (reserveButton) {
-                    reserveButton.addEventListener('click', e => {
-                        e.preventDefault();
-                        selectedCharger = charger;
-                        showReservationForm(charger);
-                    });
+// Manejador para el formulario de incidencias
+    const incidenceForm = document.getElementById('incidence-form');
+    if (incidenceForm) {
+        incidenceForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const description = document.getElementById('incidence-description').value.trim();
+            if (!description) return alert('La descripción es obligatoria.');
+            try {
+                const response = await fetch('/api/incidences', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({description})
+                });
+                if (!response.ok) throw new Error('Error al reportar incidencia.');
+                const newIncidence = await response.json();
+                // Actualizar la lista de incidencias en la UI
+                const incidencesList = document.getElementById('incidences-list');
+                if (incidencesList) {
+                    const item = document.createElement('div');
+                    item.textContent = `Incidencia: ${newIncidence.description} / Estado: ${newIncidence.status}`;
+                    incidencesList.appendChild(item);
                 }
-                if (navigateButton) {
-                    navigateButton.addEventListener('click', e => {
-                        e.preventDefault();
-                        openNavigationApp(charger.lat, charger.lon);
-                    });
-                }
-                if (favButton) {
-                    favButton.addEventListener('click', e => {
-                        e.preventDefault();
-                        addChargerToFavorites(charger);
-                    });
-                }
-            });
-            markers.push(marker);
+                incidenceForm.reset();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
         });
     }
 
-    function showReservationForm(charger) {
-        chargerDetails.innerHTML = `
-            <h3>Charger Details</h3>
-            <p>Type: ${charger.type}</p>
-            <p>Status: ${charger.status}</p>
-            <p>Battery Level: ${charger.batteryLevel || 'N/A'}</p>
-            <p>Estimated Time: ${charger.estimatedTime || 'N/A'}</p>
-            <p>Cost: ${charger.cost || 'N/A'}</p>
-        `;
-        reservationForm.classList.remove('hidden');
-        modal.classList.remove('hidden');
+// Obtener los chargers desde el archivo JSON (si es local o desde una base de datos)
+    function obtenerChargers() {
+        return fetch('/api/chargers') // Usamos el endpoint del servidor
+            .then(response => response.json()) // Parsear el archivo JSON
+            .then(data => data) // Devuelve los datos de chargers
+            .catch(error => {
+                console.error("Error al cargar chargers:", error);
+                return []; // En caso de error, devolver un array vacío
+            });
     }
 
-    function openNavigationApp(lat, lon) {
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-        window.open(url, '_blank');
+// Mostrar recomendaciones
+    function mostrarRecomendaciones() {
+        obtenerChargers().then(chargers => {
+            // Filtrar chargers que estén disponibles
+            const chargersDisponibles = chargers.filter(charger => charger.status === "available");
+
+            // Filtrar chargers por tipo (por ejemplo, "fast")
+            const chargersRecomendados = chargersDisponibles.filter(charger => charger.type === "fast");
+
+            // Obtener el contenedor de recomendaciones
+            const contenedorRecomendaciones = document.getElementById("favorites-container");
+
+            // Limpiar el contenedor antes de agregar los nuevos chargers
+            contenedorRecomendaciones.innerHTML = "";
+
+            if (chargersRecomendados.length > 0) {
+                chargersRecomendados.forEach(charger => {
+                    // Crear el elemento HTML para cada charger recomendado
+                    const divCharger = document.createElement("div");
+                    divCharger.classList.add("cargador-recomendado"); // Puedes renombrar la clase si quieres consistencia
+                    divCharger.innerHTML = `
+                    <h3>Charger ${charger.id}</h3>
+                    <p>Tipo: ${charger.type}</p>
+                    <p>Estado: ${charger.status}</p>
+                    <p>Precio: ${charger.price} €/hora</p>
+                    <p>Horario: ${charger.availability.start} - ${charger.availability.end}</p>
+                    <button class="reservar-btn" data-id="${charger.id}">Reservar</button>
+                `;
+                    contenedorRecomendaciones.appendChild(divCharger);
+
+                    // Agregar evento de reserva
+                    divCharger.querySelector(".reservar-btn").addEventListener("click", () => {
+                        reservarCargador(charger.id);
+                    });
+                });
+            } else {
+                contenedorRecomendaciones.innerHTML = "<p>No hay chargers recomendados disponibles en este momento.</p>";
+            }
+        });
     }
 
-    closeModalButton.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    window.addEventListener('click', event => {
-        if (event.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-
+    // Función para guardar la reserva en el localStorage.
     function saveReservationToHistory(chargerId, duration) {
+        const currentUser = localStorage.getItem('currentUser');
         const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
         const timestamp = new Date().toLocaleString();
         reservationHistory.push({chargerId, duration, timestamp});
         localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
     }
 
-    reserveForm.addEventListener('submit', event => {
-        event.preventDefault();
-        const reservationTime = document.getElementById('reservation-time').value;
-        if (selectedCharger) {
-            saveReservationToHistory(selectedCharger.id, reservationTime);
-            alert(`Tu cargador ha sido reservado correctamente por ${reservationTime} minutos.`);
-            reservationForm.classList.add('hidden');
-            modal.classList.add('hidden');
-            socket.send(JSON.stringify({
-                type: 'reserve',
-                chargerId: selectedCharger.id,
-                duration: reservationTime
-            }));
+    // Función para reservar el cargador.
+    function reservarCargador(chargerId) {
+        const reservationTime = prompt("Ingrese la duración de la reserva en minutos:");
+        if (!reservationTime || isNaN(reservationTime) || reservationTime <= 0) {
+            alert("Duración inválida.");
+            return;
         }
-    });
+        // Guarda la reserva en el historial del localStorage.
+        saveReservationToHistory(chargerId, reservationTime);
 
-    async function loadReservationHistory() {
-        try {
-            const response = await fetch('/api/reservations');
-            if (!response.ok) {
-                throw new Error('Error al obtener el historial de reservas');
-            }
-            const reservations = await response.json();
-            const container = document.getElementById('reservation-history-container');
-            if (reservations && reservations.length > 0) {
-                let html = `
-                    <table class="reservation-table">
-                      <thead>
-                        <tr>
-                          <th>ID de Reserva</th>
-                          <th>ID de Cargador</th>
-                          <th>Duración (min)</th>
-                          <th>Fecha</th>
-                          <th>Finalizado</th>
-                        </tr>
-                      </thead>
-                      <tbody>`;
-                reservations.forEach(reservation => {
-                    html += `
-                        <tr>
-                          <td>${reservation.id}</td>
-                          <td>${reservation.chargerId}</td>
-                          <td>${reservation.duration}</td>
-                          <td>${new Date(reservation.date).toLocaleString()}</td>
-                          <td>${reservation.finished ? 'Sí' : 'No'}</td>
-                        </tr>`;
-                });
-                html += `</tbody></table>`;
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = 'No hay reservas registradas.';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        // Envía el mensaje por WebSocket.
+        socket.send(JSON.stringify({
+            type: "reserve",
+            chargerId: chargerId,
+            duration: reservationTime,
+            user: localStorage.getItem("currentUser")
+        }));
+
+        alert(`La reserva para el cargador ${chargerId} se realizó correctamente por ${reservationTime} minutos.`);
     }
 
-    function updateMap(chargerList) {
-        markers.forEach(marker => map.removeLayer(marker));
-        markers.length = 0;
-        chargerList.forEach(charger => {
-            const marker = L.marker([charger.lat, charger.lon])
-                .addTo(map)
-                .bindPopup(`<b>Cargador ${charger.type}</b><br>Status: ${charger.status}`);
-            markers.push(marker);
+// Asignar el event listener usando el id del botón.
+    const reserveBtn1 = document.getElementById("reserve-btn-1");
+    if (reserveBtn1) {
+        reserveBtn1.addEventListener("click", (e) => {
+            e.preventDefault();
+            reservarCargador(1);
         });
     }
 
-    async function loadStatistics() {
-        mapContainer.classList.add('hidden');
-        showMapBtn.classList.remove('hidden');
-        reservationHistoryContainer.classList.add('hidden');
-
-        try {
-            const response = await fetch('/api/reservations');
-            if (!response.ok) throw new Error('Error al obtener las reservas');
-            const reservations = await response.json();
-
-            // Filtrar las reservas finalizadas
-            const finishedReservations = reservations.filter(r => r.finished);
-            const totalReservations = finishedReservations.length;
-            // Sumar la duración de las reservas finalizadas
-            const totalDuration = finishedReservations.reduce((sum, r) => sum + Number(r.duration), 0);
-            const averageDuration = totalReservations > 0 ? (totalDuration / totalReservations).toFixed(2) : 0;
-
-            // Actualizar el cuerpo de la tabla de estadísticas
-            const statsTableBody = document.querySelector('#personal-stat-table tbody');
-            statsTableBody.innerHTML = `
-      <tr>
-        <td>${totalReservations}</td>
-        <td>${totalDuration}</td>
-        <td>${averageDuration}</td>
-      </tr>
-    `;
-            // Mostrar la tabla de estadísticas
-            document.getElementById('personal-stat-table').classList.remove('hidden');
-        } catch (error) {
-            console.error('Error al cargar estadísticas:', error);
-        }
-    }
-
-    // Evento para cargar estadísticas al hacer clic en el botón
-    if (viewStatsBtn) {
-        viewStatsBtn.addEventListener('click', loadStatistics);
-    }
-
-    // Función para agregar un cargador a favoritos y actualizar la vista
-    function addChargerToFavorites(charger) {
-        let favorites = JSON.parse(localStorage.getItem(`${currentUser}-favorites`)) || [];
-        if (!favorites.find(fav => fav.id === charger.id)) {
-            favorites.push(charger);
-            localStorage.setItem(`${currentUser}-favorites`, JSON.stringify(favorites));
-        }
-        updateFavoritesDisplay();
-    }
-
-    // Función que actualiza el contenedor de favoritos
-    function updateFavoritesDisplay() {
-        const container = document.getElementById('favorites-container');
-        let favorites = JSON.parse(localStorage.getItem(`${currentUser}-favorites`)) || [];
-        if (favorites.length > 0) {
-            let html = '<h3>Favoritos</h3><ul>';
-            favorites.forEach(charger => {
-                html += `<li>Charger ${charger.type} - ID: ${charger.id}</li>`;
-            });
-            html += '</ul>';
-            container.innerHTML = html;
-        } else {
-            container.innerHTML = '<p>No tienes cargadores en favoritos.</p>';
-        }
-    }
-
-    // Llamada para actualizar la visualización al cargar la página
-    updateFavoritesDisplay();
-
-    // Función para enviar una reseña al servidor
-
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const user = document.getElementById('review-user').value.trim();
-            const rating = Number(document.getElementById('review-rating').value);
-            const comentario = document.getElementById('review-comentario').value.trim();
-            const chargerId = document.getElementById('review-chargerId') ? document.getElementById('review-chargerId').value.trim() : null;
-
-            try {
-                const response = await fetch('/api/resenas', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user, rating, comentario, chargerId})
-                });
-                if (response.ok) {
-                    const nuevaResena = await response.json();
-                    alert('Reseña guardada correctamente.');
-                    // Opcional: actualizar la vista o limpiar el formulario
-                    reviewForm.reset();
-                } else {
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.error}`);
-                }
-            } catch (error) {
-                console.error('Error al enviar la reseña:', error);
-            }
-        });
-
-    }
-
-    // Agregar el manejador para el botón de la reseña
-    const reviewRatingButtons = document.querySelectorAll('.rating-btn');
-    reviewRatingButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Desmarcar todas las estrellas
-            document.querySelectorAll('.rating-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-
-            // Marcar la estrella seleccionada
-            button.classList.add('selected');
-
-            // Actualizar el valor del input oculto con el valor correspondiente
-            document.getElementById('review-rating').value = button.getAttribute('data-value');
-        });
+    document.getElementById("show-recommendations-btn").addEventListener("click", function () {
+        const contenedorRecomendaciones = document.getElementById("favorites-container");
+        contenedorRecomendaciones.classList.toggle("hidden");
+        mostrarRecomendaciones(); // Llama a la función para mostrar las recomendaciones
     });
 
-    // Verificar si el usuario ya está autenticado al cargar la página
-    window.onload = function() {
-        const currentUser = localStorage.getItem('currentUser');
-        const surveySection = document.getElementById('survey-section');
+    if (localStorage.getItem("currentUser")) {
+        const reportIssueBtn = document.getElementById("report-issue-btn");
+        reportIssueBtn.classList.remove("hidden");
 
-        // Si no hay usuario logueado, la encuesta no se mostrará
-        if (!currentUser) {
-            surveySection.classList.add('hidden');
-        }
-    };
-
-// Llamar a la función que muestra la encuesta solo si el usuario está logueado y no ha completado la encuesta
-    function showSurveyIfNeeded() {
-        const currentUser = localStorage.getItem('currentUser');
-        const surveySection = document.getElementById('survey-section');
-
-        // Solo mostrar la encuesta si el usuario está logueado y no ha completado la encuesta
-        if (currentUser && !localStorage.getItem(`${currentUser}-surveyCompleted`)) {
-            surveySection.classList.remove('hidden');
-
-            // Ocultar la encuesta automáticamente después de 30 segundos si no se rellena
-            setTimeout(() => {
-                surveySection.classList.add('hidden');
-            }, 30000);  // 30 segundos para rellenar la encuesta
-        }
-    }
-
-// Lógica para enviar la encuesta
-    const surveyForm = document.getElementById('survey-form');
-    surveyForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const rating = document.getElementById('survey-rating-value').value;
-        const comments = document.getElementById('survey-comments').value.trim();
-        const currentUser = localStorage.getItem('currentUser');
-        const surveySection = document.getElementById('survey-section');
-
-        try {
-            const response = await fetch('/api/satisfaction-survey', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rating, comments })
-            });
-
-            if (response.ok) {
-                alert('Gracias por completar la encuesta de satisfacción.');
-                surveySection.classList.add('hidden');  // Ocultar la encuesta después de enviarla
-                localStorage.setItem(`${currentUser}-surveyCompleted`, 'true');  // Marcar la encuesta como completada
-            } else {
-                alert('Error al enviar la encuesta. Por favor, inténtalo nuevamente.');
-            }
-        } catch (error) {
-            console.error('Error al enviar la encuesta:', error);
-            alert('Hubo un problema al enviar la encuesta. Por favor, intenta más tarde.');
-        }
-    });
-
-    const rating = document.querySelector('input[name="rating"]:checked')?.value;
-    if (!rating) {
-        alert('Por favor selecciona una calificación.');
-        return;
+        reportIssueBtn.addEventListener("click", () => {
+            const reportIssueSection = document.getElementById("report-issue-section");
+            reportIssueSection.classList.toggle("hidden");
+        });
     }
 });

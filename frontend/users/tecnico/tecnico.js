@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleChargerDetails(chargerId) {
-        const row = document.getElementById(`charger-row-${chargerId}`);
+        const row = document.getElementById(charger-row-${chargerId});
         const isDetailsShown = detailsShown[chargerId];
 
         if (!isDetailsShown) {
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const charger = chargers.find(ch => ch.id == chargerId);
                     if (charger) {
                         const detailsDiv = document.createElement('div');
-                        detailsDiv.id = `details-div-${chargerId}`;
+                        detailsDiv.id = details-div-${chargerId};
                         detailsDiv.innerHTML = `
                             <strong>Estado:</strong> ${charger.status}<br>
                             <strong>Coordenadas:</strong> ${charger.lat}, ${charger.lon}<br>
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(error => console.error('Error al obtener detalles del cargador:', error));
         } else {
-            const detailsDiv = document.getElementById(`details-div-${chargerId}`);
+            const detailsDiv = document.getElementById(details-div-${chargerId});
             if (detailsDiv) detailsDiv.remove();
 
             detailsShown[chargerId] = false;
@@ -183,10 +183,33 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.removeChild(modal);
         });
 
-        document.getElementById('confirm-update').addEventListener('click', () => {
+        document.getElementById('confirm-update').addEventListener('click', async () => {
             const selectedStatus = document.getElementById('status-select').value;
-            updateChargerStatus(chargerId, selectedStatus);
-            document.body.removeChild(modal);
+
+            try {
+                const response = await fetch(/api/chargers/${chargerId}, {
+                    method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: "fast", // Cambiar según el tipo necesario
+                        status: selectedStatus,
+                        availability: { start: "08:00", end: "20:00" }, // Cambiar según disponibilidad
+                        price: 0.5 // Cambiar según precio
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Estado del cargador actualizado correctamente.');
+                    document.body.removeChild(modal);
+                    loadAndDisplayChargers();
+                } else {
+                    const errorData = await response.json();
+                    alert(Error al actualizar el cargador: ${errorData.error});
+                }
+            } catch (error) {
+                console.error('Error al actualizar el estado del cargador:', error);
+                alert('Error al actualizar el estado del cargador.');
+            }
         });
     }
 
@@ -228,34 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.body.removeChild(modal);
                 } else {
                     const errorData = await response.json();
-                    alert(`Error al reportar el problema: ${errorData.error}`);
+                    alert(Error al reportar el problema: ${errorData.error});
                 }
             } catch (error) {
                 console.error('Error al reportar el problema:', error);
                 alert('Error al reportar el problema.');
             }
         });
-    }
-
-    async function updateChargerStatus(chargerId, status) {
-        try {
-            const response = await fetch(`/api/chargers/${chargerId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-
-            if (response.ok) {
-                alert('Estado del cargador actualizado correctamente.');
-                loadAndDisplayChargers();
-            } else {
-                const errorData = await response.json();
-                alert(`Error al actualizar el cargador: ${errorData.error}`);
-            }
-        } catch (error) {
-            console.error('Error al actualizar el estado del cargador:', error);
-            alert('Error al actualizar el estado del cargador.');
-        }
     }
 
     if (btnShowChargers) {
