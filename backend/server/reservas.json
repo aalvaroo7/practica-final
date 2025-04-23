@@ -1,3 +1,20 @@
 {
-  "reservations": []
+  "reservations": [
+    {
+      "id": 1745406210635,
+      "chargerId": 1,
+      "duration": "1",
+      "date": "2025-04-23T11:03:30.635Z",
+      "finished": true,
+      "user": "carrerrovolador@gmail.com"
+    },
+    {
+      "id": 1745406355411,
+      "chargerId": 1,
+      "duration": "2",
+      "date": "2025-04-23T11:05:55.411Z",
+      "finished": true,
+      "user": "carrerrovolador@gmail.com"
+    }
+  ]
 }
