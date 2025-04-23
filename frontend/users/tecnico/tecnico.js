@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Listener de redirección para los botones
     const returnBtn = document.getElementById('return-btn');
     const returnBtn2 = document.getElementById('return-btn2');
     const tecnicoLoginContainer = document.getElementById('tecnico-login-container');
@@ -14,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnShowChargers = document.getElementById('btn-show-chargers');
     const loginForm = document.getElementById('tecnico-login-form');
 
+    let headersExpanded = false;
+
     function hideAllSections() {
         sections.forEach(section => section.classList.add('hidden'));
     }
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnUpdateStatus) {
         btnUpdateStatus.addEventListener('click', () => {
             showSection('update-charger-status');
-            loadChargers(); // Cargar los datos al mostrar la sección
+            loadChargers();
         });
     }
 
@@ -50,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Listener para el formulario del técnico
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -74,75 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Función para mostrar los cargadores en una tabla
-    function displayChargers(chargers) {
-        const table = document.createElement('table');
-        table.classList.add('charger-table');
-
-        // Crear encabezado de la tabla
-        const thead = document.createElement('thead');
-        thead.innerHTML = `
-            <tr>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th>Latitud</th>
-                <th>Longitud</th>
-                <th>Precio (€)</th>
-                <th>Acciones</th>
-            </tr>
-        `;
-        table.appendChild(thead);
-
-        // Crear cuerpo de la tabla
-        const tbody = document.createElement('tbody');
-        chargers.forEach(charger => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${charger.id}</td>
-                <td>${charger.type}</td>
-                <td>${charger.status}</td>
-                <td>${charger.lat || 'N/A'}</td>
-                <td>${charger.lon || 'N/A'}</td>
-                <td>${charger.price || 'N/A'}</td>
-                <td>
-                    <button class="btn-report" data-id="${charger.id}">Reportar Incidencia</button>
-                    <button class="btn-details" data-id="${charger.id}">Ver Detalles</button>
-                    <button class="btn-update" data-id="${charger.id}">Actualizar Estado</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-        table.appendChild(tbody);
-
-        // Limpiar el contenedor y añadir la tabla
-        tableContainer.innerHTML = '';
-        tableContainer.appendChild(table);
-
-        // Asignar eventos a los botones
-        document.querySelectorAll('.btn-report').forEach(button => {
-            button.addEventListener('click', () => {
-                const chargerId = button.getAttribute('data-id');
-                reportIssue(chargerId);
-            });
-        });
-
-        document.querySelectorAll('.btn-details').forEach(button => {
-            button.addEventListener('click', () => {
-                const chargerId = button.getAttribute('data-id');
-                showChargerDetails(chargerId, chargers);
-            });
-        });
-
-        document.querySelectorAll('.btn-update').forEach(button => {
-            button.addEventListener('click', () => {
-                const chargerId = button.getAttribute('data-id');
-                showUpdateForm(chargerId);
-            });
-        });
-    }
-
-    // Función para cargar y mostrar la tabla de cargadores
     async function loadAndDisplayChargers() {
         try {
             const response = await fetch('/api/chargers');
@@ -150,70 +81,90 @@ document.addEventListener('DOMContentLoaded', () => {
             const chargers = await response.json();
 
             const tableHTML = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Latitud</th>
-                        <th>Longitud</th>
-                        <th>Precio (€)</th>
-                        <th>Disponibilidad</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${chargers.map(charger => `
+                <table>
+                    <thead>
                         <tr>
-                            <td>${charger.id}</td>
-                            <td>${charger.type}</td>
-                            <td>${charger.status}</td>
-                            <td>${charger.lat}</td>
-                            <td>${charger.lon}</td>
-                            <td>${charger.price}</td>
-                            <td>${charger.availability.start} - ${charger.availability.end}</td>
-                            <td>
-                                <button onclick="showChargerDetails(${charger.id})">Detalles</button>
-                                <button onclick="showUpdateForm(${charger.id})">Actualizar</button>
-                                <button onclick="reportIssue(${charger.id})">Reportar</button>
-                            </td>
+                            <th>ID</th>
+                            <th style="text-align: right; padding-left: 100px;">Acciones</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
+                    </thead>
+                    <tbody>
+                        ${chargers.map(charger => `
+                            <tr id="charger-row-${charger.id}">
+                                <td>${charger.id}</td>
+                                <td style="text-align: right; padding-left: 100px; white-space: nowrap;">
+                                    <button class="btn-details" data-id="${charger.id}">Detalles</button>
+                                    <button class="btn-update" data-id="${charger.id}">Actualizar</button>
+                                    <button class="btn-report" data-id="${charger.id}">Reportar</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
 
             tableContainer.innerHTML = tableHTML;
             tableContainer.classList.remove('hidden');
+
+            tableContainer.querySelectorAll('.btn-details').forEach(button => {
+                button.addEventListener('click', () => {
+                    const chargerId = button.dataset.id;
+                    showChargerDetails(chargerId);
+                });
+            });
+
+            tableContainer.querySelectorAll('.btn-update').forEach(button => {
+                button.addEventListener('click', () => {
+                    const chargerId = button.dataset.id;
+                    showUpdateFormModal(chargerId);
+                });
+            });
+
+            tableContainer.querySelectorAll('.btn-report').forEach(button => {
+                button.addEventListener('click', () => {
+                    const chargerId = button.dataset.id;
+                    reportIssue(chargerId);
+                });
+            });
+
         } catch (error) {
             console.error('Error al cargar los cargadores:', error);
             tableContainer.innerHTML = '<p>Error al cargar los cargadores.</p>';
         }
     }
 
-    // Función para mostrar los detalles del cargador
     function showChargerDetails(chargerId) {
         fetch('/api/chargers')
             .then(response => response.json())
             .then(chargers => {
                 const charger = chargers.find(ch => ch.id == chargerId);
                 if (charger) {
-                    const detailsHTML = `
-                    <div>
-                        <h3>Detalles del Cargador</h3>
-                        <p>ID: ${charger.id}</p>
-                        <p>Tipo: ${charger.type}</p>
-                        <p>Estado: ${charger.status}</p>
-                        <p>Latitud: ${charger.lat}</p>
-                        <p>Longitud: ${charger.lon}</p>
-                        <p>Precio: ${charger.price}</p>
-                        <p>Disponibilidad: ${charger.availability.start} - ${charger.availability.end}</p>
-                    </div>
-                `;
-                    // Mostrar en un modal o contenedor
-                    document.getElementById('details-modal').innerHTML = detailsHTML;
-                    document.getElementById('details-modal').classList.remove('hidden');
+                    const row = document.getElementById(charger-row-${charger.id});
+
+                    if (!headersExpanded) {
+                        const thead = row.closest('table').querySelector('thead tr');
+                        thead.innerHTML = `
+                            <th>ID</th>
+                            <th>Estado</th>
+                            <th>Coordenadas</th>
+                            <th>Precio</th>
+                            <th>Horario</th>
+                            <th style="text-align: right; padding-left: 100px;">Acciones</th>
+                        `;
+                        headersExpanded = true;
+                    }
+
+                    row.innerHTML = `
+                        <td>${charger.id}</td>
+                        <td>${charger.status}</td>
+                        <td>${charger.lat}, ${charger.lon}</td>
+                        <td>${charger.price}</td>
+                        <td>${charger.availability.start} - ${charger.availability.end}</td>
+                        <td style="text-align: right; padding-left: 100px; white-space: nowrap;">
+                            <button class="btn-update" data-id="${charger.id}">Actualizar</button>
+                            <button class="btn-report" data-id="${charger.id}">Reportar</button>
+                        </td>
+                    `;
                 } else {
                     alert('Cargador no encontrado.');
                 }
@@ -221,10 +172,39 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al obtener detalles del cargador:', error));
     }
 
-    // Función para reportar incidencias
+    function showUpdateFormModal(chargerId) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal-overlay');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Cambiar Estado del Cargador</h3>
+                <select id="status-select">
+                    <option value="available">Disponible</option>
+                    <option value="occupied">Ocupado</option>
+                    <option value="in-repair">En Reparación</option>
+                </select>
+                <div class="modal-buttons">
+                    <button id="confirm-update" class="btn">Actualizar</button>
+                    <button id="cancel-update" class="btn">Cancelar</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-update').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        document.getElementById('confirm-update').addEventListener('click', () => {
+            const selectedStatus = document.getElementById('status-select').value;
+            updateChargerStatus(chargerId, selectedStatus);
+            document.body.removeChild(modal);
+        });
+    }
+
     async function reportIssue(chargerId) {
         const issue = prompt('Describe la incidencia:');
-        if (!issue) return alert('La descripción de la incidencia es obligatoria.');
+        if (!issue) return alert('La descripcion de la incidencia es obligatoria.');
 
         try {
             const response = await fetch('/api/issues', {
@@ -237,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Incidencia reportada correctamente.');
             } else {
                 const errorData = await response.json();
-                alert(`Error al reportar la incidencia: ${errorData.error}`);
+                alert(Error al reportar la incidencia: ${errorData.error});
             }
         } catch (error) {
             console.error('Error al reportar la incidencia:', error);
@@ -245,22 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-// Función para mostrar el formulario de actualización de estado
-    function showUpdateForm(chargerId) {
-        const validStatuses = ['available', 'occupied', 'in-repair'];
-        const newStatus = prompt('Ingrese el nuevo estado del cargador (available, occupied, in-repair):').toLowerCase();
-
-        if (!validStatuses.includes(newStatus)) {
-            return alert('Estado inválido. Los estados válidos son: available, occupied, in-repair.');
-        }
-
-        updateChargerStatus(chargerId, newStatus);
-    }
-
-// Función para actualizar el estado del cargador
     async function updateChargerStatus(chargerId, status) {
         try {
-            const response = await fetch(`/api/chargers/${chargerId}`, {
+            const response = await fetch(/api/chargers/${chargerId}, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -268,10 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 alert('Estado del cargador actualizado correctamente.');
-                loadAndDisplayChargers(); // Recargar la tabla
+                loadAndDisplayChargers();
             } else {
                 const errorData = await response.json();
-                alert(`Error al actualizar el cargador: ${errorData.error}`);
+                alert(Error al actualizar el cargador: ${errorData.error});
             }
         } catch (error) {
             console.error('Error al actualizar el estado del cargador:', error);
@@ -279,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Función para cargar los cargadores desde el servidor
     async function loadChargers() {
         try {
             const response = await fetch('/api/chargers');
@@ -290,13 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Evento para mostrar los cargadores al hacer clic en el botón
     if (btnShowChargers) {
         btnShowChargers.addEventListener('click', loadAndDisplayChargers);
     } else {
-        console.error('El botón Mostrar Cargadores no se encontró en el DOM.');
+        console.error('El boton Mostrar Cargadores no se encontro en el DOM.');
     }
 
-    // Cargar los datos al iniciar
     loadChargers();
 });
