@@ -6,10 +6,11 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
+import fsPromises from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const resenasFilePath = path.join(__dirname, 'resenas.json');
 const problemasFilePath = path.join(__dirname, 'problemas.json');
 const chargersFilePath = path.join(__dirname, 'chargers.json');
 const staticPublicPath = path.join(__dirname, '../../frontend/public');
@@ -91,8 +92,19 @@ async function initLogsFile() {
     }
 }
 
+// Función para inicializar el archivo de reseñas
+async function initResenasFile() {
+    try {
+        await fsPromises.writeFile(resenasFilePath, JSON.stringify([]));
+        console.log('Archivo resenas.json inicializado.');
+    } catch (error) {
+        console.error('Error al inicializar resenas.json:', error);
+    }
+}
+
 await initClientsFile();
 await initLogsFile();
+await initResenasFile();
 
 // Endpoint para obtener cargadores
 app.get('/api/chargers', (req, res) => {
@@ -352,6 +364,60 @@ wss.on('connection', (ws, req) => {
     saveClients(clients);
 
     logAudit(`Nuevo cliente conectado desde ${clientIp}`);
+
+    async function initResenasFile() {
+        try {
+            await fsPromises.writeFile(resenasFilePath, JSON.stringify([], null, 2));
+            console.log('Archivo resenas.json inicializado y vaciado.');
+        } catch (error) {
+            console.error('Error al inicializar resenas.json:', error);
+        }
+    }
+// Función para cargar reseñas (actualizada para usar fs/promises)
+    async function loadResenas() {
+        try {
+            await fsPromises.access(resenasFilePath);
+            const data = await fsPromises.readFile(resenasFilePath, 'utf-8');
+            return data.trim() ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Error al cargar resenas:', error);
+            return [];
+        }
+    }
+
+// Función para guardar reseñas (actualizada para usar fs/promises)
+    async function saveResenas(resenas) {
+        try {
+            await fsPromises.writeFile(resenasFilePath, JSON.stringify(resenas, null, 2));
+            console.log('Reseña guardada correctamente.');
+        } catch (error) {
+            console.error('Error al guardar resenas:', error);
+        }
+    }
+
+    app.post('/api/resenas', async (req, res) => {
+        const { user, rating, comentario, chargerId } = req.body;
+        if (!user || rating === undefined || !comentario) {
+            return res.status(400).json({ error: 'Datos incompletos para la reseña.' });
+        }
+        try {
+            const resenas = await loadResenas();
+            const nuevaResena = {
+                id: Date.now(),
+                user,
+                rating,
+                comentario,
+                chargerId: chargerId || null,
+                fecha: new Date().toISOString()
+            };
+            resenas.push(nuevaResena);
+            await saveResenas(resenas);
+            res.status(201).json(nuevaResena);
+        } catch (error) {
+            console.error('Error al procesar el POST de reseñas:', error);
+            res.status(500).json({ error: 'Error interno al guardar la reseña.' });
+        }
+    });
 
     ws.on('message', async message => {
         try {

@@ -15,7 +15,6 @@
 <div id="login-container">
     <h2>Iniciar Sesión</h2>
     <form id="login-form">
-        <input type="text" id="register-name" placeholder="Nombre" required>
         <input type="email" id="login-email" placeholder="Correo electrónico" required>
         <input type="password" id="login-password" placeholder="Contraseña" required>
 
@@ -63,12 +62,15 @@
 
 
 
-<!-- MENÚ LATERAL PARA EDITAR PERFIL -->
+<!-- MENÚ LATERAL -->
 <div id="side-menu" class="hidden">
     <!-- Botón Editar Perfil, oculto al inicio -->
     <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
     <button id="show-map-btn" class="hidden">Mostrar Mapa</button>
     <button id="reservation-history-btn" class="hidden">Ver Historial de Reservas</button>
+    <button id="view-stats-btn" class="hidden">Ver Estadísticas de Uso</button>
+    <button id="leave-review-btn" class="hidden">Dejar Reseña</button>
+    <div id="favorites-container" class="hidden"></div>
 </div>
 
 <!-- PERFIL -->
@@ -124,7 +126,77 @@
 <!-- HISTORIAL DE RESERVAS -->
 <div id="reservation-history-container" class="hidden">
     <h2>Historial de Reservas</h2>
+    <button id="back-from-reservations">Volver</button>
     <ul id="reservation-history-list"></ul>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<table id="personal-stat-table" class="hidden">
+    <thead>
+    <tr>
+        <th>Total Reservas</th>
+        <th>Total Duración (min)</th>
+        <th>Duración Promedio (min)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Se insertarán los datos aquí -->
+    </tbody>
+</table>
+
+<!-- Formulario para dejar una reseña -->
+<div id="review-section" class="hidden">
+    <form id="review-form">
+        <h3>Deja tu Reseña</h3>
+        <div>
+            <label for="review-user">Usuario:</label>
+            <input type="text" id="review-user" name="review-user" required>
+        </div>
+        <div>
+            <label for="review-rating">Puntuación (1-5):</label>
+            <div id="rating-container">
+                <button type="button" class="rating-btn" data-value="1">★</button>
+                <button type="button" class="rating-btn" data-value="2">★</button>
+                <button type="button" class="rating-btn" data-value="3">★</button>
+                <button type="button" class="rating-btn" data-value="4">★</button>
+                <button type="button" class="rating-btn" data-value="5">★</button>
+            </div>
+            <input type="hidden" id="review-rating" name="review-rating" required>
+        </div>
+        <div>
+            <label for="review-comentario">Comentario:</label>
+            <textarea id="review-comentario" name="review-comentario" rows="4" required></textarea>
+        </div>
+        <div>
+            <label for="review-chargerId">ID del Cargador (opcional):</label>
+            <input type="text" id="review-chargerId" name="review-chargerId">
+        </div>
+        <button type="submit">Enviar Reseña</button>
+    </form>
+</div>
+<!-- Sección de la encuesta -->
+<div id="survey-section" class="survey-container hidden">
+    <h2>Encuesta de Satisfacción</h2>
+    <form id="survey-form">
+        <label>Puntuación (1-5):</label>
+        <div>
+            <input type="radio" id="rating-1" name="rating" value="1" required>
+            <label for="rating-1">1</label>
+            <input type="radio" id="rating-2" name="rating" value="2">
+            <label for="rating-2">2</label>
+            <input type="radio" id="rating-3" name="rating" value="3">
+            <label for="rating-3">3</label>
+            <input type="radio" id="rating-4" name="rating" value="4">
+            <label for="rating-4">4</label>
+            <input type="radio" id="rating-5" name="rating" value="5">
+            <label for="rating-5">5</label>
+        </div>
+
+        <label for="survey-comments">Comentarios:</label>
+        <textarea id="survey-comments" name="comments"></textarea>
+
+        <button type="submit">Enviar</button>
+    </form>
 </div>
 
 </body>

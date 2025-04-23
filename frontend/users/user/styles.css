@@ -194,3 +194,360 @@ footer a:hover {
     background-color: #0056b3;
 }
 
+/* Estilos para la tabla de reservas */
+.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+}
+
+.reservation-table caption {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.reservation-table thead tr {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+.reservation-table th,
+.reservation-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.reservation-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.reservation-table tbody tr:hover {
+    background-color: #ddd;
+}
+
+/* Ejemplo para botones creados en user.js en la tabla */
+.reservation-table button {
+    padding: 5px 10px;
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.reservation-table button:hover {
+    background-color: #003d80;
+}
+
+/* Estilos para atributos agregados en user.js, por ejemplo, mensajes de reserva */
+#reservation-message {
+    font-weight: bold;
+    color: #007700;
+    margin-top: 10px;
+}
+
+/* Estilos mejorados para el contenedor de editar perfil */
+#edit-profile-container {
+    max-width: 700px;
+    margin: 30px auto;
+    width: 90%;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffffff, #f7f7f7);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+    border: 1px solid #ddd;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+#edit-profile-container:hover {
+    transform: scale(1.02);
+}
+#edit-profile-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5em;
+}
+#edit-profile-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+#edit-profile-container form label {
+    font-weight: 600;
+    color: #555;
+}
+#edit-profile-container form input {
+    width: 97%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+#edit-profile-container form button {
+    padding: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#edit-profile-container form button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos mejorados para la tabla de estadísticas */
+#personal-stat-table {
+    width: 80%;                 /* Ajusta el ancho de la tabla */
+    margin: 20px auto;          /* Centra la tabla y añade margen vertical */
+    border-collapse: collapse;  /* Elimina espacios entre bordes */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);  /* Sombra sutil para profundidad */
+    background-color: #ffffff;  /* Fondo blanco para la tabla */
+    border-radius: 8px;         /* Bordes redondeados */
+    overflow: hidden;           /* Evita que el redondeo se sobresalga */
+}
+
+#personal-stat-table th,
+#personal-stat-table td {
+    padding: 12px;              /* Espaciado interno de celdas */
+    border: 1px solid #ddd;     /* Bordes suaves en celdas */
+    text-align: center;         /* Centrado del contenido */
+}
+
+#personal-stat-table thead {
+    background-color: #007bff;  /* Color de fondo para encabezado */
+    color: #fff;                /* Texto en blanco */
+    font-size: 1.1em;           /* Tamaño de fuente */
+}
+
+#personal-stat-table tbody tr:hover {
+    background-color: #f1f1f1;  /* Efecto hover para resaltar filas */
+}
+
+#personal-stat-table caption {
+    font-size: 1.5em;           /* Tamaño de fuente para el caption */
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilos generales para el formulario de reseñas */
+#review-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#review-section h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Estilo para las etiquetas de los campos */
+#review-section label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Estilo para los campos de texto (inputs y textarea) */
+#review-section input[type="text"],
+#review-section input[type="number"],
+#review-section textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#review-section input[type="text"]:focus,
+#review-section input[type="number"]:focus,
+#review-section textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Estilo para el botón de envío */
+#review-section button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+#review-section button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para los campos de texto opcionales */
+#review-section input[type="text"]:disabled,
+#review-section textarea:disabled {
+    background-color: #f1f1f1;
+    color: #aaa;
+}
+
+/* Estilo para el formulario de reseña en dispositivos móviles */
+@media (max-width: 600px) {
+    #review-section {
+        padding: 15px;
+        width: 90%;
+    }
+
+    #review-section h3 {
+        font-size: 20px;
+    }
+
+    #review-section label {
+        font-size: 12px;
+    }
+
+    #review-section input[type="text"],
+    #review-section input[type="number"],
+    #review-section textarea {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    #review-section button {
+        font-size: 14px;
+    }
+}
+/* Contenedor de los botones de puntuación */
+#rating-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Estilo para los botones de puntuación */
+.rating-btn {
+    font-size: 30px;
+    color: #ccc;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+/* Cambio de color al pasar el cursor */
+.rating-btn:hover,
+.rating-btn.selected {
+    color: #f39c12;
+}
+
+/* Estilo cuando se selecciona una puntuación */
+.rating-btn.selected {
+    color: #f39c12;
+}
+
+/* Estilo para el input hidden */
+#review-rating {
+    display: none;
+}
+
+/* Estilos generales para la encuesta */
+#survey-section {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+/* Título de la encuesta */
+#survey-section h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilos para las preguntas */
+#survey-section p {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Estilos para las opciones de calificación (radio buttons) */
+#survey-section label {
+    font-size: 16px;
+    margin-right: 10px;
+    color: #555;
+    display: inline-block;
+}
+
+#survey-section input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Estilos para el área de comentarios */
+#survey-comments {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    resize: vertical;
+}
+
+/* Botón de envío */
+#survey-form button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Efecto hover en el botón */
+#survey-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para el mensaje de agradecimiento (cuando se envíe la encuesta) */
+#survey-thank-you {
+    display: none;
+    font-size: 18px;
+    color: #4CAF50;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Formulario oculto por defecto */
+.hidden {
+    display: none;
+}
+
