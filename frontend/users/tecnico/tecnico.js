@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnUpdateStatus) {
         btnUpdateStatus.addEventListener('click', () => {
             showSection('update-charger-status');
-            loadChargers();
+            loadAndDisplayChargers();
         });
     }
 
@@ -246,21 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadChargers() {
-        try {
-            const response = await fetch('/api/chargers');
-            const chargers = await response.json();
-            displayChargers(chargers);
-        } catch (error) {
-            console.error('Error al cargar los cargadores:', error);
-        }
-    }
-
     if (btnShowChargers) {
         btnShowChargers.addEventListener('click', loadAndDisplayChargers);
     } else {
         console.error('El boton Mostrar Cargadores no se encontro en el DOM.');
     }
 
-    loadChargers();
+    loadAndDisplayChargers();
 });

@@ -46,29 +46,5 @@
       "start": "00:00",
       "end": "23:59"
     }
-  },
-  {
-    "id": 5,
-    "lat": 10,
-    "lon": 20,
-    "type": "compatible",
-    "status": "occupied",
-    "price": 0.5,
-    "availability": {
-      "start": "06:00",
-      "end": "22:00"
-    }
-  },
-  {
-    "id": 123,
-    "lat": 10,
-    "lon": 20,
-    "type": "Compatible",
-    "status": "Disponible",
-    "price": 1,
-    "availability": {
-      "start": "10:00",
-      "end": "15:00"
-    }
   }
 ]

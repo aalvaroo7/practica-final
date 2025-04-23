@@ -333,5 +333,5 @@ table.charger-table th, table.charger-table td {
 
 table.charger-table td button {
     display: inline-block; /* Asegura que los botones estén alineados correctamente */
-    margin: 0 5px; /* Espaciado entre los botones */
+    margin: 0 5px; /* Espaciado entre los botones */
 }
