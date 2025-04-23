@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     reserveForm.appendChild(reservationMessage);
     const showSurveyBtn = document.getElementById('show-survey-btn');
     const verRecomendacionesBtn = document.getElementById('show-recommendations-btn');
-const incidenciasformulario = document.getElementById('report-issue-section');
+    const incidenciasformulario = document.getElementById('report-issue-section');
     // Mostrar/ocultar elementos según si el usuario está autenticado
     if (!localStorage.getItem('currentUser')) {
         document.getElementById('favorites-container').classList.add('hidden');
@@ -104,7 +104,7 @@ const incidenciasformulario = document.getElementById('report-issue-section');
         if (newEmail !== currentUser) {
             // Cambiar la clave en localStorage si se modificó el correo
             localStorage.removeItem(currentUser);
-            localStorage.setItem(newEmail, JSON.stringify({ name: newName, email: newEmail }));
+            localStorage.setItem(newEmail, JSON.stringify({name: newName, email: newEmail}));
             localStorage.setItem('currentUser', newEmail);
             currentUser = newEmail;  // 🔁 ACTUALIZA LA VARIABLE para futuras referencias
         } else {
@@ -231,7 +231,7 @@ const incidenciasformulario = document.getElementById('report-issue-section');
     function saveReservationToHistory(chargerId, duration) {
         const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
         const timestamp = new Date().toLocaleString();
-        reservationHistory.push({ chargerId, duration, timestamp });
+        reservationHistory.push({chargerId, duration, timestamp});
         localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
     }
 
@@ -445,8 +445,8 @@ const incidenciasformulario = document.getElementById('report-issue-section');
             try {
                 const response = await fetch('/api/resenas', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user, rating, comentario, chargerId })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user, rating, comentario, chargerId})
                 });
                 if (response.ok) {
                     await response.json();
@@ -556,8 +556,8 @@ const incidenciasformulario = document.getElementById('report-issue-section');
             try {
                 const response = await fetch('/api/incidences', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ description })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({description})
                 });
                 if (!response.ok) throw new Error('Error al reportar incidencia.');
                 const newIncidence = await response.json();
@@ -627,12 +627,13 @@ const incidenciasformulario = document.getElementById('report-issue-section');
             }
         });
     }
+
     // Función para guardar la reserva en el localStorage.
     function saveReservationToHistory(chargerId, duration) {
         const currentUser = localStorage.getItem('currentUser');
         const reservationHistory = JSON.parse(localStorage.getItem(`${currentUser}-history`)) || [];
         const timestamp = new Date().toLocaleString();
-        reservationHistory.push({ chargerId, duration, timestamp });
+        reservationHistory.push({chargerId, duration, timestamp});
         localStorage.setItem(`${currentUser}-history`, JSON.stringify(reservationHistory));
     }
 
@@ -657,8 +658,7 @@ const incidenciasformulario = document.getElementById('report-issue-section');
         alert(`La reserva para el cargador ${chargerId} se realizó correctamente por ${reservationTime} minutos.`);
     }
 
-
-    // Asignar el event listener usando el id del botón.
+// Asignar el event listener usando el id del botón.
     const reserveBtn1 = document.getElementById("reserve-btn-1");
     if (reserveBtn1) {
         reserveBtn1.addEventListener("click", (e) => {
@@ -667,19 +667,19 @@ const incidenciasformulario = document.getElementById('report-issue-section');
         });
     }
 
-    document.getElementById("show-recommendations-btn").addEventListener("click", function() {
+    document.getElementById("show-recommendations-btn").addEventListener("click", function () {
         const contenedorRecomendaciones = document.getElementById("favorites-container");
         contenedorRecomendaciones.classList.toggle("hidden");
         mostrarRecomendaciones(); // Llama a la función para mostrar las recomendaciones
     });
 
-    if (localStorage.getItem('currentUser')) {
-        const reportIssueBtn = document.getElementById('report-issue-btn');
-        reportIssueBtn.classList.remove('hidden');
+    if (localStorage.getItem("currentUser")) {
+        const reportIssueBtn = document.getElementById("report-issue-btn");
+        reportIssueBtn.classList.remove("hidden");
 
-        reportIssueBtn.addEventListener('click', () => {
-            const reportIssueSection = document.getElementById('report-issue-section');
-            reportIssueSection.classList.toggle('hidden');
+        reportIssueBtn.addEventListener("click", () => {
+            const reportIssueSection = document.getElementById("report-issue-section");
+            reportIssueSection.classList.toggle("hidden");
         });
     }
 });
